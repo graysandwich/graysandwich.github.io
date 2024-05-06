@@ -1,0 +1,26 @@
+h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 48px;
+}
+giant{
+    font-size: 100px;
+    cursor: crosshair;
+}
+transparent{
+    opacity:0.4;
+    word-spacing: 30px;
+}
+blank{
+}
+border{
+    border: 5px solid red;
+    outline: 2px dashed blue;
+}
+allOfTheAbove{
+    border: 5px solid red;
+    outline: 2px dashed blue;
+    opacity:0.4;
+    word-spacing: 30px;
+    font-size: 100px;
+    cursor: crosshair;
+}
