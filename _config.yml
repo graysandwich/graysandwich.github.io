@@ -2,8 +2,7 @@ title: My New Homepage
 email: tim293130@gmail.com
 description: >-
   This is my awesome website about technology and coding.
-baseurl: "/index.html"
-url: "http://graysandwich.github.io"
+url: "https://graysandwich.github.io"
 github_username: graysandwich
 
 theme: minima
