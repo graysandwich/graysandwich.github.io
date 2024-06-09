@@ -34,7 +34,6 @@ date:   2000-05-19 15:11:48 -0700
         <div>My favourite subjects are:</div>
         <ol>
             <li>Computer Science</li>
-            <a href="https://graysandwich.github.io/jekyll/update/2000/05/19/csinfo.html">Click here to learn more information</a>
             <p>I am currently working towards my cs50 certificate.</p>
             <li>Math</li>
             <li>Science</li>
