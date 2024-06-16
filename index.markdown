@@ -7,4 +7,4 @@ layout: page
 
 # Self-introduction
 
-Hey! My name is Tim.
+Hey! My name is Tim. I am in grade 9, and this is my cs50 project. I go to Lord Byng Secondary School in Vancouver, Canada. Check out my blog to find out more about me!
