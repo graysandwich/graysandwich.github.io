@@ -1,8 +1,16 @@
-title: My New Homepage
+title: Tim Yang
 email: tim293130@gmail.com
 description: >-
   This is my awesome website about technology and coding.
 url: "https://graysandwich.github.io"
+baseurl: ""
+
+navbar-links: 
+  Blog: "blog"
+
+
+avatar: "/assets/avatar.png"
+
 github_username: graysandwich
 
 remote_theme: daattali/beautiful-jekyll@6.0.1
