@@ -4,4 +4,5 @@ Some design choices I had to make were:
 2. The tools. I chose Jekyll and Github pages because it was a simple way to make my own blog website.
 3. The Jekyll theme. I chose a theme called Beautiful Jekyll because the default theme looked a bit too basic for me and Beautiful Jekyll was the best free theme I could find.
 4. The web design. In computer studies class in my school we had a unit on web design and a lot of the lessons there helped in this website. The differences can be seen when my first website from the homepage problem is compared to my latest page.
+
 This project took a lot longer than I thought. One of the main reasons for this is that I found myself having a hard time understanding the Jekyll documentation, so whenever I had an error, I had to wait until I had a session with my tutor for help. Another reason for this is that before I could start making the website, I needed to understand the basics of git and also how Markdown works. This took more time than I expected it to take and along with some configuration issues, my website was made later than I wanted. However, I am still proud of what I acomplished when making this.
