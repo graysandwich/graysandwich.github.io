@@ -25,6 +25,8 @@
         </div>
         <div id="losePage" style="display:none">
             <h1>You lost</h1>
+            <button onclick="Commence()" style="text-align: center; font-size: 67px; position: relative; top: 230px; left: 0; width: 100%; z-index: 1000; margin: 0px;">Restart</button>
+
         </div>
         <div id="upgradePage" style="display:none">
             <h1 style="text-align: center; font-size: 67px; position: absolute; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0;"><span style="background-color: black; color: white">Choose Your Upgrade</span></h1>
@@ -32,10 +34,22 @@
         <div id="IntroPage">
             <h1 style="text-align: center; font-size: 67px; position: relative; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0;"><span style="background-color: black; color: white">A Very Cool Game</span></h1>
             
-            <button onclick="Commence()" style="text-align: center; font-size: 67px; position: relative; top: 230px; left: 0; width: 100%; z-index: 1000; margin: 0;">START</button>
+            <button onclick="Commence()" style="text-align: center; font-size: 67px; position: relative; top: 230px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">START</button>
+            <button onclick="ChangePage('helpPage', false)" style="text-align: center; font-size: 67px; position: relative; top: 300px; left: 0; width: 100%; z-index: 1000; margin: 0;">How to Play</button>
+
+        </div>
+        
+        <div id="helpPage" style="display:none">
+            <h1 style="text-align: center; font-size: 67px; position: relative; top: 0px; left: 0; width: 100%; z-index: 1000; margin: 0px;"><span style="background-color: black; color: white">A Very Cool Game</span></h1>
+            <h1 style="text-align: center; font-size: 67px; position: relative; top: 50px; left: 0; width: 100%; z-index: 1000; margin: 0px;"><span style="color: black">WASD to move</span></h1>
+            <h1 style="text-align: center; font-size: 67px; position: relative; top: 50px; left: 0; width: 100%; z-index: 1000; margin: 0px;"><span style="color: black">Player automatically shoots bullets. Shoot enemies to gain XP!</span></h1>
+            <h1 style="text-align: center; font-size: 67px; position: relative; top: 50px; left: 0; width: 100%; z-index: 1000; margin: 0px;"><span style="color: black">Fullscreen recommended and keyboard required</span></h1>
+
+            <button onclick="ChangePage('IntroPage', false)" style="text-align: center; font-size: 67px; position: relative; top: 50px; left: 0; width: 100%; z-index: 1000; margin: 0;">Back</button>
+
         </div>
         <div id="newEnemyPage" style="display:none">
-            <h1 style="text-align: center; font-size: 67px; position: absolute; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0;"><span style="background-color: black; color: white">New Enemy Discovered!</span></h1>
+            <h1 style="text-align: center; font-size: 67px; position: absolute; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0px;"><span style="background-color: black; color: white">New Enemy Discovered!</span></h1>
         </div>
     </head>
 </html>

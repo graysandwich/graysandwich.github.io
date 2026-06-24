@@ -24,7 +24,7 @@ let waveTimer=0;
 let isBossWave=false;
 let movingLeft, movingRight, movingUp, movingDown=false;
 let page="gamePage";
-let healthBar, levellingBar, bossBars, boss, bombIcon, waveText, timeWarpIcon, background, gambleText;
+let healthBar, levellingBar, bossBars, boss, bombIcon, waveText, timeWarpIcon, background, gambleText, choice1, choice2;
 let xpBagTimer=Math.random()*200+200;
 let timeElapsed=0;
 let mouseX=0;
@@ -43,7 +43,9 @@ let gambleChoice=0;
 let textSpeed=5;
 let bossesLeft=0;
 let gameOver=false;
-
+let accumulator=0;
+const frameRate=1/60;
+let lastTime=Date.now();
 function Commence(){
     
     list=document.querySelectorAll('div[id$="Page"]');
@@ -52,9 +54,9 @@ function Commence(){
     }
     document.querySelectorAll('img').forEach(img => img.remove());
     document.getElementById("gamePage").style.display="block";
-    start();
+    Start();
 }
-function start(){
+function Start(){
     player=new Player();
     player.image.width = "50";
     player.image.height = "50";
@@ -150,6 +152,8 @@ function start(){
     background.style.top= (-screen.height/2)+'px';
     background.style.zIndex=-4;
     document.getElementById("world").appendChild(background);
+
+    lastTime=Date.now();
     RandomizeEnemies(2, 0, 0,0);
     loop();
 

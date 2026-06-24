@@ -76,7 +76,12 @@ class Enemy{
         this.image.style.left=this.x+"px";
         this.image.style.top=this.y+"px";
         //console.log(this.redTimer);
+        if(this.slowCountdown>0){
+            this.speed*=2;
+            this.slowCountdown--;
+        }
         this.checkForCollisions();
+        this.changeColor();
     }
     checkForCollisions(){
         
@@ -84,15 +89,16 @@ class Enemy{
                 (player.x - player.image.width / 2) < (this.x + this.image.width / 2) && 
                 (player.x + player.image.width / 2) > (this.x - this.image.width / 2) && 
                 (player.y - player.image.height / 2) < (this.y + this.image.height / 2) && 
-                (player.y + player.image.height / 2) > (this.y - this.image.height / 2)
+                (player.y + player.image.height / 2) > (this.y - this.image.height / 2) && !this.dead
             ){
-            player.takeDamage(this.health, this);
+            if(this.isBoss) player.takeDamage(this.health, this);
+            else player.takeDamage(Math.min(5,this.health), this);
+            
             this.dead=true;
         }
-        if(this.slowCountdown>0){
-            this.speed*=2;
-            this.slowCountdown--;
-        }
+    }
+    changeColor(){
+        
         if(this.redTimer<=0){
             if(this.slowCountdown<=0){
                 this.image.style.filter="brightness(100%)";
@@ -698,33 +704,50 @@ class BulletHellBoss extends Enemy{
         this.walkTimer=600;
         this.bossBar=new BossBar(this);
         bossBars.push(this.bossBar);
+        this.loopingShotTimer=0;
+        this.spiralShotTimer=0;
+        this.laserTimer=0;
     }
     timer(){
         //console.log(this.attackTimer);
         this.attackTimer--;
-        this.shootTimer++;
         if(this.slowCountdown>0){
             this.walkTimer-=0.5;
+            this.loopingShotTimer-=0.5;
+            this.spiralShotTimer-=0.5;
+            this.laserTimer-=0.5;
         }
         else{
             this.walkTimer--;
+            this.loopingShotTimer--;
+            this.spiralShotTimer--;
+            this.laserTimer--;
         } 
         if(this.health<=50){
-            this.image.src="images/chargingEnemy.webp";
-            this.shootTimer++;
-            if(this.shootTimer%2==0){
-                this.shootTimer++;
+            this.image.src="images/bulletHellBossEnraged.webp";
+            this.bossText.innerHTML=`<div style=" color:red;pointer-events:none; font-size:30px;text-align:center; white-space: nowrap; font-family:'Black Ops One';" id="bossTitle">VIRUS DETECTED</div>`
+            
+            if(this.slowCountdown>0){
+                this.loopingShotTimer-=0.5;
+                this.spiralShotTimer-=0.5;
+                this.laserTimer-=0.5;
             }
+            else{
+                this.loopingShotTimer--;
+                this.spiralShotTimer--;
+                this.laserTimer--;
+            } 
         }
         if(this.walkTimer<=0){
             this.speed=0;
-            if((this.slowCountdown<=0 && this.shootTimer%40==0) || this.shootTimer%80==0){
+            if(this.loopingShotTimer<=0){
+                this.loopingShotTimer=40;
+
                 let distanceX=player.x-this.x;
                 let distanceY=player.y-this.y;
                 let distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
                 let vx = 0;
                 let vy = 0;
-
                 if (distance > 0) {
                     let angle=Math.atan2(distanceY, distanceX);
                     vx=5*Math.cos(angle);
@@ -732,7 +755,9 @@ class BulletHellBoss extends Enemy{
                 }
                 enemyBullets.push(new SpinningBullet(vx, vy, 1, this.x, this.y))
             }
-            if((this.slowCountdown<=0 && this.shootTimer%40==0) || this.shootTimer%80==0){
+            if(this.spiralShotTimer<=0){
+                this.spiralShotTimer=40;
+
                 this.angle+=0.4;
                 this.angle%=Math.PI*2;
                 for(let i=0;i<4;i++){
@@ -749,7 +774,8 @@ class BulletHellBoss extends Enemy{
                     this.angle+=Math.PI/2
                 }
             }
-            if((this.slowCountdown<=0 && this.shootTimer%350==0) || this.shootTimer%700==0){
+            if(this.laserTimer<=0){
+                this.laserTimer=350;
                 enemyBullets.push(new Laser(0, this.x, this.y));
                 enemyBullets.push(new Laser(Math.PI/2, this.x, this.y));
                 enemyBullets.push(new Laser(Math.PI, this.x, this.y));
@@ -930,27 +956,12 @@ class ChargingEnemy extends Enemy{
         
         this.image.style.left=this.x+"px";
         this.image.style.top=this.y+"px";
-        if (this.x<player.x+player.image.width && this.x+this.image.width>player.x && this.y<player.y+player.image.height && this.y+this.image.height>player.y) {
-            player.takeDamage(this.health,this);
-            this.dead=true;
-        }
         if(this.slowCountdown>0){
+            this.speed*=2;
             this.slowCountdown--;
         }
-        else{
-            this.image.style.filter="brightness(100%)";
-        }
-        if(this.redTimer==0){
-            if(this.slowCountdown<=0){
-                this.image.style.filter="brightness(100%)";
-            }
-            else this.image.style.filter=this.savedColor;
-        }
-        else{
-            this.temp=this.image.style.filter;
-            this.image.style.filter="sepia(100%) saturate(500%) hue-rotate(320deg)";
-            this.redTimer--;
-        }
+        super.checkForCollisions();
+        super.changeColor();
     }
     special(){
         this.timer();
@@ -1195,6 +1206,9 @@ class ZombieEnemy extends Enemy{
     move(){
         if(this.deathTimer<=0){
             super.move();
+        }
+        else{
+            super.changeColor();
         }
     }
     takeDamage(bullet, index){
@@ -2226,10 +2240,6 @@ class BlackHole extends EnemyBullet{
         const dx = (this.x + 5) - (player.x + 5);
         const dy = (this.y + 5) - (player.y + 5);
         const distance = Math.sqrt(dx * dx + dy * dy);
-        if(this.x<-500 || this.y<-500 || this.x>screen.width+500 || this.y>=screen.height+500){
-            this.image.remove();
-            this.dead=true;
-        }
     }
     special(){
         this.deathTimer--;
@@ -2953,7 +2963,7 @@ class LevellingBar{
             player.health=Math.min(player.health+5, player.maxHealth);
             // console.log(player.currentExp+" "+player.nextLevel);
             //this.image2.style.width=(player.currentExp/player.nextLevel*400)+"px";
-            changePage("upgradePage", true);
+            ChangePage("upgradePage", true);
         }
     }
 }
@@ -3352,196 +3362,207 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numBoss){
 }
 
 function loop(){
-    if(timeElapsed==1){
-        healthBar.image1.style.width = "400px";
+    let timeChange=(Date.now()-lastTime)/1000
+    lastTime=Date.now();
+    accumulator+=timeChange;
+    while(accumulator>frameRate){
+
+        if(timeElapsed==1){
+            healthBar.image1.style.width = "400px";
+        }
+        if(timeWarpCounter>0 && timeWarpCounter%2==0){
+            timeWarpCounter--;
+            background.src="images/timeWarpBackground.webp";
+        }
+        else{
+            GameLogic();
+            accumulator-=frameRate;
+        }
     }
-    if(timeWarpCounter>0 && timeWarpCounter%2==0){
-        timeWarpCounter--;
-        background.src="images/timeWarpBackground.webp";
+    if(page=="gamePage"){
         requestAnimationFrame(loop);
     }
-    else{
-        if(timeWarpCounter==-1){
-            background.src="images/background.webp";
-        }
-        const cameraX = (screen.width / 2) - (player.x+25); 
-        const cameraY = (screen.height / 2) - (player.y+100); 
+}
+function GameLogic(){
+    if(timeWarpCounter==-1){
+        background.src="images/background.webp";
+    }
+    const cameraX = (screen.width / 2) - (player.x+25); 
+    const cameraY = (screen.height / 2) - (player.y+100); 
 
-        worldDiv.style.left = cameraX + "px";
-        worldDiv.style.top = cameraY + "px";
-        player.act();
-        if(enemySpawnTimer<0 && BasicEnemy.isActive){
-            enemySpawnTimer=Math.random()*200+200;
-            enemySpawnTimer/=1+timeElapsed*SCALE;
-            const newEnemy=new BasicEnemy(2, 5);
-            enemies[enemies.length]=newEnemy;
-        }
-        if(shooterEnemySpawnTimer<0 && ShooterEnemy.isActive){
-            shooterEnemySpawnTimer=Math.random()*200+300;
-            shooterEnemySpawnTimer/=1+timeElapsed*SCALE;
-            const newEnemy=new ShooterEnemy(2, 3);
-            enemies[enemies.length]=newEnemy;
-            //console.log(newEnemy.health);
-        }
-        if(aimingEnemySpawnTimer<0 && AimingEnemy.isActive){
-            aimingEnemySpawnTimer=Math.random()*400+400;
-            aimingEnemySpawnTimer/=1+timeElapsed*SCALE;
-            const newEnemy=new AimingEnemy(3.5, 1);
-            enemies[enemies.length]=newEnemy;
-            //console.log(newEnemy.health);
-        }
-        if(homingEnemySpawnTimer<0 && HomingEnemy.isActive){
-            homingEnemySpawnTimer=Math.random()*400+400;
-            homingEnemySpawnTimer/=1+timeElapsed*SCALE;
-            const newEnemy=new HomingEnemy(1, 2);
-            enemies[enemies.length]=newEnemy;
-            //console.log(newEnemy.health);
-        }
-        if(chargingEnemySpawnTimer<0 && ChargingEnemy.isActive){
-            chargingEnemySpawnTimer=Math.random()*500+900;
-            chargingEnemySpawnTimer/=1+timeElapsed*SCALE;
-            const newEnemy=new ChargingEnemy(1, 8);
-            enemies[enemies.length]=newEnemy;
-            //console.log(newEnemy.health);
-        }
-        if(shieldEnemySpawnTimer<0 && ShieldEnemy.isActive){
-            shieldEnemySpawnTimer=Math.random()*750+900;
-            shieldEnemySpawnTimer/=1+timeElapsed*SCALE;
-            const newEnemy=new ShieldEnemy(1.5, 15);
-            enemies[enemies.length]=newEnemy;
-            //console.log(newEnemy.health);
-        }
-        if(trapperEnemySpawnTimer<0 && TrapperEnemy.isActive){
-            trapperEnemySpawnTimer=Math.random()*400+400;
-            trapperEnemySpawnTimer/=1+timeElapsed*SCALE;
-            const newEnemy=new TrapperEnemy(3, 4);
-            enemies[enemies.length]=newEnemy;
-            //console.log(newEnemy.health);
-        }
-        if(zombieEnemySpawnTimer<0 && ZombieEnemy.isActive){
-            zombieEnemySpawnTimer=Math.random()*300+450;
-            zombieEnemySpawnTimer/=1+timeElapsed*SCALE;
-            const newEnemy=new ZombieEnemy(2, 3);
-            enemies[enemies.length]=newEnemy;
-            //console.log(newEnemy.health);
-        }
-        if(ghostEnemySpawnTimer<0 && GhostEnemy.isActive){
-            ghostEnemySpawnTimer=Math.random()*500+750;
-            ghostEnemySpawnTimer/=1+timeElapsed*SCALE;
-            const newEnemy=new GhostEnemy(4, 4);
-            enemies[enemies.length]=newEnemy;
-            //console.log(newEnemy.health);
-        }
-        if(poisonEnemySpawnTimer<0 && PoisonEnemy.isActive){
-            poisonEnemySpawnTimer=Math.random()*500+750;
-            poisonEnemySpawnTimer/=1+timeElapsed*SCALE;
-            const newEnemy=new PoisonEnemy(1, 5);
-            enemies[enemies.length]=newEnemy;
-        }
-        if(blackHoleEnemySpawnTimer<0 && BlackHoleEnemy.isActive){
-            blackHoleEnemySpawnTimer=Math.random()*600+800;
-            blackHoleEnemySpawnTimer/=1+timeElapsed*SCALE;
-            const newEnemy=new BlackHoleEnemy(1.5, 5);
-            enemies[enemies.length]=newEnemy;
-        }
-        if(builderEnemySpawnTimer<0 && BuilderEnemy.isActive){
-            builderEnemySpawnTimer=Math.random()*800+900;
-            builderEnemySpawnTimer/=1+timeElapsed*SCALE;
-            const newEnemy=new BuilderEnemy(1.5, 12);
-            enemies[enemies.length]=newEnemy;
-        }
-        if(windupEnemySpawnTimer<0 && WindupEnemy.isActive){
-            windupEnemySpawnTimer=Math.random()*800+900;
-            windupEnemySpawnTimer/=1+timeElapsed*SCALE;
-            const newEnemy=new WindupEnemy(2, 20);
-            enemies[enemies.length]=newEnemy;
-        }
-        if(spawnerEnemySpawnTimer<0 && SpawnerEnemy.isActive){
-            spawnerEnemySpawnTimer=Math.random()*900+1000;
-            spawnerEnemySpawnTimer/=1+timeElapsed*SCALE;
-            const newEnemy=new SpawnerEnemy(1.5, 25);
-            enemies[enemies.length]=newEnemy;
-        }
-        if(xpBagTimer<0){
-            xpBagTimer=Math.random()*200+200;
-            const newCollectable=new XPBag(Math.random()*(screen.width-screen.width/10)+screen.width/20, Math.random()*(screen.height-screen.height/10)+screen.height/20);
-            collectables.push(newCollectable);
-            //console.log(newEnemy.health);
-        }
-        if(healthPotionSpawnTimer<0){
-            healthPotionSpawnTimer=Math.random()*600+700;
-            const newCollectable=new HealthPotion(Math.random()*(screen.width-screen.width/10)+screen.width/20, Math.random()*(screen.height-screen.height/10)+screen.height/20);
-            collectables.push(newCollectable);
-            //console.log(newEnemy.health);
-        }
-        player.image.style.left = player.x+'px';
-        player.image.style.top= player.y+'px';
-        for(let i=enemies.length-1;i>=0;i--){
-            enemies[i].move();
-            enemies[i].special();
-            if(enemies[i].dead){
-                player.currentExp+=enemies[i].value*player.xpMultiplier;
-                enemies[i].image.remove();
-                enemies.splice(i,1);
-            }
-        }
-        for(let i=bullets.length-1;i>=0;i--){
-            bullets[i].move();
-            if(bullets[i].dead){
-                bullets[i].image.remove();
-                bullets.splice(i,1);
-            }
-        }
-        for(let i=enemyBullets.length-1;i>=0;i--){
-            enemyBullets[i].move();
-            enemyBullets[i].special();
-            if(enemyBullets[i].dead){
-                enemyBullets[i].image.remove();
-                if(enemyBullets[i].image2){
-                    enemyBullets[i].image2.remove();
-                }
-                enemyBullets.splice(i,1);
-            }
-
-        }
-        for(let i=collectables.length-1;i>=0;i--){
-            collectables[i].act();
-            if(collectables[i].dead){
-                collectables[i].image.remove();
-                collectables.splice(i,1);
-            }
-        }
-        if(!isBossWave && timeElapsed>=waveTimer){
-            ChangeWave();
-        }
-        if(newEnemyQueue.length>0){
-            changePage("newEnemyPage");
-        }
-        enemySpawnTimer--;
-        shooterEnemySpawnTimer--;
-        aimingEnemySpawnTimer--;
-        homingEnemySpawnTimer--;
-        chargingEnemySpawnTimer--;
-        shieldEnemySpawnTimer--;
-        trapperEnemySpawnTimer--;
-        zombieEnemySpawnTimer--;
-        ghostEnemySpawnTimer--;
-        poisonEnemySpawnTimer--;
-        blackHoleEnemySpawnTimer--;
-        timeWarpCounter--;
-        builderEnemySpawnTimer--;
-        windupEnemySpawnTimer--;
-        spawnerEnemySpawnTimer--;
-        healthPotionSpawnTimer--;
-        xpBagTimer--;
-        timeElapsed++;
-        levellingBar.Update();
-        healthBar.Update();
-        //console.log(enemyBullets.length);
-        if(page=="gamePage"){
-            requestAnimationFrame(loop);
+    worldDiv.style.left = cameraX + "px";
+    worldDiv.style.top = cameraY + "px";
+    player.act();
+    if(enemySpawnTimer<0 && BasicEnemy.isActive){
+        enemySpawnTimer=Math.random()*200+200;
+        enemySpawnTimer/=1+timeElapsed*SCALE;
+        const newEnemy=new BasicEnemy(2, 5);
+        enemies[enemies.length]=newEnemy;
+    }
+    if(shooterEnemySpawnTimer<0 && ShooterEnemy.isActive){
+        shooterEnemySpawnTimer=Math.random()*200+300;
+        shooterEnemySpawnTimer/=1+timeElapsed*SCALE;
+        const newEnemy=new ShooterEnemy(2, 3);
+        enemies[enemies.length]=newEnemy;
+        //console.log(newEnemy.health);
+    }
+    if(aimingEnemySpawnTimer<0 && AimingEnemy.isActive){
+        aimingEnemySpawnTimer=Math.random()*400+400;
+        aimingEnemySpawnTimer/=1+timeElapsed*SCALE;
+        const newEnemy=new AimingEnemy(3.5, 1);
+        enemies[enemies.length]=newEnemy;
+        //console.log(newEnemy.health);
+    }
+    if(homingEnemySpawnTimer<0 && HomingEnemy.isActive){
+        homingEnemySpawnTimer=Math.random()*400+400;
+        homingEnemySpawnTimer/=1+timeElapsed*SCALE;
+        const newEnemy=new HomingEnemy(1, 2);
+        enemies[enemies.length]=newEnemy;
+        //console.log(newEnemy.health);
+    }
+    if(chargingEnemySpawnTimer<0 && ChargingEnemy.isActive){
+        chargingEnemySpawnTimer=Math.random()*500+900;
+        chargingEnemySpawnTimer/=1+timeElapsed*SCALE;
+        const newEnemy=new ChargingEnemy(1, 8);
+        enemies[enemies.length]=newEnemy;
+        //console.log(newEnemy.health);
+    }
+    if(shieldEnemySpawnTimer<0 && ShieldEnemy.isActive){
+        shieldEnemySpawnTimer=Math.random()*750+900;
+        shieldEnemySpawnTimer/=1+timeElapsed*SCALE;
+        const newEnemy=new ShieldEnemy(1.5, 15);
+        enemies[enemies.length]=newEnemy;
+        //console.log(newEnemy.health);
+    }
+    if(trapperEnemySpawnTimer<0 && TrapperEnemy.isActive){
+        trapperEnemySpawnTimer=Math.random()*400+400;
+        trapperEnemySpawnTimer/=1+timeElapsed*SCALE;
+        const newEnemy=new TrapperEnemy(3, 4);
+        enemies[enemies.length]=newEnemy;
+        //console.log(newEnemy.health);
+    }
+    if(zombieEnemySpawnTimer<0 && ZombieEnemy.isActive){
+        zombieEnemySpawnTimer=Math.random()*300+450;
+        zombieEnemySpawnTimer/=1+timeElapsed*SCALE;
+        const newEnemy=new ZombieEnemy(2, 3);
+        enemies[enemies.length]=newEnemy;
+        //console.log(newEnemy.health);
+    }
+    if(ghostEnemySpawnTimer<0 && GhostEnemy.isActive){
+        ghostEnemySpawnTimer=Math.random()*500+750;
+        ghostEnemySpawnTimer/=1+timeElapsed*SCALE;
+        const newEnemy=new GhostEnemy(4, 4);
+        enemies[enemies.length]=newEnemy;
+        //console.log(newEnemy.health);
+    }
+    if(poisonEnemySpawnTimer<0 && PoisonEnemy.isActive){
+        poisonEnemySpawnTimer=Math.random()*500+750;
+        poisonEnemySpawnTimer/=1+timeElapsed*SCALE;
+        const newEnemy=new PoisonEnemy(1, 5);
+        enemies[enemies.length]=newEnemy;
+    }
+    if(blackHoleEnemySpawnTimer<0 && BlackHoleEnemy.isActive){
+        blackHoleEnemySpawnTimer=Math.random()*600+800;
+        blackHoleEnemySpawnTimer/=1+timeElapsed*SCALE;
+        const newEnemy=new BlackHoleEnemy(1.5, 5);
+        enemies[enemies.length]=newEnemy;
+    }
+    if(builderEnemySpawnTimer<0 && BuilderEnemy.isActive){
+        builderEnemySpawnTimer=Math.random()*800+900;
+        builderEnemySpawnTimer/=1+timeElapsed*SCALE;
+        const newEnemy=new BuilderEnemy(1.5, 12);
+        enemies[enemies.length]=newEnemy;
+    }
+    if(windupEnemySpawnTimer<0 && WindupEnemy.isActive){
+        windupEnemySpawnTimer=Math.random()*800+900;
+        windupEnemySpawnTimer/=1+timeElapsed*SCALE;
+        const newEnemy=new WindupEnemy(2, 20);
+        enemies[enemies.length]=newEnemy;
+    }
+    if(spawnerEnemySpawnTimer<0 && SpawnerEnemy.isActive){
+        spawnerEnemySpawnTimer=Math.random()*900+1000;
+        spawnerEnemySpawnTimer/=1+timeElapsed*SCALE;
+        const newEnemy=new SpawnerEnemy(1.5, 25);
+        enemies[enemies.length]=newEnemy;
+    }
+    if(xpBagTimer<0){
+        xpBagTimer=Math.random()*200+200;
+        const newCollectable=new XPBag(Math.random()*(screen.width-screen.width/10)+screen.width/20, Math.random()*(screen.height-screen.height/10)+screen.height/20);
+        collectables.push(newCollectable);
+        //console.log(newEnemy.health);
+    }
+    if(healthPotionSpawnTimer<0){
+        healthPotionSpawnTimer=Math.random()*600+700;
+        const newCollectable=new HealthPotion(Math.random()*(screen.width-screen.width/10)+screen.width/20, Math.random()*(screen.height-screen.height/10)+screen.height/20);
+        collectables.push(newCollectable);
+        //console.log(newEnemy.health);
+    }
+    player.image.style.left = player.x+'px';
+    player.image.style.top= player.y+'px';
+    for(let i=enemies.length-1;i>=0;i--){
+        enemies[i].move();
+        enemies[i].special();
+        if(enemies[i].dead){
+            player.currentExp+=enemies[i].value*player.xpMultiplier;
+            enemies[i].image.remove();
+            enemies.splice(i,1);
         }
     }
+    for(let i=bullets.length-1;i>=0;i--){
+        bullets[i].move();
+        if(bullets[i].dead){
+            bullets[i].image.remove();
+            bullets.splice(i,1);
+        }
+    }
+    for(let i=enemyBullets.length-1;i>=0;i--){
+        enemyBullets[i].move();
+        enemyBullets[i].special();
+        if(enemyBullets[i].dead){
+            enemyBullets[i].image.remove();
+            if(enemyBullets[i].image2){
+                enemyBullets[i].image2.remove();
+            }
+            enemyBullets.splice(i,1);
+        }
+
+    }
+    for(let i=collectables.length-1;i>=0;i--){
+        collectables[i].act();
+        if(collectables[i].dead){
+            collectables[i].image.remove();
+            collectables.splice(i,1);
+        }
+    }
+    if(!isBossWave && timeElapsed>=waveTimer){
+        ChangeWave();
+    }
+    if(newEnemyQueue.length>0){
+        ChangePage("newEnemyPage");
+    }
+    enemySpawnTimer--;
+    shooterEnemySpawnTimer--;
+    aimingEnemySpawnTimer--;
+    homingEnemySpawnTimer--;
+    chargingEnemySpawnTimer--;
+    shieldEnemySpawnTimer--;
+    trapperEnemySpawnTimer--;
+    zombieEnemySpawnTimer--;
+    ghostEnemySpawnTimer--;
+    poisonEnemySpawnTimer--;
+    blackHoleEnemySpawnTimer--;
+    timeWarpCounter--;
+    builderEnemySpawnTimer--;
+    windupEnemySpawnTimer--;
+    spawnerEnemySpawnTimer--;
+    healthPotionSpawnTimer--;
+    xpBagTimer--;
+    timeElapsed++;
+    levellingBar.Update();
+    healthBar.Update();
+    //console.log(enemyBullets.length);
+
+
 }
 function ChangeWave(){
     currentWave++;
@@ -3577,12 +3598,12 @@ function ChangeWave(){
         case 7:
             RandomizeEnemies(2,2,2,2);
             isBossWave=true;
-            SCALE=0.0006;
+            SCALE=0.0005;
             break;
     }
 }
 
-function changePage(id, reset){
+function ChangePage(id, reset){
     if(continueFlag)return;
     console.log(id);
     if(gameOver && id!="gamePage" && id!="losePage"){
@@ -3596,7 +3617,6 @@ function changePage(id, reset){
     }
     page=id;
     document.getElementById(id).style.display="block";
-    document.querySelectorAll("button").forEach(upgrade=>upgrade.remove());
     if(id=="losePage"){
         document.querySelectorAll('img').forEach(img => img.remove());
         for(let i=0;i<enemies.length;i++){
@@ -3607,20 +3627,20 @@ function changePage(id, reset){
         if(document.getElementById("indicator"))document.getElementById("indicator").remove();
         if(document.getElementById("indicator2"))document.getElementById("indicator2").remove();
         if(document.getElementById("waveText"))document.getElementById("waveText").remove();
-        const choice1=document.createElement("div");
-        choice1.innerHTML=`<button onclick="changePage('gamePage', true)">CLICK ME to restart</button>`
-        document.body.appendChild(choice1);
     }
     if(id=="gamePage"){
-        if(reset)start();
+        choice1.remove();
+        choice2.remove();
+        if(reset)Start();
         else{
+        lastTime=Date.now();
             loop();
         }
     }
     if(id=="upgradePage"){
         paused=true;
-        const choice1=document.createElement("div");
-        const choice2=document.createElement("div");
+        choice1=document.createElement("div");
+        choice2=document.createElement("div");
         let randomNum=Math.floor(Math.random()*NUMUPGRADES);
         while(boughtUpgrades[randomNum]==1){
             randomNum=Math.floor(Math.random()*NUMUPGRADES);
@@ -3654,7 +3674,7 @@ function changePage(id, reset){
                 choice1.innerHTML=`<button onclick="addBomb(1)" style="position:absolute;left:${screen.width/2-100}px; text-align:center; top:120px; z-index:3" id="upgrade">Bomb Attack (Aims to Mouse)</button>`
                 break;
             case 9:
-                choice1.innerHTML=`<button onclick="addTimeWarp(1)" style="position:absolute;left:${screen.width/2-100}px; text-align:center; top:120px; z-index:3" id="upgrade">Time Warp Ability</button>`
+                choice1.innerHTML=`<button onclick="addTimeWarp(1)" style="position:absolute;left:${screen.width/2-100}px; text-align:center; top:120px; z-index:3" id="upgrade">Speed Up Ability</button>`
                 break;
             case 10:
                 choice1.innerHTML=`<button onclick="AddPassiveHealing(1)" style="position:absolute;left:${screen.width/2-100}px; text-align:center; top:120px; z-index:3" id="upgrade">+1 Passive Healing</button>`
@@ -3704,7 +3724,7 @@ function changePage(id, reset){
                 choice2.innerHTML=`<button onclick="addBomb(1)" style="position:absolute;left:${screen.width/2+100}px; text-align:center; top:120px; z-index:3" id="upgrade">Bomb Attack (Aims to Mouse)</button>`
                 break;
             case 9:
-                choice2.innerHTML=`<button onclick="addTimeWarp(1)" style="position:absolute;left:${screen.width/2+100}px; text-align:center; top:120px; z-index:3" id="upgrade">Time Warp Ability</button>`
+                choice2.innerHTML=`<button onclick="addTimeWarp(1)" style="position:absolute;left:${screen.width/2+100}px; text-align:center; top:120px; z-index:3" id="upgrade">Speed Up Ability</button>`
                 break;
             case 10:
                 choice2.innerHTML=`<button onclick="AddPassiveHealing(1)" style="position:absolute;left:${screen.width/2+100}px; text-align:center; top:120px; z-index:3" id="upgrade">+1 Passive Healing</button>`
@@ -3732,67 +3752,65 @@ function lose(){
         loseScreen.remove();
     }
     gameOver=true;
-    changePage("losePage", true);
+    ChangePage("losePage", true);
 }
 
 function increaseDamage(amount){
     player.damage+=amount;
     boughtUpgrades[0]=1;
-    //console.log(boughtUpgrades[0]);
-
-    //console.log(player.damage); 
-    changePage('gamePage', false)
+    
+    ChangePage('gamePage', false)
 }
 
 function increaseMaxHealth(amount){
     player.health+=amount;
     player.maxHealth+=amount;
-    changePage('gamePage', false)
+    ChangePage('gamePage', false)
 }
 
 function increaseProjectiles(amount){
     player.projectiles+=amount;
     boughtUpgrades[2]+=0.5;
-    changePage('gamePage', false)
+    ChangePage('gamePage', false)
 }
 
 function addFrostProjectiles(amount){
     player.frostProjectiles+=amount;
     player.frostProjectileMaxCooldown=100/player.frostProjectiles;
-    changePage('gamePage', false)
+    ChangePage('gamePage', false)
 }
 function addLaserProjectiles(amount){
     bullets.push(new PlayerLaser(-Math.PI/2, player.x, player.y))
     boughtUpgrades[4]=1;
-    changePage('gamePage', false)
+    ChangePage('gamePage', false)
 }
 function speedUpAttacks(amount){
     player.attackSpeed/=amount;
-    changePage('gamePage', false)
+    ChangePage('gamePage', false)
 }
 function addSiphon(amount){
     player.siphon+=amount;
-    changePage('gamePage', false)
+    ChangePage('gamePage', false)
 }
 function multiplyXPGain(amount){
     player.xpMultiplier*=amount;
-    changePage('gamePage', false)
+    ChangePage('gamePage', false)
 }
 function addBomb(amount){
     player.bombCount+=amount;
     bombIcon=new BombIcon(50);
     boughtUpgrades[8]=1;
-    changePage('gamePage', false)
+    ChangePage('gamePage', false)
 }
 function addTimeWarp(amount){
     player.timeWarp+=amount;
     timeWarpIcon=new TimeWarpIcon(50);
     boughtUpgrades[9]=1;
-    changePage('gamePage', false)
+    ChangePage('gamePage', false)
 }
 function AddPassiveHealing(amount){
     player.passiveHealing+=amount;
-    changePage('gamePage', false)
+    ChangePage('gamePage', false)
 }
 function Gamble(numGambles){
     for(let i=0;i<numGambles;i++){
@@ -3811,7 +3829,7 @@ function AddProtectorBullet(amount){
         bullets.push(new ProtectorBullet(1));
     }
     ProtectorBullet.Spacing();
-    changePage('gamePage', false)
+    ChangePage('gamePage', false)
 }
 function Roll(){
     if(gambleTimer%textSpeed==0 && gambleTimer>50){
@@ -3914,22 +3932,22 @@ function Roll(){
                 if(player.health<=0){
                     lose();
                 }
-                changePage('gamePage', false)
+                ChangePage('gamePage', false)
                 break;
             case 1:
                 player.speed-=1;
-                changePage('gamePage', false)
+                ChangePage('gamePage', false)
                 break;
             case 2:
-                changePage('gamePage', false)
+                ChangePage('gamePage', false)
                 break;
             case 3:
                 player.health=Math.min(player.health+10, player.maxHealth);
-                changePage('gamePage', false)
+                ChangePage('gamePage', false)
                 break;
             case 4:
                 player.speed+=2;
-                changePage('gamePage', false)
+                ChangePage('gamePage', false)
                 break;
             case 5:
                 increaseDamage(1);
@@ -3978,5 +3996,5 @@ async function newEnemyText(){
     await delay(3000);
     continueFlag=false;
     image.remove();
-    changePage("gamePage", false);
+    ChangePage("gamePage", false);
 }
