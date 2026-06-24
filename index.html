@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <style>
+            body{
+                overflow:hidden;
+                width:100vw;
+                height:100vh;
+                /* background-image: url('introBackground.png');
+                background-repeat: no-repeat;
+                background-attachment: fixed; */
+            }
+            
+        </style>
+        <title>A COMPLETELY ORIGINAL GAME</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+        <div id="gamePage" display:none>
+            <div id="world" style="position: relative;left: 0;right: 0;">
+                <script src="initialization.js" defer></script>
+                <script src="helpers.js" defer></script>
+                <script src="game.js" defer></script>
+            </div>
+        </div>
+        <div id="losePage" style="display:none">
+            <h1>You lost</h1>
+        </div>
+        <div id="upgradePage" style="display:none">
+            <h1 style="text-align: center; font-size: 67px; position: absolute; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0;"><span style="background-color: black; color: white">Choose Your Upgrade</span></h1>
+        </div>
+        <div id="IntroPage">
+            <h1 style="text-align: center; font-size: 67px; position: relative; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0;"><span style="background-color: black; color: white">A Very Cool Game</span></h1>
+            
+            <button onclick="Commence()" style="text-align: center; font-size: 67px; position: relative; top: 230px; left: 0; width: 100%; z-index: 1000; margin: 0;">START</button>
+        </div>
+        <div id="newEnemyPage" style="display:none">
+            <h1 style="text-align: center; font-size: 67px; position: absolute; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0;"><span style="background-color: black; color: white">New Enemy Discovered!</span></h1>
+        </div>
+    </head>
+</html>
