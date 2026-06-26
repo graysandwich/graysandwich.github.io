@@ -6,6 +6,7 @@
                 overflow:hidden;
                 width:100vw;
                 height:100vh;
+                margin:0
                 /* background-image: url('introBackground.png');
                 background-repeat: no-repeat;
                 background-attachment: fixed; */
@@ -16,16 +17,18 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+        
+        <canvas id="myCanvas" width=1920 height=1080 style="position:absolute; z-index: 0"></canvas>
         <div id="gamePage" display:none>
-            <div id="world" style="position: relative;left: 0;right: 0;">
-                <script src="initialization.js" defer></script>
-                <script src="helpers.js" defer></script>
-                <script src="game.js" defer></script>
-            </div>
+                <div id="world" style="position: relative;left: 0;right: 0;">
+                    <script src="initialization.js" defer></script>
+                    <script src="helpers.js" defer></script>
+                    <script src="game.js" defer></script>
+                </div>
         </div>
-        <div id="losePage" style="display:none">
-            <h1>You lost</h1>
-            <button onclick="Commence()" style="text-align: center; font-size: 67px; position: relative; top: 230px; left: 0; width: 100%; z-index: 1000; margin: 0px;">Restart</button>
+        <div id="losePage" style="display:none">            
+            <h1 style="text-align: center; font-size: 67px; position: absolute; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0;"><span style="background-color: black; color: white">You Lost</span></h1>
+            <button onclick="Commence()" style="text-align: center; font-size: 67px; position: relative; top: 230px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Restart</button>
 
         </div>
         <div id="upgradePage" style="display:none">

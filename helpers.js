@@ -1,30 +1,21 @@
 
+
+
 function RectCircleColliding(circle, rect, radius, x, y) {
     var distX = Math.abs(x - rect.x);
     var distY = Math.abs(y - rect.y);
 
-    if (distX > (rect.image.width / 2 + radius)) { return false; }
-    if (distY > (rect.image.height / 2 + radius)) { return false; }
+    if (distX > (rect.width / 2 + radius)) { return false; }
+    if (distY > (rect.height / 2 + radius)) { return false; }
 
-    if (distX <= (rect.image.width / 2)) { return true; }
-    if (distY <= (rect.image.height / 2)) { return true; }
+    if (distX <= (rect.width / 2)) { return true; }
+    if (distY <= (rect.height / 2)) { return true; }
 
-    var dx = distX - rect.image.width / 2;
-    var dy = distY - rect.image.height / 2;
+    var dx = distX - rect.width / 2;
+    var dy = distY - rect.height / 2;
     return (dx * dx + dy * dy <= (radius * radius));
 }
 
-function moveText(text, currentFrame, currentY){
-    text.style.top=(currentY)+"px";
-    if(currentFrame<60){
-        requestAnimationFrame((timestamp) => {
-            moveText(text, currentFrame+1, currentY-1);
-        });
-    }
-    else{
-        text.remove();
-    }
-}
 function shuffle(array) {
     const shuffled = [...array]; 
         for (let i = shuffled.length - 1; i > 0; i--) {
@@ -73,7 +64,7 @@ document.addEventListener("keydown", (e)=>{
         if(e.key=="q" && player.bombCount>0 && player.bombTimer<=0){
             let distanceX=mouseX-screen.width/2;
             let distanceY=mouseY-screen.height/2;
-            let distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+            let distance = distanceX * distanceX + distanceY * distanceY;
             console.log(mouseX+" "+mouseY+" "+distance);
             let vx = 0;
             let vy = 0;
@@ -127,6 +118,7 @@ window.addEventListener("beforeunload", (e)=>{
     localStorage.setItem("GhostEnemyFound", GhostEnemy.seen);
     localStorage.setItem("ShieldEnemyFound", ShieldEnemy.seen);
     localStorage.setItem("BlackHoleEnemyFound", BlackHoleEnemy.seen);
+    localStorage.setItem("MimicEnemyFound", MimicEnemy.seen);
     localStorage.setItem("WindupEnemyFound", WindupEnemy.seen);
     localStorage.setItem("BuilderEnemyFound", BuilderEnemy.seen);
     localStorage.setItem("SpawnerEnemyFound", SpawnerEnemy.seen);
@@ -135,6 +127,7 @@ window.addEventListener("beforeunload", (e)=>{
     localStorage.setItem("BouncyBossFound", BouncyBoss.seen);
     localStorage.setItem("MageBossFound", MageBoss.seen);
     localStorage.setItem("BulletHellBossFound", BulletHellBoss.seen);
+    localStorage.setItem("GambleBossFound", GambleBoss.seen);
 });
 document.addEventListener('DOMContentLoaded', () => {
     BasicEnemy.seen=JSON.parse(localStorage.getItem("BasicEnemyFound"));
@@ -148,6 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
     PoisonEnemy.seen=JSON.parse(localStorage.getItem("PoisonEnemyFound"));
     ShieldEnemy.seen=JSON.parse(localStorage.getItem("ShieldEnemyFound"));
     BlackHoleEnemy.seen=JSON.parse(localStorage.getItem("BlackHoleEnemyFound"));
+    MimicEnemy.seen=JSON.parse(localStorage.getItem("MimicEnemyFound"));
     WindupEnemy.seen=JSON.parse(localStorage.getItem("WindupEnemyFound"));
     BuilderEnemy.seen=JSON.parse(localStorage.getItem("BuilderEnemyFound"));
     SpawnerEnemy.seen=JSON.parse(localStorage.getItem("SpawnerEnemyFound"));
@@ -156,4 +150,5 @@ document.addEventListener('DOMContentLoaded', () => {
     BouncyBoss.seen=JSON.parse(localStorage.getItem("BouncyBossFound"));
     MageBoss.seen=JSON.parse(localStorage.getItem("MageBossFound"));
     BulletHellBoss.seen=JSON.parse(localStorage.getItem("BulletHellBossFound"));
+    GambleBoss.seen=JSON.parse(localStorage.getItem("GambleBossFound"));
 });
