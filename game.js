@@ -1079,6 +1079,7 @@ class GambleBoss extends Enemy {
         else {
             ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
         }
+        ctx.reset();
         if(this.gambleTimer>-60){
 
             switch(this.currentGamble){
@@ -3461,7 +3462,7 @@ class WaveText {
 
 const worldDiv = document.getElementById("world");
 function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Boss) {
-    bossesLeft = numTier1Boss+numTier1Boss;
+    bossesLeft = numTier1Boss+numTier2Boss;
     let tier1 = [1, 2, 3, 4, 5, 6];
     let tier2 = [1, 2, 3, 4, 5, 6];
     let tier3 = [1, 2, 3];
