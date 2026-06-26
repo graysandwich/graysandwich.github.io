@@ -323,7 +323,9 @@ class IceBoss extends Enemy {
     draw() {
         if (this.dead) return;
         ctx.save();
+        ctx.globalAlpha=0.2;
         ctx.drawImage(this.frostAura, this.x - this.frostAuraWidth / 2, this.y - this.frostAuraHeight / 2, this.frostAuraWidth, this.frostAuraHeight);
+        ctx.globalAlpha=1; 
         if (this.redTimer > 0) {
             ctx.globalCompositeOperation = 'source-over';
             ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
