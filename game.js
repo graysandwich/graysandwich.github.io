@@ -1079,7 +1079,7 @@ class GambleBoss extends Enemy {
         else {
             ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
         }
-        ctx.reset();
+        ctx.fillStyle='#000000'; 
         if(this.gambleTimer>-60){
 
             switch(this.currentGamble){
@@ -3654,7 +3654,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
     for (let i = 0; i < numTier2Boss; i++) {
         switch (tier2Bosses[i]) {
             case 1:
-                boss = new GambleBoss(1, 100);
+                boss = new GambleBoss(1, 5);
                 enemies[enemies.length] = boss;
                 if (!GambleBoss.seen) {
                     GambleBoss.seen = true;
