@@ -28,7 +28,12 @@
         </div>
         <div id="losePage" style="display:none">            
             <h1 style="text-align: center; font-size: 67px; position: absolute; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0;"><span style="background-color: black; color: white">You Lost</span></h1>
-            <button onclick="Commence()" style="text-align: center; font-size: 67px; position: relative; top: 230px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Restart</button>
+            <button onclick="ChangePage('difficultyPage', false)" style="text-align: center; font-size: 67px; position: relative; top: 230px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Restart</button>
+
+        </div>
+        <div id="winPage" style="display:none">            
+            <h1 style="text-align: center; font-size: 67px; position: absolute; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0;"><span style="background-color: black; color: white">You Win!</span></h1>
+            <button onclick="ChangePage('difficultyPage', false)" style="text-align: center; font-size: 67px; position: relative; top: 230px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Play Again</button>
 
         </div>
         <div id="upgradePage" style="display:none">
@@ -37,8 +42,17 @@
         <div id="IntroPage">
             <h1 style="text-align: center; font-size: 67px; position: relative; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0;"><span style="background-color: black; color: white">A Very Cool Game</span></h1>
             
-            <button onclick="Commence()" style="text-align: center; font-size: 67px; position: relative; top: 230px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">START</button>
+            <button onclick="ChangePage('difficultyPage', false)" style="text-align: center; font-size: 67px; position: relative; top: 230px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">START</button>
             <button onclick="ChangePage('helpPage', false)" style="text-align: center; font-size: 67px; position: relative; top: 300px; left: 0; width: 100%; z-index: 1000; margin: 0;">How to Play</button>
+
+        </div>
+        <div id="difficultyPage" style="display:none">
+            <h1 style="text-align: center; font-size: 67px; position: relative; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0;"><span style="background-color: black; color: white">Choose Your Difficulty</span></h1>
+            
+            <button onclick="Commence(1)" style="text-align: center; font-size: 67px; position: relative; top: 130px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Easy</button>
+            <button onclick="Commence(2)" style="text-align: center; font-size: 67px; position: relative; top: 150px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Normal</button>
+            <button onclick="Commence(3)" style="text-align: center; font-size: 67px; position: relative; top: 170px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Hard</button>
+            <button onclick="Commence(4)" style="text-align: center; font-size: 67px; position: relative; top: 190px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Extreme Demon</button>
 
         </div>
         

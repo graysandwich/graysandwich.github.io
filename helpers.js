@@ -34,7 +34,7 @@ function rotateAroundPoint(pivotX, pivotY, objectX, objectY, angleInDegrees) {
 
     return { x: newX, y: newY };
 }
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+var delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 document.addEventListener("mousemove", (e)=>{
     mouseX=e.clientX;
@@ -55,11 +55,16 @@ document.addEventListener("keydown", (e)=>{
             movingDown=true;
         }
         if(e.key=="c"){
-            player.currentExp+=1000;
+            player.currentExp+=10000;
         }
         if(e.key=="p"){
             player.currentExp+=1000;
             ChangeWave(); 
+        }
+        if(e.key=="o"){
+            for(let i=0;i<enemies.length;i++){
+                enemies[i].takeDamage(new Bullet(1,1,20), i);
+            }
         }
         if(e.key=="q" && player.bombCount>0 && player.bombTimer<=0){
             let distanceX=mouseX-screen.width/2;
@@ -113,20 +118,25 @@ window.addEventListener("beforeunload", (e)=>{
     localStorage.setItem("HomingEnemyFound", HomingEnemy.seen);
     localStorage.setItem("ZombieEnemyFound", ZombieEnemy.seen);
     localStorage.setItem("TrapperEnemyFound", TrapperEnemy.seen);
+
     localStorage.setItem("ChargingEnemyFound", ChargingEnemy.seen);
     localStorage.setItem("PoisonEnemyFound", PoisonEnemy.seen);
     localStorage.setItem("GhostEnemyFound", GhostEnemy.seen);
     localStorage.setItem("ShieldEnemyFound", ShieldEnemy.seen);
     localStorage.setItem("BlackHoleEnemyFound", BlackHoleEnemy.seen);
     localStorage.setItem("MimicEnemyFound", MimicEnemy.seen);
+
     localStorage.setItem("WindupEnemyFound", WindupEnemy.seen);
     localStorage.setItem("BuilderEnemyFound", BuilderEnemy.seen);
     localStorage.setItem("SpawnerEnemyFound", SpawnerEnemy.seen);
+    localStorage.setItem("SelfDestructEnemyFound", SelfDestructEnemy.seen);
+
     localStorage.setItem("LaserBossFound", LaserBoss.seen);
     localStorage.setItem("IceBossFound", IceBoss.seen);
     localStorage.setItem("BouncyBossFound", BouncyBoss.seen);
     localStorage.setItem("MageBossFound", MageBoss.seen);
     localStorage.setItem("BulletHellBossFound", BulletHellBoss.seen);
+
     localStorage.setItem("GambleBossFound", GambleBoss.seen);
 });
 document.addEventListener('DOMContentLoaded', () => {
@@ -136,15 +146,19 @@ document.addEventListener('DOMContentLoaded', () => {
     HomingEnemy.seen=JSON.parse(localStorage.getItem("HomingEnemyFound"));
     ZombieEnemy.seen=JSON.parse(localStorage.getItem("ZombieEnemyFound"));
     TrapperEnemy.seen=JSON.parse(localStorage.getItem("TrapperEnemyFound"));
+
     ChargingEnemy.seen=JSON.parse(localStorage.getItem("ChargingEnemyFound"));
     GhostEnemy.seen=JSON.parse(localStorage.getItem("GhostEnemyFound"));
     PoisonEnemy.seen=JSON.parse(localStorage.getItem("PoisonEnemyFound"));
     ShieldEnemy.seen=JSON.parse(localStorage.getItem("ShieldEnemyFound"));
     BlackHoleEnemy.seen=JSON.parse(localStorage.getItem("BlackHoleEnemyFound"));
     MimicEnemy.seen=JSON.parse(localStorage.getItem("MimicEnemyFound"));
+
     WindupEnemy.seen=JSON.parse(localStorage.getItem("WindupEnemyFound"));
     BuilderEnemy.seen=JSON.parse(localStorage.getItem("BuilderEnemyFound"));
     SpawnerEnemy.seen=JSON.parse(localStorage.getItem("SpawnerEnemyFound"));
+    SelfDestructEnemy.seen=JSON.parse(localStorage.getItem("SelfDestructEnemyFound"));
+
     LaserBoss.seen=JSON.parse(localStorage.getItem("LaserBossFound"));
     IceBoss.seen=JSON.parse(localStorage.getItem("IceBossFound"));
     BouncyBoss.seen=JSON.parse(localStorage.getItem("BouncyBossFound"));

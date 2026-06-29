@@ -22,6 +22,7 @@ let windupEnemySpawnTimer=0;
 let spawnerEnemySpawnTimer=0;
 let mimicEnemySpawnTimer=0;
 let healthPotionSpawnTimer=0;
+let selfDestructEnemySpawnTimer=0;
 let waveTimer=0;
 let isBossWave=false;
 let movingLeft, movingRight, movingUp, movingDown=false;
@@ -48,8 +49,12 @@ let gameOver=false;
 let accumulator=0;
 const frameRate=1/61;
 let lastTime=Date.now();
-
-function Commence(){
+let difficulty=0;
+let scaleMultiplier=0;
+let bossMultiplier=0;
+let originalScale=0;
+//higher number = higher difficulty
+function Commence(d){
     
     list=document.querySelectorAll('div[id$="Page"]');
     for(let i=0;i<list.length;i++){
@@ -57,9 +62,10 @@ function Commence(){
     }
     document.querySelectorAll('img').forEach(img => img.remove());
     document.getElementById("gamePage").style.display="block";
+    difficulty=d;
     Start();
 }
-function Start(){
+async function Start(){
     player=new Player();
     gameOver=false;
     enemySpawnTimer=0;
@@ -76,6 +82,7 @@ function Start(){
     windupEnemySpawnTimer=0;
     spawnerEnemySpawnTimer=0;
     mimicEnemySpawnTimer=0;
+    selfDestructEnemySpawnTimer=0;
     
     healthPotionSpawnTimer=Math.random()*600+700;
     xpBagTimer=Math.random()*200+200;
@@ -112,9 +119,30 @@ function Start(){
     
     background=new Image();
     background.src='images/background.webp';
+    canvas.style.display = "block";
 
     lastTime=Date.now();
+    if(difficulty==1){
+        scaleMultiplier=0.75;
+        bossMultiplier=0.75;
+    }
+    else if(difficulty==2){
+        scaleMultiplier=1;
+        bossMultiplier=1;
+    }
+    else if(difficulty==3){
+        scaleMultiplier=1.5;
+        bossMultiplier=1.5;
+    }
+    else{
+        scaleMultiplier=2;
+        bossMultiplier=2;
+    }
+    SCALE*=scaleMultiplier
     RandomizeEnemies(2, 0, 0,0,0);
+    
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    await delay(100);
     loop();
 
 }
