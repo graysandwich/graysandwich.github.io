@@ -27,7 +27,7 @@ let waveTimer=0;
 let isBossWave=false;
 let movingLeft, movingRight, movingUp, movingDown=false;
 let page="gamePage";
-let healthBar, levellingBar, bossBars, boss, bombIcon, waveText, timeWarpIcon, background, gambleText, choice1, choice2;
+let healthBar, levellingBar, bossBars, boss, bombIcon, waveText, timeWarpIcon, background, gambleText, choice1, choice2, shieldBar;
 let xpBagTimer=Math.random()*200+200;
 let timeElapsed=0;
 let mouseX=0;
@@ -35,7 +35,7 @@ let mouseY=0;
 let currentWave=0;
 let SCALE=0.001;
 let continueFlag=false;
-const NUMUPGRADES=14;
+const NUMUPGRADES=15;
 let boughtUpgrades=new Array(NUMUPGRADES);
 for(let i=0;i<boughtUpgrades.length;i++){
     boughtUpgrades[i]=0;
@@ -107,6 +107,7 @@ async function Start(){
     movingDown=false;
     isBossWave=false;
     bombIcon=null;
+    shieldBar=null;
     timeWarpCounter=-1;
     let boughtUpgrades=new Array(NUMUPGRADES);
     for(let i=0;i<boughtUpgrades.length;i++){
@@ -123,16 +124,20 @@ async function Start(){
 
     lastTime=Date.now();
     if(difficulty==1){
-        scaleMultiplier=0.75;
-        bossMultiplier=0.75;
+        scaleMultiplier=0.6;
+        bossMultiplier=0.6;
+        player.health=15;
+        player.maxHealth=15;
     }
     else if(difficulty==2){
-        scaleMultiplier=1;
-        bossMultiplier=1;
+        scaleMultiplier=0.8;
+        bossMultiplier=0.8;
+        player.health=12;
+        player.maxHealth=12;
     }
     else if(difficulty==3){
-        scaleMultiplier=1.5;
-        bossMultiplier=1.5;
+        scaleMultiplier=1;
+        bossMultiplier=1;
     }
     else{
         scaleMultiplier=2;
@@ -140,7 +145,6 @@ async function Start(){
     }
     SCALE*=scaleMultiplier
     RandomizeEnemies(2, 0, 0,0,0);
-    
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     await delay(100);
     loop();

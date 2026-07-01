@@ -138,6 +138,7 @@ window.addEventListener("beforeunload", (e)=>{
     localStorage.setItem("BulletHellBossFound", BulletHellBoss.seen);
 
     localStorage.setItem("GambleBossFound", GambleBoss.seen);
+    localStorage.setItem("SnakeBossFound", SnakeBoss.seen);
 });
 document.addEventListener('DOMContentLoaded', () => {
     BasicEnemy.seen=JSON.parse(localStorage.getItem("BasicEnemyFound"));
@@ -164,5 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
     BouncyBoss.seen=JSON.parse(localStorage.getItem("BouncyBossFound"));
     MageBoss.seen=JSON.parse(localStorage.getItem("MageBossFound"));
     BulletHellBoss.seen=JSON.parse(localStorage.getItem("BulletHellBossFound"));
+
     GambleBoss.seen=JSON.parse(localStorage.getItem("GambleBossFound"));
+    SnakeBoss.seen=JSON.parse(localStorage.getItem("SnakeBossFound"));
 });
