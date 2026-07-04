@@ -6,10 +6,15 @@
                 overflow:hidden;
                 width:100vw;
                 height:100vh;
-                margin:0
+                margin:0;
+                background-color: lightblue;
                 /* background-image: url('introBackground.png');
                 background-repeat: no-repeat;
                 background-attachment: fixed; */
+            }
+            h1 {
+                font-family: Black ops one;
+                pointer-events:none;
             }
             
         </style>
@@ -24,6 +29,7 @@
                     <script src="initialization.js" defer></script>
                     <script src="helpers.js" defer></script>
                     <script src="game.js" defer></script>
+                    <script src="upgrades.js" defer></script>
                 </div>
         </div>
         <div id="losePage" style="display:none">            
@@ -40,33 +46,60 @@
             <h1 style="text-align: center; font-size: 67px; position: absolute; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0;"><span style="background-color: black; color: white">Choose Your Upgrade</span></h1>
         </div>
         <div id="IntroPage">
-            <h1 style="text-align: center; font-size: 67px; position: relative; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0;"><span style="background-color: black; color: white">A Very Cool Game</span></h1>
+            <h1 style="text-align: center; font-size: 67px; position: relative; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0; "><u>Crossover</u></h1>
+            <h1 style="text-align: center; font-size: 47px; position: relative; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0; font-family: Black ops one;">A very cool Roguelike Game by graysandwich</h1>
+            <h1 style="text-align: center; font-size: 20px; position: relative; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0; font-family: Black ops one;">If the word larp means what i think it does then im larping as a gamedev</h1>
             
-            <button onclick="ChangePage('difficultyPage', false)" style="text-align: center; font-size: 67px; position: relative; top: 230px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">START</button>
-            <button onclick="ChangePage('helpPage', false)" style="text-align: center; font-size: 67px; position: relative; top: 290px; left: 0; width: 100%; z-index: 1000; margin: 0;">How to Play</button>
-            <button onclick="ChangePage('devlogPage', false)" style="text-align: center; font-size: 67px; position: relative; top: 350px; left: 0; width: 100%; z-index: 1000; margin: 0;">Update Log</button>
+            <button onclick="ChangePage('difficultyPage', false)" style="text-align: center; font-size: 67px; position: relative; top: 150px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">START</button>
+            <button onclick="ChangePage('helpPage', false)" style="text-align: center; font-size: 67px; position: relative; top: 180px; left: 0; width: 100%; z-index: 1000; margin: 0;">How to Play</button>
+            <button onclick="ChangePage('devlogPage', false)" style="text-align: center; font-size: 67px; position: relative; top: 210px; left: 0; width: 100%; z-index: 1000; margin: 0;">Update Log</button>
         </div>
         <div id="difficultyPage" style="display:none">
-            <h1 style="text-align: center; font-size: 67px; position: relative; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0;"><span style="background-color: black; color: white">Choose Your Difficulty</span></h1>
+            <h1 style="text-align: center; font-size: 67px; position: relative; top: 7px; left: 0; width: 100%; z-index: 1000; margin: 0;">Choose Your Difficulty</h1>
             
             <button onclick="Commence(1)" style="text-align: center; font-size: 67px; position: relative; top: 130px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Easy</button>
             <button onclick="Commence(2)" style="text-align: center; font-size: 67px; position: relative; top: 150px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Normal</button>
             <button onclick="Commence(3)" style="text-align: center; font-size: 67px; position: relative; top: 170px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Hard</button>
             <button onclick="Commence(4)" style="text-align: center; font-size: 67px; position: relative; top: 190px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Extreme Demon</button>
+            <button onclick="ChangePage('IntroPage', false)" style="text-align: center; font-size: 67px; position: relative; top: -410px; left: 1300px; width: 15%; z-index: 1000; margin: 0px;">Back</button>
 
         </div>
         
         <div id="helpPage" style="display:none">
-            <h1 style="text-align: center; font-size: 67px; position: relative; top: 0px; left: 0; width: 100%; z-index: 1000; margin: 0px;"><span style="background-color: black; color: white">A Very Cool Game</span></h1>
-            <h1 style="text-align: center; font-size: 67px; position: relative; top: 50px; left: 0; width: 100%; z-index: 1000; margin: 0px;"><span style="color: black">WASD to move</span></h1>
-            <h1 style="text-align: center; font-size: 67px; position: relative; top: 50px; left: 0; width: 100%; z-index: 1000; margin: 0px;"><span style="color: black">Player automatically shoots bullets. Shoot enemies to gain XP!</span></h1>
-            <h1 style="text-align: center; font-size: 67px; position: relative; top: 50px; left: 0; width: 100%; z-index: 1000; margin: 0px;"><span style="color: black">Fullscreen recommended and keyboard required</span></h1>
+            <h1 style="text-align: center; font-size: 67px; position: relative; top: 0px; left: 0; width: 100%; z-index: 1000; margin: 0px; font-family: 'Times New Roman';"><span style="background-color: black; color: white">A Very Cool Game</span></h1>
+            <h1 style="text-align: center; font-size: 67px; position: relative; top: 50px; left: 0; width: 100%; z-index: 1000; margin: 0px;font-family: 'Times New Roman';"><span style="color: black">WASD to move</span></h1>
+            <h1 style="text-align: center; font-size: 67px; position: relative; top: 50px; left: 0; width: 100%; z-index: 1000; margin: 0px;font-family: 'Times New Roman';"><span style="color: black">Player automatically shoots bullets. Shoot enemies to gain XP!</span></h1>
+            <h1 style="text-align: center; font-size: 67px; position: relative; top: 50px; left: 0; width: 100%; z-index: 1000; margin: 0px;font-family: 'Times New Roman';"><span style="color: black">Fullscreen recommended and keyboard required</span></h1>
 
             <button onclick="ChangePage('IntroPage', false)" style="text-align: center; font-size: 67px; position: relative; top: 50px; left: 0; width: 100%; z-index: 1000; margin: 0;">Back</button>
 
         </div>
         <div id="devlogPage" style="display:none; overflow: auto; height:100%; font-size: 18px; top: 10px; left: 0; width: 100%; z-index: 1000; margin: 0px;">
-            <button onclick="ChangePage('IntroPage', false)" style="text-align: center; font-size: 67px; top: 0px; left: 0; width: 100%; z-index: 1000; margin: 0;">Back</button>
+            <button onclick="ChangePage('IntroPage', false)" style="position:absolute;text-align: center; font-size: 67px; top: 0px; left: 0; width: 100%; z-index: 1000; margin: 0;">Back</button>
+
+            <h1>.</h1>
+
+
+            <h1>Update 1.5 - July 3, 2026</h1>
+            <ul>
+                <li>Added 1 new tier 3 enemy</li>
+                <li>Added 1 new upgrade</li>
+                <li>Made intro screen look slightly better</li>
+                <li>Added background color</li>
+                <li>Balance Changes:</li>
+                <ul>
+                    <li>Increased health of furnace zombie (15 -> 20)</li>
+                    <li>Reworked speed scaling for furnace zombie (Before: 6-health/3. After: 6.5-health/4)</li>
+                    <b>Developer's note:</b> Furnace zombie felt way too underpowered for a tier 3 enemy.
+                    <li>Increased the rate at which health potions spawn (16.67s on average -> 10s)</li>
+                    <li>Increased the range of healing amounts that health potions can give (1-4 -> 2-5)</li>
+                    <b>Developer's note:</b> Health potions felt too rare and not useful enough, leading to players being forced to pick healing-related upgrades in order to stay alive.
+                    <li>Decreased amount of times the 2x Exp Gain upgrade could be obtained (2 -> 1)</li>
+                    <li>Nerfed wave 9 (2 tier 3 enemies -> 1 tier 3 enemy)</li>
+                    <li>Nerfed wave 10 (3 tier 3 enemies -> 2 tier 3 enemies)</li>
+                    <b>Developer's note:</b> Waves 9 and 10 were still too difficult even on easy difficulty.
+                </ul>
+            </ul>
 
             <h1>Update 1.4 - June 30, 2026</h1>
             <ul>
@@ -79,8 +112,8 @@
                     <li>Increased starting health for easy and medium difficulties (15 for easy, 12 for medium, originally 10 for both)</li>
                     <li>Decreased rates at which enemies spawn for easy, medium, and hard mode</li>
                     <li>Decreased boss difficulty for easy, medium, and hard mode</li>
+                    <b>Developer's note:</b> Got feedback that the player died way too quickly even in easy difficulty.
                 </ul>
-                Developer's note: Got feedback that the player died way too quickly even in easy difficulty.
             </ul>
 
             <h1>Update 1.3</h1>

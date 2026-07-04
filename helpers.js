@@ -58,7 +58,6 @@ document.addEventListener("keydown", (e)=>{
             player.currentExp+=10000;
         }
         if(e.key=="p"){
-            player.currentExp+=1000;
             ChangeWave(); 
         }
         if(e.key=="o"){
@@ -66,27 +65,17 @@ document.addEventListener("keydown", (e)=>{
                 enemies[i].takeDamage(new Bullet(1,1,20), i);
             }
         }
-        if(e.key=="q" && player.bombCount>0 && player.bombTimer<=0){
-            let distanceX=mouseX-screen.width/2;
-            let distanceY=mouseY-screen.height/2;
-            let distance = distanceX * distanceX + distanceY * distanceY;
-            console.log(mouseX+" "+mouseY+" "+distance);
-            let vx = 0;
-            let vy = 0;
-
-            if (distance > 0) {
-                let angle=Math.atan2(distanceY, distanceX);
-                vx=5*Math.cos(angle);
-                vy=5*Math.sin(angle);
-            }
-            bullets.push(new PlayerBomb(player.x, player.y, vx, vy))
-            player.bombTimer=420;
-            bombIcon.indicator.style.color="black";
+        if(e.key=="q" && playerAbilities.length>0){
+            playerAbilities[0].Activate();
         }
-        if(e.key=="e" && player.timeWarp>0 && player.timeWarpTimer<=0){
-            timeWarpCounter=250;
-            player.timeWarpTimer=800;
-            timeWarpIcon.indicator.style.color="black";
+        if(e.key=="e" && playerAbilities.length>1){
+            playerAbilities[1].Activate();
+        }
+        if(e.key=="r" && playerAbilities.length>2){
+            playerAbilities[2].Activate();
+        }
+        if(e.key=="f" && playerAbilities.length>3){
+            playerAbilities[3].Activate();
         }
         if (['w', 'a', 's', 'd'].includes(e.key)) {
             e.preventDefault();
@@ -130,6 +119,7 @@ window.addEventListener("beforeunload", (e)=>{
     localStorage.setItem("BuilderEnemyFound", BuilderEnemy.seen);
     localStorage.setItem("SpawnerEnemyFound", SpawnerEnemy.seen);
     localStorage.setItem("SelfDestructEnemyFound", SelfDestructEnemy.seen);
+    localStorage.setItem("MachineGunEnemyFound", MachineGunEnemy.seen);
 
     localStorage.setItem("LaserBossFound", LaserBoss.seen);
     localStorage.setItem("IceBossFound", IceBoss.seen);
@@ -159,6 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
     BuilderEnemy.seen=JSON.parse(localStorage.getItem("BuilderEnemyFound"));
     SpawnerEnemy.seen=JSON.parse(localStorage.getItem("SpawnerEnemyFound"));
     SelfDestructEnemy.seen=JSON.parse(localStorage.getItem("SelfDestructEnemyFound"));
+    MachineGunEnemy.seen=JSON.parse(localStorage.getItem("MachineGunEnemyFound"));
 
     LaserBoss.seen=JSON.parse(localStorage.getItem("LaserBossFound"));
     IceBoss.seen=JSON.parse(localStorage.getItem("IceBossFound"));
