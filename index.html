@@ -16,6 +16,9 @@
                 font-family: Black ops one;
                 pointer-events:none;
             }
+            button{
+                cursor: pointer;
+            }
             
         </style>
         <title>A COMPLETELY ORIGINAL GAME</title>
@@ -26,6 +29,7 @@
         <canvas id="myCanvas" width=1920 height=1080 style="position:absolute; z-index: 0"></canvas>
         <div id="gamePage" style="display:none">
                 <div id="world" style="position: relative;left: 0;right: 0;">
+                    <script src="UI.js" defer></script>
                     <script src="initialization.js" defer></script>
                     <script src="helpers.js" defer></script>
                     <script src="game.js" defer></script>
@@ -40,6 +44,10 @@
         <div id="winPage" style="display:none">            
             <h1 style="text-align: center; font-size: 67px; position: absolute; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0;"><span style="background-color: black; color: white">You Win!</span></h1>
             <button onclick="ChangePage('difficultyPage', false)" style="text-align: center; font-size: 67px; position: relative; top: 230px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Play Again</button>
+
+        </div>
+        <div id="loadingPage" style="display:none">            
+            <h1 style="text-align: center; font-size: 67px; position: absolute; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0;"><span style="background-color: black; color: white">Loading...</span></h1>
 
         </div>
         <div id="upgradePage" style="display:none">
@@ -57,11 +65,32 @@
         <div id="difficultyPage" style="display:none">
             <h1 style="text-align: center; font-size: 67px; position: relative; top: 7px; left: 0; width: 100%; z-index: 1000; margin: 0;">Choose Your Difficulty</h1>
             
-            <button onclick="Commence(1)" style="text-align: center; font-size: 67px; position: relative; top: 130px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Easy</button>
-            <button onclick="Commence(2)" style="text-align: center; font-size: 67px; position: relative; top: 150px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Normal</button>
-            <button onclick="Commence(3)" style="text-align: center; font-size: 67px; position: relative; top: 170px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Hard</button>
-            <button onclick="Commence(4)" style="text-align: center; font-size: 67px; position: relative; top: 190px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Extreme Demon</button>
+            <button onclick="SetDifficulty(1)" style="text-align: center; font-size: 67px; position: relative; top: 130px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Easy</button>
+            <button onclick="SetDifficulty(2)" style="text-align: center; font-size: 67px; position: relative; top: 150px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Normal</button>
+            <button onclick="SetDifficulty(3)" style="text-align: center; font-size: 67px; position: relative; top: 170px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Hard</button>
+            <button onclick="SetDifficulty(4)" style="text-align: center; font-size: 67px; position: relative; top: 190px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Extreme Demon</button>
             <button onclick="ChangePage('IntroPage', false)" style="text-align: center; font-size: 67px; position: relative; top: -410px; left: 1300px; width: 15%; z-index: 1000; margin: 0px;">Back</button>
+
+        </div>
+        <div id="characterSelectionPage" style="display:none">
+            <h1 style="text-align: center; font-size: 67px; position: relative; top: 7px; left: 0; width: 100%; z-index: 1000; margin: 0;">Choose Your Character</h1>
+            
+            <button onclick="SelectCharacter(1)" style=" font-size:30px; position:absolute; top: 300px; left: 100px; width: 200px; height:200px; z-index: 1000;padding:0px" id="basicPlayer"><img src="images/player.webp" style="height:100%;width: 100%; "></img></button>
+            <h1 style="position: absolute  ; text-align:center;top: 225px; left: 100px; width: 200px; height:200px; z-index: 1000;">Basic</h1>
+            <button onclick="SelectCharacter(2)" style=" font-size:30px;position: absolute; top: 300px; left: 500px; width: 200px; height:200px; z-index: 1000;padding:0px" id="tankPlayer"><img src="images/tankPlayer.webp" style="height:100%;width: 100%; "id="tankPlayerImage"></img></button>
+            <h1 style="position: absolute  ; text-align:center;top: 225px; left: 500px; width: 200px; height:200px; z-index: 1000;"id="tankPlayerText">Tank</h1>
+            <button onclick="SelectCharacter(3)" style=" font-size:30px;position: absolute; top: 300px; left: 900px; width: 200px; height:200px; z-index: 1000;padding:0px" id="healerPlayer"><img src="images/healerPlayer.webp" style="height:100%;width: 100%; "id="healerPlayerImage"></img></button>
+            <h1 style="position: absolute  ; text-align:center;top: 225px; left: 900px; width: 200px; height:200px; z-index: 1000;"id="healerPlayerText">Healer</h1>
+            <button onclick="SelectCharacter(4)" style=" font-size:30px;position: absolute; top: 300px; left: 1300px; width: 200px; height:200px; z-index: 1000;padding:0px" id="magePlayer"><img src="images/magePlayer.webp" style="height:100%;width: 100%; "id="magePlayerImage"></img></button>
+            <h1 style="position: absolute  ; text-align:center;top: 225px; left: 1300px; width: 200px; height:200px; z-index: 1000;"id="magePlayerText">Mage</h1>
+            
+            <h1 style="position: absolute  ; text-align:center;top: 500px; height:200px; z-index: 1000;"id="descriptionText"></h1>
+
+            
+            <!-- <button onclick="Commence(3)" style="text-align: center; font-size: 67px; position: relative; top: 170px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Hard</button>
+            <button onclick="Commence(4)" style="text-align: center; font-size: 67px; position: relative; top: 190px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Extreme Demon</button> -->
+            <button onclick="ChangePage('difficultyPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 10px; left: 80%; width: 15%; z-index: 1001; margin: 0px;">Back</button>
+            <button onclick="Commence()" style="text-align: center; font-size: 67px; position: absolute; top: 110px; left: 80%; width: 15%; z-index: 1001; margin: 0px;" id="startButton" disabled>Start</button>
 
         </div>
         
@@ -79,6 +108,26 @@
 
             <h1>.</h1>
 
+            <h1>Update 2.0 - </h1>
+            <ul>
+                <li>Added new feature: Unlockable characters! These are chosen before the start of the game and can be unlocked though progression. Currently, there are three new characters: Tank, Healer, and Mage. Each character has their own unique strengths and weaknesses.</li>
+                <li>Added 1 new tier 3 enemy</li>
+                <li>Balance Changes:</li>
+                <ul>
+                    <li>Increased time between attacks of arena closer (0.33s -> 0.5s)</li>
+                    <b>Developer's note:</b> Arena closer was too good at its job.
+                    <li>Increased health of slither.io boss (240 -> 300)</li>
+                    <b>Developer's note:</b> slither.io could be burst down too easily, especially for a tier 2 boss.
+                    <li>Increased starting health hultiplier for easy and medium difficulties (1.5x -> 1.8x for easy, 1.2x -> 1.4x for medium)</li>
+                    <li>Decreased enemy spawn rate for easy and medium difficulties.</li>
+                    <b>Developer's note:</b> Since there are now multiple characters with different amounts of starting health, it has become a multiplier instead of a flat increase. Easy and medium mode were still too difficult so they get nerfed yet again.
+                    <li>Made every boss enemy deal knockback to the player instead of instantly killing them on contact</li>
+                    <b>Developer's note:</b> Instakilling the player on contact caused a lot of runs to suddenly die out, and it's always really frustrating when that happens. Now every boss deals knockback and a little bit of damage instead. All the bosses currently in the game either already deal knockback or rely on their projectiles for damage, so this shouldn't be too big of a nerf.
+                    <li>Made health potions survive longer before dissappearing (10s -> 16.67s)</li>
+
+
+                </ul>
+            </ul>
 
             <h1>Update 1.5 - July 3, 2026</h1>
             <ul>
@@ -137,7 +186,7 @@
             </ul>
         </div>
         <div id="newEnemyPage" style="display:none">
-            <h1 style="text-align: center; font-size: 67px; position: absolute; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0px;"><span style="background-color: black; color: white">New Enemy Discovered!</span></h1>
+            <h1 style="text-align: center; font-size: 67px; position: absolute; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0px;" id="introText"><span style="background-color: black; color: white">New Enemy Discovered!</span></h1>
         </div>
     </head>
 </html>

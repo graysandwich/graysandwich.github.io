@@ -120,6 +120,7 @@ window.addEventListener("beforeunload", (e)=>{
     localStorage.setItem("SpawnerEnemyFound", SpawnerEnemy.seen);
     localStorage.setItem("SelfDestructEnemyFound", SelfDestructEnemy.seen);
     localStorage.setItem("MachineGunEnemyFound", MachineGunEnemy.seen);
+    localStorage.setItem("SmokeBombEnemyFound", SmokeBombEnemy.seen);
 
     localStorage.setItem("LaserBossFound", LaserBoss.seen);
     localStorage.setItem("IceBossFound", IceBoss.seen);
@@ -129,6 +130,10 @@ window.addEventListener("beforeunload", (e)=>{
 
     localStorage.setItem("GambleBossFound", GambleBoss.seen);
     localStorage.setItem("SnakeBossFound", SnakeBoss.seen);
+    
+    localStorage.setItem("TankPlayerUnlocked", TankPlayer.unlocked);
+    localStorage.setItem("HealerPlayerUnlocked", HealerPlayer.unlocked);
+    localStorage.setItem("MagePlayerUnlocked", MagePlayer.unlocked);
 });
 document.addEventListener('DOMContentLoaded', () => {
     BasicEnemy.seen=JSON.parse(localStorage.getItem("BasicEnemyFound"));
@@ -150,6 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
     SpawnerEnemy.seen=JSON.parse(localStorage.getItem("SpawnerEnemyFound"));
     SelfDestructEnemy.seen=JSON.parse(localStorage.getItem("SelfDestructEnemyFound"));
     MachineGunEnemy.seen=JSON.parse(localStorage.getItem("MachineGunEnemyFound"));
+    SmokeBombEnemy.seen=JSON.parse(localStorage.getItem("SmokeBombEnemyFound"));
 
     LaserBoss.seen=JSON.parse(localStorage.getItem("LaserBossFound"));
     IceBoss.seen=JSON.parse(localStorage.getItem("IceBossFound"));
@@ -159,4 +165,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     GambleBoss.seen=JSON.parse(localStorage.getItem("GambleBossFound"));
     SnakeBoss.seen=JSON.parse(localStorage.getItem("SnakeBossFound"));
+
+    BasicPlayer.unlocked=true;
+    TankPlayer.unlocked=JSON.parse(localStorage.getItem("TankPlayerUnlocked"));
+    HealerPlayer.unlocked=JSON.parse(localStorage.getItem("HealerPlayerUnlocked"));
+    MagePlayer.unlocked=JSON.parse(localStorage.getItem("MagePlayerUnlocked"));
 });

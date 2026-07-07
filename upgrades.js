@@ -29,6 +29,7 @@ function addLaserProjectiles(amount) {
 }
 function speedUpAttacks(amount) {
     player.attackSpeed /= amount;
+    player.attackSpeedMultiplier/=amount;
     ChangePage('gamePage', false)
 }
 function addSiphon(amount) {
