@@ -18,6 +18,7 @@ class Enemy {
         this.health = health;
         this.maxHealth=health;
         this.isBoss = false;
+        this.isEnemy=true;
         this.value = 30;
         if (Math.random() < 0.5) {
             this.y = Math.random() * canvas.height;
@@ -318,7 +319,7 @@ class LaserBoss extends Enemy {
             this.shootTimer--;
         }
         if (this.shootTimer <= 0) {
-            this.shootTimer = 400;
+            this.shootTimer = 450;
             this.shootTimer-=this.shootTimer*(bossMultiplier-1)*0.4
             let distanceX = player.x - (this.x);
             let distanceY = player.y - (this.y);
@@ -328,7 +329,7 @@ class LaserBoss extends Enemy {
             enemyBullets.push(new Laser(this.angle + 1.2, this.x, this.y));
             enemyBullets.push(new Laser(this.angle - 1.2, this.x, this.y));
             this.speed = 0;
-            this.speedTimer = 300;
+            this.speedTimer = 350;
             this.speedTimer-=this.speedTimer*(bossMultiplier-1)*0.4
         }
     }
@@ -3547,6 +3548,7 @@ class EnemyBullet {
         this.ignoreShield=false;
         this.ignoreWipe=false;
         this.hitPlayer=false;
+        this.isEnemy=false;
     }
     move() {
 
@@ -4253,8 +4255,12 @@ class Player {
         this.healMultiplier=1;
         this.attackSpeedMultiplier=1;
         this.projectileSizeMultiplier=1;
+        this.collisionDamageMultiplier=1;
     }
     takeDamage(damage, bullet) {
+        if(bullet.isEnemy){
+            damage*=this.collisionDamageMultiplier;
+        }
         if(playerShield!=null){
             playerShield.takeDamage(damage);
             return;
@@ -4471,7 +4477,7 @@ class TankPlayer extends Player{
         this.attackSpeed=70;
         this.nextLevel=120;
         this.damage=2;
-        this.image="images/tankPlayer.webp";
+        this.image.src="images/tankPlayer.webp";
         this.normalImage="images/tankPlayer.webp";
         this.mirroredImage="images/tankPlayerMirrored.webp";
         this.shieldTimer=1800;
@@ -4483,10 +4489,10 @@ class TankPlayer extends Player{
         }
         super.act();
         if(movingLeft){
-            this.image=this.normalImage;
+            this.image.src=this.normalImage;
         }
         if(movingRight){
-            this.image=this.mirroredImage;
+            this.image.src=this.mirroredImage;
         }
         this.shieldTimer--;
         if(this.shieldTimer<=0){
@@ -5071,6 +5077,7 @@ function GameLogic() {
                 enemies[i].bossText.remove();
                 bossesLeft--;
                 if (bossesLeft == 0) {
+                    killedBoss=true;
                     ChangeWave();
                 }
             }
@@ -5149,6 +5156,12 @@ function GameLogic() {
     if (player.health <= 0) {
         EndGame(false);
         player.health=0;
+    }
+    if(currentPage=="gamePage" && killedBoss==true){
+        ChangePage("upgradePage", false);
+    }
+    if(currentPage=="gamePage" && isLevelling==true){
+        ChangePage("upgradePage", false);
     }
     levellingBar.Update();
     healthBar.Update();
@@ -5245,6 +5258,7 @@ function ChangePage(id, reset) {
     if (gameOver && id == "upgradePage") {
         return;
     }
+    currentPage=id;
     list = document.querySelectorAll('div[id$="Page"]');
     if (id != "upgradePage" && id != "newEnemyPage") {
         for (let i = 0; i < list.length; i++) {
@@ -5457,18 +5471,36 @@ function ChangePage(id, reset) {
         paused = true;
         choice1 = document.createElement("div");
         choice2 = document.createElement("div");
-        let randomNum = Math.floor(Math.random() * NUMUPGRADES);
-        while (boughtUpgrades[randomNum] == 1) {
-            randomNum = Math.floor(Math.random() * NUMUPGRADES);
-        }
-        choice1.innerHTML=`<button onclick="${UPGRADES[randomNum].onclick}" style="position:absolute;left:${canvas.width/2-400}px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">${UPGRADES[randomNum].text}</button>`;
+        if(killedBoss==false){
+            document.getElementById("upgradeText").style.color="white";
+            let randomNum = Math.floor(Math.random() * NUMUPGRADES);
+            while (boughtUpgrades[randomNum] == 1) {
+                randomNum = Math.floor(Math.random() * NUMUPGRADES);
+            }
+            choice1.innerHTML=`<button onclick="${UPGRADES[randomNum].onclick}" style="position:absolute;left:${canvas.width/2-400}px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">${UPGRADES[randomNum].text}</button>`;
 
-        let randomNum2 = Math.floor(Math.random() * NUMUPGRADES);
-        while (randomNum == randomNum2 || boughtUpgrades[randomNum2] == 1) {
-            randomNum2 = Math.floor(Math.random() * NUMUPGRADES);
+            let randomNum2 = Math.floor(Math.random() * NUMUPGRADES);
+            while (randomNum == randomNum2 || boughtUpgrades[randomNum2] == 1) {
+                randomNum2 = Math.floor(Math.random() * NUMUPGRADES);
+            }
+            choice2.innerHTML=`<button onclick="${UPGRADES[randomNum2].onclick}" style="position:absolute;left:${canvas.width/2}px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">${UPGRADES[randomNum2].text}</button>`;
+            isLevelling=false;
         }
-        choice2.innerHTML=`<button onclick="${UPGRADES[randomNum2].onclick}" style="position:absolute;left:${canvas.width/2}px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">${UPGRADES[randomNum2].text}</button>`;
+        else{
+            document.getElementById("upgradeText").style.color="yellow";
+            let randomNum = Math.floor(Math.random() * NUMTIER2UPGRADES);
+            while (boughtTier2Upgrades[randomNum] == 1) {
+                randomNum = Math.floor(Math.random() * NUMTIER2UPGRADES);
+            }
+            choice1.innerHTML=`<button onclick="${TIER2UPGRADES[randomNum].onclick}" style="position:absolute;left:${canvas.width/2-400}px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">${TIER2UPGRADES[randomNum].text}</button>`;
 
+            let randomNum2 = Math.floor(Math.random() * NUMTIER2UPGRADES);
+            while (randomNum == randomNum2 || boughtTier2Upgrades[randomNum2] == 1) {
+                randomNum2 = Math.floor(Math.random() * NUMTIER2UPGRADES);
+            }
+            choice2.innerHTML=`<button onclick="${TIER2UPGRADES[randomNum2].onclick}" style="position:absolute;left:${canvas.width/2}px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">${TIER2UPGRADES[randomNum2].text}</button>`;
+            killedBoss=false;
+        }
         document.body.appendChild(choice1);
         document.body.appendChild(choice2);
     }

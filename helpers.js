@@ -173,9 +173,9 @@ document.addEventListener('DOMContentLoaded', () => {
     HealerBoss.seen=JSON.parse(localStorage.getItem("HealerBossFound"));
 
     BasicPlayer.unlocked=true;
-    TankPlayer.unlocked=JSON.parse(localStorage.getItem("TankPlayerUnlocked"));
-    HealerPlayer.unlocked=JSON.parse(localStorage.getItem("HealerPlayerUnlocked"));
-    MagePlayer.unlocked=JSON.parse(localStorage.getItem("MagePlayerUnlocked"));
+    if(JSON.parse(localStorage.getItem("TankPlayerUnlocked"))!=null) TankPlayer.unlocked=JSON.parse(localStorage.getItem("TankPlayerUnlocked"));
+    if(JSON.parse(localStorage.getItem("HealerPlayerUnlocked"))!=null) HealerPlayer.unlocked=JSON.parse(localStorage.getItem("HealerPlayerUnlocked"));
+    if(JSON.parse(localStorage.getItem("MagePlayerUnlocked"))!=null) MagePlayer.unlocked=JSON.parse(localStorage.getItem("MagePlayerUnlocked"));
 
     if(JSON.parse(localStorage.getItem("ShowHealthbarSetting"))!=null) showHealthBars=JSON.parse(localStorage.getItem("ShowHealthbarSetting"));
 

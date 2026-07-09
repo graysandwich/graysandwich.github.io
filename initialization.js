@@ -22,9 +22,14 @@ let currentWave=0;
 let SCALE=0.001;
 let continueFlag=false;
 const NUMUPGRADES=17;
+const NUMTIER2UPGRADES=5;
 let boughtUpgrades=new Array(NUMUPGRADES);
 for(let i=0;i<boughtUpgrades.length;i++){
     boughtUpgrades[i]=0;
+}
+let boughtTier2Upgrades=new Array(NUMTIER2UPGRADES);
+for(let i=0;i<boughtTier2Upgrades.length;i++){
+    boughtTier2Upgrades[i]=0;
 }
 let UPGRADES = [
     { onclick: "increaseDamage(1)",        text: "+1 Damage" },
@@ -46,6 +51,13 @@ let UPGRADES = [
     { onclick: "IncreaseProjectileSize(1.5)",  text: "Increase Projectile Size" },
     { onclick: "",  text: "" }
 ];
+let TIER2UPGRADES=[
+    { onclick: "increaseDamage(2)",        text: "+2 Damage" },
+    { onclick: "increaseMaxHealth(20)",    text: "+20 Max Health" },
+    { onclick: "increaseProjectiles(4)",   text: "+4 Projectiles" },
+    { onclick: "HalveCollisionDamage(0.5)",   text: "Enemy Collisions Deal 0.5x Damage" },
+    { onclick: "AddSiphon(0.5)",   text: "+0.5 Siphon" },
+]
 let timeWarpCounter=0;
 let gambleTimer=0;
 let gambleChoice=0;
@@ -64,6 +76,9 @@ let chosenCharacter=0;
 let images={};
 let doneLoading=false;
 let showHealthBars=true;
+let killedBoss=false;
+let isLevelling=false;
+let currentPage="";
 const imageSources = {
 //   aimingEnemy: 'images/aimingEnemy.webp',
 //   background: 'images/background.webp',
@@ -262,6 +277,8 @@ function Start(){
     timeWarpCounter=-1;
 
     movingLeft, movingRight, movingUp, movingDown=false;
+    isLevelling=false;
+    killedBoss=false;
     page="gamePage";
     
     
@@ -307,6 +324,7 @@ function Start(){
     }
     RandomizeEnemies(2, 0, 0,0,0);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    currentPage="gamePage";
     loop();
 
 }

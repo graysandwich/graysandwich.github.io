@@ -1,7 +1,10 @@
 function increaseDamage(amount) {
     player.damage += amount;
-    boughtUpgrades[0] = 1;
-
+    if(amount==1){
+        boughtUpgrades[0] = 1;
+    }
+    boughtTier2Upgrades[0]=1;
+    
     ChangePage('gamePage', false)
 }
 
@@ -13,7 +16,11 @@ function increaseMaxHealth(amount) {
 
 function increaseProjectiles(amount) {
     player.projectiles += amount;
-    boughtUpgrades[2] += 0.5;
+    if(amount==2){
+        boughtUpgrades[2] += 0.5;
+    }
+    boughtTier2Upgrades[2]=1;
+    
     ChangePage('gamePage', false)
 }
 
@@ -251,5 +258,10 @@ function BulletDeleterAbility(amount) {
 function IncreaseProjectileSize(amount) {
     player.projectileSizeMultiplier *=amount;
     boughtUpgrades[16]+=0.5;
+    ChangePage('gamePage', false)
+}
+function HalveCollisionDamage(amount) {
+    player.collisionDamageMultiplier *=amount;
+    boughtTier2Upgrades[3]=1;
     ChangePage('gamePage', false)
 }

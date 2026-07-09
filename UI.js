@@ -110,7 +110,12 @@ class LevellingBar {
             player.Heal(5);
             // console.log(player.currentExp+" "+player.nextLevel);
             //this.image2.style.width=(player.currentExp/player.nextLevel*400)+"px";
-            ChangePage("upgradePage", true);
+            if(currentPage=="gamePage"){
+                ChangePage("upgradePage", true);
+            }
+            else{
+                isLevelling=true;
+            }
         }
     }
 }
