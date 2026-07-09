@@ -1,14 +1,22 @@
 
 const canvas = document.getElementById('myCanvas');
 const ctx = canvas.getContext('2d');
+
 class Enemy {
     static isActive = false;
     static seen = false;
+    static spawnCooldown=0;
+    static baseTimer=0;
+    static randomTimer=0;
+    static index=0;
+    static health=0;
+    static speed=0;
     constructor(speed, health) {
         this.image = new Image();
         this.image.src = 'images/enemy.webp';
         this.speed = speed;
         this.health = health;
+        this.maxHealth=health;
         this.isBoss = false;
         this.value = 30;
         if (Math.random() < 0.5) {
@@ -31,7 +39,9 @@ class Enemy {
         }
         this.width = 50;
         this.height = 50;
+
         this.ignoreBullets = false;
+        this.ignoreShield=false;
         this.giveXP = true;
         this.redTimer = 0;
         this.slowCountdown = -1;
@@ -40,6 +50,8 @@ class Enemy {
         this.accelerationY=0;
         this.speedTimer=0;
         this.knockbackIFrame=0;
+        this.hasHealthBar=true;
+        this.healTimer=0;
         //console.log(this.image);
     }
     draw() {
@@ -51,7 +63,22 @@ class Enemy {
             ctx.strokeStyle = "blue";
             ctx.strokeRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
         }
-        if (this.redTimer > 0) {
+        else{
+            if(showHealthBars && this.hasHealthBar){
+                ctx.fillStyle = "red";
+                ctx.fillRect(this.x - this.width / 2-this.width/4, this.y - this.height, this.width*1.5, 15)
+                ctx.fillStyle = "green";
+                ctx.fillRect(this.x - this.width / 2-this.width/4, this.y - this.height, (this.width*1.5)/this.maxHealth*this.health, 15)
+            }
+        }
+        if(this.healTimer>0){
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+            ctx.globalCompositeOperation = 'multiply';
+            ctx.fillStyle = 'lime';
+            ctx.fillRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+        }
+        else if (this.redTimer > 0) {
             ctx.globalCompositeOperation = 'source-over';
             ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
             ctx.globalCompositeOperation = 'multiply';
@@ -118,7 +145,17 @@ class Enemy {
             this.speedTimer--;
         }
         if(this.redTimer>0)this.redTimer--;
+        this.healTimer--;
         this.checkForCollisions();
+    }
+    
+    Heal(amount){
+        this.health=Math.min(this.maxHealth,this.health+amount);
+        floatingObjects.push(new FloatingObject(this.x-this.width/2+Math.random()*this.width,this.y,amount,"lime"));
+        this.healTimer=10;
+        if (this.isBoss) {
+            this.bossBar.Update();
+        }
     }
     checkForCollisions() {
         if(this.isBoss && 
@@ -146,7 +183,7 @@ class Enemy {
             this.knockbackIFrame = 15;
         
         }
-        else if (
+        else if (!this.isBoss &&
             (player.x - player.width / 2) < (this.x + this.width / 2) &&
             (player.x + player.width / 2) > (this.x - this.width / 2) &&
             (player.y - player.height / 2) < (this.y + this.height / 2) &&
@@ -207,6 +244,16 @@ class Enemy {
         }
         this.accelerationX += x;
         this.accelerationY += y;
+    }
+    static Spawn(){
+        this.spawnCooldown--;
+        if(this.spawnCooldown<=0 ){
+            this.spawnCooldown = Math.random() * this.randomTimer + this.baseTimer;
+            this.spawnCooldown /= 1 + timeElapsed * SCALE;
+            //console.log(ENEMYTYPES[0]+" "+this.index)
+            const newEnemy = new ENEMYTYPES[this.index](this.speed, this.health);
+            enemies[enemies.length] = newEnemy;
+        }
     }
 }
 class BasicEnemy extends Enemy {
@@ -365,9 +412,6 @@ class IceBoss extends Enemy {
             this.frostAura.remove();
         }
     }
-    move() {
-        super.move();
-    }
     draw() {
         if (this.dead) return;
         ctx.save();
@@ -377,7 +421,14 @@ class IceBoss extends Enemy {
         ctx.globalAlpha=0.4;
         ctx.drawImage(this.frostAura, this.x - this.frostAuraWidth / 2, this.y - this.frostAuraHeight / 2, this.frostAuraWidth, this.frostAuraHeight);
         ctx.globalAlpha=1; 
-        if (this.redTimer > 0) {
+        if(this.healTimer>0){
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+            ctx.globalCompositeOperation = 'multiply';
+            ctx.fillStyle = 'lightgreen';
+            ctx.fillRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+        }
+        else if (this.redTimer > 0) {
             ctx.globalCompositeOperation = 'source-over';
             ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
             ctx.globalCompositeOperation = 'multiply';
@@ -602,7 +653,14 @@ class BouncyBoss extends Enemy {
         ctx.strokeStyle = "blue";
         ctx.strokeRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
         ctx.strokeStyle = "red";
-        if (this.redTimer > 0) {
+        if(this.healTimer>0){
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+            ctx.globalCompositeOperation = 'multiply';
+            ctx.fillStyle = 'lime';
+            ctx.fillRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+        }
+        else if (this.redTimer > 0) {
             ctx.globalCompositeOperation = 'source-over';
             ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
             ctx.globalCompositeOperation = 'multiply';
@@ -1244,7 +1302,14 @@ class GambleBoss extends Enemy {
         ctx.lineWidth = 5;
         ctx.strokeStyle = "blue";
         ctx.strokeRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
-        if (this.redTimer > 0) {
+        if(this.healTimer>0){
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+            ctx.globalCompositeOperation = 'multiply';
+            ctx.fillStyle = 'lime';
+            ctx.fillRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+        }
+        else if (this.redTimer > 0) {
             ctx.globalCompositeOperation = 'source-over';
             ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
             ctx.globalCompositeOperation = 'multiply';
@@ -1336,6 +1401,7 @@ class SnakeBoss extends Enemy {
         }
         else{
             SnakeBoss.count--;
+            this.hasHealthBar=false;
             this.image.src = 'images/snakeBody.webp';
             this.isBoss = false;
             this.value = 0;
@@ -1511,6 +1577,155 @@ class SnakeBoss extends Enemy {
         else{
             super.draw();
         }
+    }
+}
+class HealerBoss extends Enemy {
+    /*
+    Idea: Heals self and enemies in a circle around it every time it deals damage
+    */
+    constructor(speed, health) {
+        super(speed, health);
+        this.image.src = 'images/healingBoss.webp';
+        this.width = 150;
+        this.height = 150;
+
+        this.shootTimer = 60;
+        this.shootTimer-=this.shootTimer*(bossMultiplier-1)*0.4
+        this.isBoss = true;
+        this.value = 500;
+        //console.log(this.image.style.transform+" transofrmer");
+
+
+        this.healAura = new Image();
+        this.healAuraWidth = 750;
+        this.healAuraHeight = 750;
+        this.healAura.src="images/healAura.webp"
+        this.bossText = document.createElement("div");
+        this.bossText.style.position = "absolute"
+        this.bossText.innerHTML = `<div style=" color:red;pointer-events:none; font-size:30px; white-space: nowrap; font-family:'Black Ops One'; text-align:center;" id="bossTitle">The Database</div>`
+        this.bossText.style.left = (canvas.width / 2-200) + "px";
+        this.bossText.style.top = (25 + bossBars.length * 75) + "px";
+        this.bossText.style.zIndex = 2;
+        this.bossText.style.transform = "translate(-50%, -50%)";
+        //console.log(bossText.style.transform+" tradsnf");
+
+        document.body.appendChild(this.bossText);
+        //console.log(this.shootTimer);
+        this.isHealing=false;
+        this.healAbilityTimer=1200;
+        this.stopTimer=0;
+        this.healCooldown=15-15*(bossMultiplier-1)*0.4;
+        this.healCooldown=Math.round(this.healCooldown);
+
+        this.health=Math.ceil(this.health*bossMultiplier);
+        this.maxHealth = this.health;
+        this.bossBar = new BossBar(this);
+        bossBars.push(this.bossBar);
+        
+    }
+    timer() {
+        this.stopTimer--;
+        if (this.slowCountdown > 0) {
+            this.shootTimer -= 0.5;
+            this.healAbilityTimer-=0.5;
+        }
+        else {
+            this.shootTimer--;
+            this.healAbilityTimer--;
+        }
+        if (this.shootTimer <= 0 && this.isHealing==false) {
+            this.shootTimer = 160;
+            this.shootTimer-=this.shootTimer*(bossMultiplier-1)*0.4;
+            enemyBullets.push(new HealerBossBullet(0,0,1,this.x+75,this.y+75,this));
+            enemyBullets.push(new HealerBossBullet(0,0,1,this.x-75,this.y+75,this));
+            enemyBullets.push(new HealerBossBullet(0,0,1,this.x+75,this.y-75,this));
+            enemyBullets.push(new HealerBossBullet(0,0,1,this.x-75,this.y-75,this));
+            
+        }
+        //console.log(this.healCooldown)
+        if(this.stopTimer>0 && this.stopTimer%this.healCooldown==0){
+            this.Heal(1);
+        }
+        if(this.stopTimer<=0 && this.isHealing){
+            this.isHealing=false;
+            this.bossText.innerHTML = `<div style=" color:red;pointer-events:none; font-size:30px; white-space: nowrap; font-family:'Black Ops One'; text-align:center;" id="bossTitle">The Database</div>`
+            this.image.src = "images/healingBoss.webp";
+        }
+        if(this.healAbilityTimer<=0){
+            this.stopTimer=360;
+            this.healAbilityTimer=1200;
+            this.isHealing=true;
+            this.bossText.innerHTML = `<div style=" color:red;pointer-events:none; font-size:30px; white-space: nowrap; font-family:'Black Ops One'; text-align:center;" id="bossTitle">Healing...</div>`
+            this.image.src="images/healingBossHeal.webp";
+        }
+        if(this.isHealing){
+            this.speed=0;
+        }
+        else{
+            this.speed=1.5;
+        }
+    }
+    move(){
+        super.move();
+    }
+    takeDamage(bullet, index) {
+        super.takeDamage(bullet, index);
+        if (this.dead == true) {
+            player.slowed = false;
+            this.frostAura.remove();
+        }
+    }
+    HealAll(){
+
+        for(let i=0;i<enemies.length;i++){
+            if(RectCircleColliding(this, enemies[i], 375, this.x, this.y)){
+                enemies[i].Heal(1);
+            }
+        }
+    }
+    draw() {
+        if (this.dead) return;
+        ctx.save();        
+        ctx.globalAlpha=0.4;
+        ctx.fillStyle="lightgreen"
+        if(this.healTimer>0 && this.isHealing==false){
+            ctx.drawImage(this.healAura, this.x - this.healAuraHeight / 2, this.y - this.healAuraHeight / 2, this.healAuraWidth, this.healAuraHeight);
+        }
+        ctx.drawImage(this.healAura, this.x - this.healAuraHeight / 2, this.y - this.healAuraHeight / 2, this.healAuraWidth, this.healAuraHeight);
+        ctx.globalAlpha=1; 
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = "blue";
+        ctx.strokeRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+        if(this.healTimer>0 && this.isHealing==false){
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+            ctx.globalCompositeOperation = 'multiply';
+            ctx.fillStyle = 'lime';
+            ctx.fillRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+        }
+        else if (this.redTimer > 0) {
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+            ctx.globalCompositeOperation = 'multiply';
+            ctx.fillStyle = 'rgba(255, 80, 80, 0.6)';
+            ctx.fillRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+        }
+        else if (this.slowCountdown > 0) {
+            ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+            ctx.globalCompositeOperation = 'multiply';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            ctx.fillRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+        }
+        else {
+            ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+        }
+
+        ctx.restore();
+    }
+    special() {
+        //console.log(this.frostAura.style.left);
+        this.timer();
+
     }
 }
 // class CodingBoss extends Enemy {
@@ -1700,10 +1915,6 @@ class ChargingEnemy extends Enemy {
         this.accelerationX/=1.05;
         this.accelerationY/=1.05;
 
-        if (this.slowCountdown > 0) {
-            this.speed *= 2;
-            this.slowCountdown--;
-        }
         super.checkForCollisions();
     }
     special() {
@@ -1832,6 +2043,11 @@ class ShieldEnemy extends Enemy {
         this.height = 100;
         this.shield = new EnemyShield(0, 1000, this);
         enemies.push(this.shield);
+        this.constructor.baseTimer=900;
+        this.constructor.randomTimer=750;
+        this.constructor.index=6;
+        this.constructor.health=15;
+        this.constructor.speed=1.5;
         //console.log(this.shootTimer);
     }
     timer() {
@@ -1858,6 +2074,7 @@ class EnemyShield extends Enemy {
         this.ignoreShield=true;
         this.width=150;
         this.height=150;
+        this.hasHealthBar=false;
         if (this.x < -90) {
             this.offsetX = 60;
             this.offsetY = 0;
@@ -1898,6 +2115,11 @@ class TrapperEnemy extends Enemy {
         this.shootTimer = 30;
         this.order = 1;
         this.value = 30;
+        this.constructor.baseTimer=400;
+        this.constructor.randomTimer=400;
+        this.constructor.index=4;
+        this.constructor.health=4;
+        this.constructor.speed=3;
         //console.log(this.shootTimer);
     }
     timer() {
@@ -1932,6 +2154,7 @@ class ZombieEnemy extends Enemy {
         this.deathTimer--;
         if (this.deathTimer == 0) {
             this.ignoreBullets = false;
+            this.health = this.originalHealth;
             this.image.src = "images/zombieEnemy.webp";
         }
     }
@@ -1949,7 +2172,6 @@ class ZombieEnemy extends Enemy {
     takeDamage(bullet, index) {
         let damage = bullet.damage * player.damageMultiplier;
         this.health -= damage;
-        this.health -= bullet.damage;
         //console.log(this.health);
         
         if(bullet.frostbite){
@@ -1965,9 +2187,9 @@ class ZombieEnemy extends Enemy {
         if (this.health <= 0) this.dead = true;
         if (this.dead && this.deathCount < 3) {
             this.dead = false;
-            this.health = this.originalHealth;
             this.image.src = "images/deadZombie.webp";
             this.deathTimer = 300;
+            this.health=0;
             this.deathCount++;
             this.ignoreBullets = true;
             this.image.style.filter = this.savedColor;
@@ -2041,7 +2263,22 @@ class GhostEnemy extends Enemy {
         if(this.ignoreBullets){
             ctx.globalAlpha = 0.5;
         }
-        if (this.redTimer > 0) {
+        
+        if(showHealthBars){
+            ctx.fillStyle = "red";
+            ctx.fillRect(this.x - this.width / 2-this.width/4, this.y - this.height, this.width*1.5, 15)
+            ctx.fillStyle = "green";
+            ctx.fillRect(this.x - this.width / 2-this.width/4, this.y - this.height, (this.width*1.5)/this.maxHealth*this.health, 15)
+        }
+        
+        if(this.healTimer>0){
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+            ctx.globalCompositeOperation = 'multiply';
+            ctx.fillStyle = 'lime';
+            ctx.fillRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+        }
+        else if (this.redTimer > 0) {
             ctx.globalCompositeOperation = 'source-over';
             ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
             ctx.globalCompositeOperation = 'multiply';
@@ -2184,6 +2421,7 @@ class EnemyWall extends Enemy {
         this.y = y;
         this.width = 200;
         this.height = 200;
+        this.hasHealthBar=false;
         this.image.style.zIndex = -1;
         this.canSiphon = false;
         //console.log(this.shootTimer);
@@ -2519,7 +2757,9 @@ class MimicEnemy extends Enemy {
             super.checkForCollisions();
         }
         if (this.dead) {
+            this.hasHealthBar=false;
             this.dead = false;
+            this.health=0;
             this.image.src = "images/mimicEnemyDead.webp"
             this.trollTimer = 60;
             this.ignoreBullets = true;
@@ -2528,6 +2768,42 @@ class MimicEnemy extends Enemy {
         if (this.trollTimer == 0) {
             this.dead = true;
         }
+    }
+    draw() {
+        if (this.dead) return;
+        ctx.save();
+        if(showHealthBars && this.hasHealthBar && this.health<this.maxHealth){
+            ctx.fillStyle = "red";
+            ctx.fillRect(this.x - this.width / 2-this.width/4, this.y - this.height, this.width*1.5, 15)
+            ctx.fillStyle = "green";
+            ctx.fillRect(this.x - this.width / 2-this.width/4, this.y - this.height, (this.width*1.5)/this.maxHealth*this.health, 15)
+        }
+        
+        if(this.healTimer>0){
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+            ctx.globalCompositeOperation = 'multiply';
+            ctx.fillStyle = 'lime';
+            ctx.fillRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+        }
+        else if (this.redTimer > 0) {
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+            ctx.globalCompositeOperation = 'multiply';
+            ctx.fillStyle = 'rgba(255, 80, 80, 0.6)';
+            ctx.fillRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+        }
+        else if (this.slowCountdown > 0) {
+            ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+            ctx.globalCompositeOperation = 'multiply';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            ctx.fillRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+        }
+        else {
+            ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+        }
+
+        ctx.restore();
     }
     takeDamage(a,b){
         super.takeDamage(a,b);
@@ -2613,6 +2889,7 @@ class SelfDestructEnemy extends Enemy {
     SelfDestruct(){
         this.dead=false;
         this.exploding=true;
+        this.hasHealthBar=false;
         this.image.src='images/explosion.webp';
         this.redTimer=-1;
         this.slowCountdown=-1;
@@ -2679,6 +2956,12 @@ class MachineGunEnemy extends Enemy {
         let angle=Math.atan2((player.y-this.y),(player.x-this.x));
         if (this.dead) return;
         ctx.save();
+        if(showHealthBars){
+            ctx.fillStyle = "red";
+            ctx.fillRect(this.x - this.width / 2-this.width/4, this.y - this.height, this.width*1.5, 15)
+            ctx.fillStyle = "green";
+            ctx.fillRect(this.x - this.width / 2-this.width/4, this.y - this.height, (this.width*1.5)/this.maxHealth*this.health, 15)
+        }
         ctx.translate(this.x, this.y);
         ctx.rotate(angle-Math.PI/4)
         if (this.redTimer > 0) {
@@ -2726,6 +3009,7 @@ class SmokeBombEnemy extends Enemy {
         this.speedAuraHeight =75;
         this.health=health;
         this.iFrame=0;
+
     }
     
     takeDamage(bullet, index) {
@@ -2817,10 +3101,23 @@ class SmokeBombEnemy extends Enemy {
         ctx.strokeStyle = "blue";
         //ctx.globalAlpha=0.4;
         if(!this.moving) ctx.drawImage(this.speedAura, this.x - this.speedAuraWidth / 2, this.y - this.speedAuraHeight / 2, this.speedAuraWidth, this.speedAuraHeight);
-        
+        if(showHealthBars){
+            ctx.fillStyle = "red";
+            ctx.fillRect(this.x - this.width / 2-this.width/4, this.y - this.height, this.width*1.5, 15)
+            ctx.fillStyle = "green";
+            ctx.fillRect(this.x - this.width / 2-this.width/4, this.y - this.height, (this.width*1.5)/this.maxHealth*this.health, 15)
+        }
+
         ctx.strokeRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
 //ctx.globalAlpha=1; 
-        if (this.redTimer > 0) {
+        if(this.healTimer>0){
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+            ctx.globalCompositeOperation = 'multiply';
+            ctx.fillStyle = 'lime';
+            ctx.fillRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+        }
+        else if (this.redTimer > 0) {
             ctx.globalCompositeOperation = 'source-over';
             ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
             ctx.globalCompositeOperation = 'multiply';
@@ -2868,9 +3165,12 @@ class Bullet {
         this.damage = damage;
         this.width = 10;
         this.height = 10;
+        this.width*=player.projectileSizeMultiplier;
+        this.height*=player.projectileSizeMultiplier;
+        // console.log(player.projectileSizeMultiplier)
+        // console.log(this.width)
         this.frostbite = false;
         this.slowed = false;
-        this.isProtectorBullet=false;
     }
     move() {
         if (this.slowed) {
@@ -2913,6 +3213,8 @@ class FrostBullet extends Bullet {
         super(speedX, speedY, damage);
         this.width = 20;
         this.height = 20;
+        this.width*=player.projectileSizeMultiplier;
+        this.height*=player.projectileSizeMultiplier;
         this.image.src = "images/frostProjectile.webp";
         this.frostbite = true;
     }
@@ -3051,10 +3353,13 @@ class ProtectorBullet extends Bullet {
         this.damage = damage;
         this.angle = 0;
         this.hitEnemies = new Map();
-        this.isProtectorBullet
+        this.width*=player.projectileSizeMultiplier;
+        this.height*=player.projectileSizeMultiplier;
         protectorBullets.push(this);
     }
     move() {
+        this.width=40*player.projectileSizeMultiplier;
+        this.height=40*player.projectileSizeMultiplier;
         if(ProtectorBullet.slowed==true){
             this.angle += 0.07/3;
         }
@@ -3173,6 +3478,8 @@ class PlayerFire extends Bullet {
         this.height = 30;
         this.image.src = "images/playerFire.webp";
         this.timer=45;
+        this.width*=player.projectileSizeMultiplier;
+        this.height*=player.projectileSizeMultiplier;
     }
     move(){
         super.move();
@@ -3186,6 +3493,8 @@ class WindBullet extends Bullet {
         super(speedX, speedY, damage);
         this.width = 40;
         this.height = 40;
+        this.width*=player.projectileSizeMultiplier;
+        this.height*=player.projectileSizeMultiplier;
         this.image.src = "images/playerWind.webp";
     }
     move(){
@@ -3237,6 +3546,7 @@ class EnemyBullet {
         this.frostbite = false;
         this.ignoreShield=false;
         this.ignoreWipe=false;
+        this.hitPlayer=false;
     }
     move() {
 
@@ -3248,6 +3558,7 @@ class EnemyBullet {
         if (distance < (player.width/2-10) + this.width / 2) {
             player.takeDamage(this.damage, this);
             this.dead = true;
+            this.hitPlayer=true;
         }
         if (this.x < -500 || this.y < -500 || this.x > canvas.width + 500 || this.y >= canvas.height + 500) {
             this.dead = true;
@@ -3382,6 +3693,23 @@ class HomingBullet extends EnemyBullet {
         }
         //this.previousAngle=angle;
         //console.log(this.x+" "+this.y+" after");
+    }
+
+}
+class HealerBossBullet extends HomingBullet {
+    constructor(speedX, speedY, damage, x, y, owner) {
+        super(speedX, speedY, damage, x, y);
+        this.owner=owner;
+        this.image.src = 'images/healingBossProjectile.webp';
+        this.width = 40;
+        this.height = 40;
+        //this.previousAngle=Math.atan(distanceY/distanceX);
+    }
+    move(){
+        super.move();
+        if(this.dead && this.hitPlayer){
+            this.owner.HealAll();
+        }
     }
 
 }
@@ -3888,8 +4216,7 @@ class Player {
     static unlocked=false;
     constructor() {
         this.image = new Image();
-        console.log(images);
-        this.image = images.player;
+        this.image.src="images/player.webp";
         this.speed = 5;
         this.x = screen.width / 2;
         this.y = screen.height / 2;
@@ -3925,6 +4252,7 @@ class Player {
         this.level = 1;
         this.healMultiplier=1;
         this.attackSpeedMultiplier=1;
+        this.projectileSizeMultiplier=1;
     }
     takeDamage(damage, bullet) {
         if(playerShield!=null){
@@ -3937,9 +4265,6 @@ class Player {
         //console.log(this.health);
         floatingObjects.push(new FloatingObject(this.x-this.width/2+Math.random()*this.width,this.y,damage,"red"));
 
-        if (this.health <= 0) {
-            EndGame(false);
-        }
         if (bullet.frostbite) {
             this.slowCountdown = 120;
         }
@@ -4077,7 +4402,14 @@ class Player {
     draw() {
         if (this.dead) return;
         ctx.save();
-        if (this.redTimer > 0) {
+        if(this.healTimer>0){
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+            ctx.globalCompositeOperation = 'multiply';
+            ctx.fillStyle = 'lime';
+            ctx.fillRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+        }
+        else if (this.redTimer > 0) {
             ctx.globalCompositeOperation = 'source-over';
             ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
             ctx.globalCompositeOperation = 'multiply';
@@ -4109,6 +4441,7 @@ class Player {
 class BasicPlayer extends Player{
     constructor(){
         super();
+        this.image.src="images/player.webp";
     }
     act(){
         if (this.bulletCooldown <= 0) {
@@ -4121,7 +4454,8 @@ class BasicPlayer extends Player{
         
         let angle = 0;
         for (let i = 0; i < this.projectiles; i++) {
-            bullets[bullets.length] = new Bullet(10 * Math.cos(angle), 10 * Math.sin(angle), this.damage);
+            let temp=new Bullet(10 * Math.cos(angle), 10 * Math.sin(angle), this.damage);
+            bullets[bullets.length] = temp;
             angle += 2 * Math.PI / this.projectiles;
         }
     }
@@ -4137,9 +4471,9 @@ class TankPlayer extends Player{
         this.attackSpeed=70;
         this.nextLevel=120;
         this.damage=2;
-        this.image=images.tankPlayer;
-        this.normalImage=images.tankPlayer;
-        this.mirroredImage=images.tankPlayerMirrored;
+        this.image="images/tankPlayer.webp";
+        this.normalImage="images/tankPlayer.webp";
+        this.mirroredImage="images/tankPlayerMirrored.webp";
         this.shieldTimer=1800;
     }
     act(){
@@ -4288,6 +4622,8 @@ class MagePlayer extends Player{
                 temp.image.src="images/playerIceBullet.webp"
                 temp.width=30;
                 temp.height=30;
+                temp.width*=player.projectileSizeMultiplier;
+                temp.height*=player.projectileSizeMultiplier;
                 bullets[bullets.length] = temp;
                 angle += 2 * Math.PI / this.projectiles;
             }
@@ -4309,13 +4645,16 @@ class MagePlayer extends Player{
 //Boss: LaserBoss, IceBoss
 
 const worldDiv = document.getElementById("world");
+const ENEMYTYPES=[BasicEnemy,ShooterEnemy,AimingEnemy,HomingEnemy,TrapperEnemy,ZombieEnemy,ShieldEnemy,ChargingEnemy,GhostEnemy,PoisonEnemy,BlackHoleEnemy,MimicEnemy,BuilderEnemy,WindupEnemy,SpawnerEnemy,SelfDestructEnemy,MachineGunEnemy,SmokeBombEnemy];
+
 function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Boss) {
+    InitializeStats();
     bossesLeft = numTier1Boss+numTier2Boss;
     let tier1 = [1, 2, 3, 4, 5, 6];
     let tier2 = [1, 2, 3, 4, 5, 6];
     let tier3 = [1, 2, 3, 4, 5, 6];
     let tier1Bosses = [1, 2, 3, 4, 5];
-    let tier2Bosses = [1, 2];
+    let tier2Bosses = [1, 2, 3];
     tier1 = shuffle(tier1);
     tier2 = shuffle(tier2);
     tier3 = shuffle(tier3);
@@ -4541,9 +4880,126 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                     newEnemyQueue.push("images/snakeBoss.webp");
                 }
                 break;
+            case 3:
+                boss = new HealerBoss(1.5,150);
+                enemies[enemies.length] = boss;
+                if (!HealerBoss.seen) {
+                    HealerBoss.seen = true;
+                    newEnemyQueue.push("images/healingBoss.webp");
+                }
+                break;
         }
     }
 
+}
+function InitializeStats(){
+    BasicEnemy.baseTimer=200;
+    BasicEnemy.randomTimer=200;
+    BasicEnemy.index=0;
+    BasicEnemy.health=5;
+    BasicEnemy.speed=2;
+
+    ShooterEnemy.baseTimer=300;
+    ShooterEnemy.randomTimer=200;
+    ShooterEnemy.index=1;
+    ShooterEnemy.health=3;
+    ShooterEnemy.speed=2;
+
+    ChargingEnemy.baseTimer=900;
+    ChargingEnemy.randomTimer=500;
+    ChargingEnemy.index=7;
+    ChargingEnemy.health=8;
+    ChargingEnemy.speed=1;
+
+    AimingEnemy.baseTimer=400;
+    AimingEnemy.randomTimer=400;
+    AimingEnemy.index=2;
+    AimingEnemy.health=1;
+    AimingEnemy.speed=3.5;
+
+    HomingEnemy.baseTimer=400;
+    HomingEnemy.randomTimer=400;
+    HomingEnemy.index=3;
+    HomingEnemy.health=2;
+    HomingEnemy.speed=1;
+    
+    ShieldEnemy.baseTimer=900;
+    ShieldEnemy.randomTimer=750;
+    ShieldEnemy.index=6;
+    ShieldEnemy.health=15;
+    ShieldEnemy.speed=1.5;
+    
+    TrapperEnemy.baseTimer=400;
+    TrapperEnemy.randomTimer=400;
+    TrapperEnemy.index=4;
+    TrapperEnemy.health=4;
+    TrapperEnemy.speed=3;
+    
+    ZombieEnemy.baseTimer=450;
+    ZombieEnemy.randomTimer=300;
+    ZombieEnemy.index=5;
+    ZombieEnemy.health=3;
+    ZombieEnemy.speed=2;
+
+    GhostEnemy.baseTimer=750;
+    GhostEnemy.randomTimer=500;
+    GhostEnemy.index=8;
+    GhostEnemy.health=4;
+    GhostEnemy.speed=4;
+
+    PoisonEnemy.baseTimer=750;
+    PoisonEnemy.randomTimer=500;
+    PoisonEnemy.index=9;
+    PoisonEnemy.health=5;
+    PoisonEnemy.speed=1;
+
+    BlackHoleEnemy.baseTimer=800;
+    BlackHoleEnemy.randomTimer=600;
+    BlackHoleEnemy.index=10;
+    BlackHoleEnemy.health=5;
+    BlackHoleEnemy.speed=1.5;
+
+    BuilderEnemy.baseTimer=1000;
+    BuilderEnemy.randomTimer=900;
+    BuilderEnemy.index=12;
+    BuilderEnemy.health=12;
+    BuilderEnemy.speed=1.5;
+    
+    WindupEnemy.baseTimer=900;
+    WindupEnemy.randomTimer=800;
+    WindupEnemy.index=13;
+    WindupEnemy.health=20;
+    WindupEnemy.speed=2;
+    
+    SpawnerEnemy.baseTimer=900;
+    SpawnerEnemy.randomTimer=800;
+    SpawnerEnemy.index=14;
+    SpawnerEnemy.health=25;
+    SpawnerEnemy.speed=1.5;
+
+    MimicEnemy.baseTimer=700;
+    MimicEnemy.randomTimer=600;
+    MimicEnemy.index=11;
+    MimicEnemy.health=8;
+    MimicEnemy.speed=3;
+
+    SelfDestructEnemy.baseTimer=800;
+    SelfDestructEnemy.randomTimer=750;
+    SelfDestructEnemy.index=15;
+    SelfDestructEnemy.health=20;
+    SelfDestructEnemy.speed=2;
+    
+    MachineGunEnemy.baseTimer=900;
+    MachineGunEnemy.randomTimer=800;
+    MachineGunEnemy.index=16;
+    MachineGunEnemy.health=15;
+    MachineGunEnemy.speed=3;
+    
+    SmokeBombEnemy.baseTimer=1000;
+    SmokeBombEnemy.randomTimer=900;
+    SmokeBombEnemy.index=17;
+    SmokeBombEnemy.health=27;
+    SmokeBombEnemy.speed=3;
 }
 
 function loop() {
@@ -4586,12 +5042,14 @@ function GameLogic() {
 
     if (xpBagTimer < 0) {
         xpBagTimer = Math.random() * 200 + 200;
+        xpBagTimer /= 1 + timeElapsed * 0.0003;
         const newCollectable = new XPBag(Math.random() * (canvas.width - canvas.width / 10) + canvas.width / 20, Math.random() * (canvas.height - canvas.height / 10) + canvas.height / 20);
         collectables.push(newCollectable);
         //console.log(newEnemy.health);
     }
     if (healthPotionSpawnTimer < 0) {
         healthPotionSpawnTimer = Math.random() * 300 + 450;
+        healthPotionSpawnTimer /= 1 + timeElapsed * 0.0003;
         const newCollectable = new HealthPotion(Math.random() * (canvas.width - canvas.width / 10) + canvas.width / 20, Math.random() * (canvas.height - canvas.height / 10) + canvas.height / 20);
         collectables.push(newCollectable);
         //console.log(newEnemy.health);
@@ -4681,11 +5139,16 @@ function GameLogic() {
         ChangePage("newEnemyPage");
     }
     xpBagTimer--;
+    healthPotionSpawnTimer--;
     if(timeElapsed<7200 || !isBossWave){
         timeElapsed++;
     }
     if (isBossWave) {
         timeElapsed = Math.min(timeElapsed, 3600);
+    }
+    if (player.health <= 0) {
+        EndGame(false);
+        player.health=0;
     }
     levellingBar.Update();
     healthBar.Update();
@@ -4695,142 +5158,12 @@ function GameLogic() {
 
 }
 function SpawnEnemies() {
-    if (enemySpawnTimer < 0 && BasicEnemy.isActive) {
-        enemySpawnTimer = Math.random() * 200 + 200;
-        enemySpawnTimer /= 1 + timeElapsed * SCALE;
-        const newEnemy = new BasicEnemy(2, 5);
-        enemies[enemies.length] = newEnemy;
+    for(let i=0;i<ENEMYTYPES.length;i++){
+        if(ENEMYTYPES[i].isActive){
+            ENEMYTYPES[i].Spawn();
+        }
     }
-    if (shooterEnemySpawnTimer < 0 && ShooterEnemy.isActive) {
-        shooterEnemySpawnTimer = Math.random() * 200 + 300;
-        shooterEnemySpawnTimer /= 1 + timeElapsed * SCALE;
-        const newEnemy = new ShooterEnemy(2, 3);
-        enemies[enemies.length] = newEnemy;
-        //console.log(newEnemy.health);
-    }
-    if (aimingEnemySpawnTimer < 0 && AimingEnemy.isActive) {
-        aimingEnemySpawnTimer = Math.random() * 400 + 400;
-        aimingEnemySpawnTimer /= 1 + timeElapsed * SCALE;
-        const newEnemy = new AimingEnemy(3.5, 1);
-        enemies[enemies.length] = newEnemy;
-        //console.log(newEnemy.health);
-    }
-    if (homingEnemySpawnTimer < 0 && HomingEnemy.isActive) {
-        homingEnemySpawnTimer = Math.random() * 400 + 400;
-        homingEnemySpawnTimer /= 1 + timeElapsed * SCALE;
-        const newEnemy = new HomingEnemy(1, 2);
-        enemies[enemies.length] = newEnemy;
-        //console.log(newEnemy.health);
-    }
-    if (chargingEnemySpawnTimer < 0 && ChargingEnemy.isActive) {
-        chargingEnemySpawnTimer = Math.random() * 500 + 900;
-        chargingEnemySpawnTimer /= 1 + timeElapsed * SCALE;
-        const newEnemy = new ChargingEnemy(1, 8);
-        enemies[enemies.length] = newEnemy;
-        //console.log(newEnemy.health);
-    }
-    if (shieldEnemySpawnTimer < 0 && ShieldEnemy.isActive) {
-        shieldEnemySpawnTimer = Math.random() * 750 + 900;
-        shieldEnemySpawnTimer /= 1 + timeElapsed * SCALE;
-        const newEnemy = new ShieldEnemy(1.5, 15);
-        enemies[enemies.length] = newEnemy;
-        //console.log(newEnemy.health);
-    }
-    if (trapperEnemySpawnTimer < 0 && TrapperEnemy.isActive) {
-        trapperEnemySpawnTimer = Math.random() * 400 + 400;
-        trapperEnemySpawnTimer /= 1 + timeElapsed * SCALE;
-        const newEnemy = new TrapperEnemy(3, 4);
-        enemies[enemies.length] = newEnemy;
-        //console.log(newEnemy.health);
-    }
-    if (zombieEnemySpawnTimer < 0 && ZombieEnemy.isActive) {
-        zombieEnemySpawnTimer = Math.random() * 300 + 450;
-        zombieEnemySpawnTimer /= 1 + timeElapsed * SCALE;
-        const newEnemy = new ZombieEnemy(2, 3);
-        enemies[enemies.length] = newEnemy;
-        //console.log(newEnemy.health);
-    }
-    if (ghostEnemySpawnTimer < 0 && GhostEnemy.isActive) {
-        ghostEnemySpawnTimer = Math.random() * 500 + 750;
-        ghostEnemySpawnTimer /= 1 + timeElapsed * SCALE;
-        const newEnemy = new GhostEnemy(4, 4);
-        enemies[enemies.length] = newEnemy;
-        //console.log(newEnemy.health);
-    }
-    if (poisonEnemySpawnTimer < 0 && PoisonEnemy.isActive) {
-        poisonEnemySpawnTimer = Math.random() * 500 + 750;
-        poisonEnemySpawnTimer /= 1 + timeElapsed * SCALE;
-        const newEnemy = new PoisonEnemy(1, 5);
-        enemies[enemies.length] = newEnemy;
-    }
-    if (blackHoleEnemySpawnTimer < 0 && BlackHoleEnemy.isActive) {
-        blackHoleEnemySpawnTimer = Math.random() * 600 + 800;
-        blackHoleEnemySpawnTimer /= 1 + timeElapsed * SCALE;
-        const newEnemy = new BlackHoleEnemy(1.5, 5);
-        enemies[enemies.length] = newEnemy;
-    }
-    if (mimicEnemySpawnTimer < 0 && MimicEnemy.isActive) {
-        mimicEnemySpawnTimer = Math.random() * 600 + 700;
-        mimicEnemySpawnTimer /= 1 + timeElapsed * SCALE;
-        const newEnemy = new MimicEnemy(3, 8);
-        enemies[enemies.length] = newEnemy;
-    }
-    if (builderEnemySpawnTimer < 0 && BuilderEnemy.isActive) {
-        builderEnemySpawnTimer = Math.random() * 900 + 1000;
-        builderEnemySpawnTimer /= 1 + timeElapsed * SCALE;
-        const newEnemy = new BuilderEnemy(1.5, 12);
-        enemies[enemies.length] = newEnemy;
-    }
-    if (windupEnemySpawnTimer < 0 && WindupEnemy.isActive) {
-        windupEnemySpawnTimer = Math.random() * 800 + 900;
-        windupEnemySpawnTimer /= 1 + timeElapsed * SCALE;
-        const newEnemy = new WindupEnemy(2, 20);
-        enemies[enemies.length] = newEnemy;
-    }
-    if (spawnerEnemySpawnTimer < 0 && SpawnerEnemy.isActive) {
-        spawnerEnemySpawnTimer = Math.random() * 800 + 900;
-        spawnerEnemySpawnTimer /= 1 + timeElapsed * SCALE;
-        const newEnemy = new SpawnerEnemy(1.5, 25);
-        enemies[enemies.length] = newEnemy;
-    }
-    if (selfDestructEnemySpawnTimer < 0 && SelfDestructEnemy.isActive) {
-        selfDestructEnemySpawnTimer = Math.random() * 750 + 800;
-        selfDestructEnemySpawnTimer /= 1 + timeElapsed * SCALE;
-        const newEnemy = new SelfDestructEnemy(2, 20);
-        enemies[enemies.length] = newEnemy;
-    }
-    if (machineGunEnemySpawnTimer < 0 && MachineGunEnemy.isActive) {
-        machineGunEnemySpawnTimer = Math.random() * 800 + 900;
-        machineGunEnemySpawnTimer /= 1 + timeElapsed * SCALE;
-        const newEnemy = new MachineGunEnemy(3, 15);
-        enemies[enemies.length] = newEnemy;
-    }
-    if (smokeBombEnemySpawnTimer < 0 && SmokeBombEnemy.isActive) {
-        smokeBombEnemySpawnTimer = Math.random() * 900 + 1000;
-        smokeBombEnemySpawnTimer /= 1 + timeElapsed * SCALE;
-        const newEnemy = new SmokeBombEnemy(3, 27);
-        enemies.splice(0,0,newEnemy);
-    }
-    enemySpawnTimer--;
-    shooterEnemySpawnTimer--;
-    aimingEnemySpawnTimer--;
-    homingEnemySpawnTimer--;
-    chargingEnemySpawnTimer--;
-    shieldEnemySpawnTimer--;
-    trapperEnemySpawnTimer--;
-    zombieEnemySpawnTimer--;
-    ghostEnemySpawnTimer--;
-    poisonEnemySpawnTimer--;
-    blackHoleEnemySpawnTimer--;
-    timeWarpCounter--;
-    builderEnemySpawnTimer--;
-    windupEnemySpawnTimer--;
-    spawnerEnemySpawnTimer--;
-    healthPotionSpawnTimer--;
-    mimicEnemySpawnTimer--;
-    selfDestructEnemySpawnTimer--;
-    machineGunEnemySpawnTimer--;
-    smokeBombEnemySpawnTimer--;
+    
 }
 function ChangeWave() {
     currentWave++;
@@ -4854,7 +5187,7 @@ function ChangeWave() {
             SCALE = 0.001;
             if(TankPlayer.unlocked==false){
                 TankPlayer.unlocked=true;
-                newEnemyQueue.push(images.tankPlayer.src);
+                newEnemyQueue.push("images/tankPlayer.webp".src);
                 isUnlockingCharacter=true;
             }
             break;
@@ -4943,8 +5276,7 @@ function ChangePage(id, reset) {
         }
         else{
             tankPlayerButton.style.pointerEvents="auto";
-            console.log(images.tankPlayer);
-            tankPlayerImage.src=images.tankPlayer.src;
+            tankPlayerImage.src="images/tankPlayer.webp";
             tankPlayerText.textContent="Tank";
             tankPlayerText.style.fontSize="30px";
             tankPlayerText.style.top="225px";
@@ -4984,6 +5316,130 @@ function ChangePage(id, reset) {
             magePlayerText.style.top="225px";
         }
     }
+    if(id=="settingsPage"){
+        let temp=""
+        console.log(showHealthBars);
+        if(showHealthBars){
+            temp="ON"
+        }
+        else{
+            temp="OFF"
+        }
+        document.getElementById("healthBarSetting").innerText="Show Healthbars: "+temp;
+    }
+    if(id=="enemyDescriptionSelectionPage"){
+        
+        images = document.querySelectorAll('[id$="GuideImage"]');
+        buttons = document.querySelectorAll('[id$="GuideButton"]');
+        for (let i = 0; i < images.length; i++) {
+            images[i].src="images/questionMark.png";
+            buttons[i].style.pointerEvents="none";
+        }
+        if(BasicEnemy.seen){
+            images[0].src="images/Enemy.webp";
+            images[0].style.pointerEvents="auto";
+        }
+        if(ShooterEnemy.seen){
+            images[1].src="images/shooterEnemy.webp";
+            images[1].style.pointerEvents="auto";
+        }
+        if(AimingEnemy.seen){
+            images[2].src="images/aimingEnemy.webp";
+            images[2].style.pointerEvents="auto";
+        }
+        if(HomingEnemy.seen){
+            images[3].src="images/homingEnemy.webp";
+            images[3].style.pointerEvents="auto";
+        }
+        if(TrapperEnemy.seen){
+            images[4].src="images/trapperEnemy.webp";
+            images[4].style.pointerEvents="auto";
+        }
+        if(ZombieEnemy.seen){
+            images[5].src="images/zombieEnemy.webp";
+            images[5].style.pointerEvents="auto";
+        }
+        if(ShieldEnemy.seen){
+            images[6].src="images/shieldEnemy.webp";
+            images[6].style.pointerEvents="auto";
+        }
+        if(ChargingEnemy.seen){
+            images[7].src="images/chargingEnemy.webp";
+            images[7].style.pointerEvents="auto";
+        }
+        if(GhostEnemy.seen){
+            images[8].src="images/ghostEnemy.webp";
+            images[8].style.pointerEvents="auto";
+        }
+        if(PoisonEnemy.seen){
+            images[9].src="images/poisonEnemy.webp";
+            images[9].style.pointerEvents="auto";
+        }
+        if(BlackHoleEnemy.seen){
+            images[10].src="images/blackHoleEnemy.webp";
+            images[10].style.pointerEvents="auto";
+        }
+        if(MimicEnemy.seen){
+            images[11].src="images/mimicEnemyDead.webp";
+            images[11].style.pointerEvents="auto";
+        }
+        if(BuilderEnemy.seen){
+            images[12].src="images/builderEnemy.webp";
+            images[12].style.pointerEvents="auto";
+        }
+        if(WindupEnemy.seen){
+            images[13].src="images/windupEnemy.webp";
+            images[13].style.pointerEvents="auto";
+        }
+        if(SpawnerEnemy.seen){
+            images[14].src="images/spawnerEnemy.webp";
+            images[14].style.pointerEvents="auto";
+        }
+        if(SelfDestructEnemy.seen){
+            images[15].src="images/selfDestructEnemy.webp";
+            images[15].style.pointerEvents="auto";
+        }
+        if(MachineGunEnemy.seen){
+            images[16].src="images/machineGunEnemy.webp";
+            images[16].style.pointerEvents="auto";
+        }
+        if(SmokeBombEnemy.seen){
+            images[17].src="images/smokeBombEnemy.webp";
+            images[17].style.pointerEvents="auto";
+        }
+        if(LaserBoss.seen){
+            images[18].src="images/laserBoss.webp";
+            images[18].style.pointerEvents="auto";
+        }
+        if(IceBoss.seen){
+            images[19].src="images/iceBoss.webp";
+            images[19].style.pointerEvents="auto";
+        }
+        if(BouncyBoss.seen){
+            images[20].src="images/bouncyBoss.webp";
+            images[20].style.pointerEvents="auto";
+        }
+        if(MageBoss.seen){
+            images[21].src="images/mageFireMode.webp";
+            images[21].style.pointerEvents="auto";
+        }
+        if(BulletHellBoss.seen){
+            images[22].src="images/bulletHellBoss.webp";
+            images[22].style.pointerEvents="auto";
+        }
+        if(GambleBoss.seen){
+            images[23].src="images/gambleBoss.webp";
+            images[23].style.pointerEvents="auto";
+        }
+        if(SnakeBoss.seen){
+            images[24].src="images/snakeBoss.webp";
+            images[24].style.pointerEvents="auto";
+        }
+        if(HealerBoss.seen){
+            images[25].src="images/healingBoss.webp";
+            images[25].style.pointerEvents="auto";
+        }
+    }
     if (id == "gamePage") {
         if(choice1){
             choice1.remove();
@@ -5005,115 +5461,14 @@ function ChangePage(id, reset) {
         while (boughtUpgrades[randomNum] == 1) {
             randomNum = Math.floor(Math.random() * NUMUPGRADES);
         }
-        switch (randomNum) {
-            case 0:
-                choice1.innerHTML = `<button onclick="increaseDamage(1)" style="position:absolute;left:${canvas.width / 2 - 400}px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">+1 Damage</button>`
-                break;
-            case 1:
-                choice1.innerHTML = `<button onclick="increaseMaxHealth(10)" style="position:absolute;left:${canvas.width / 2 - 400}px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">+10 Max Health</button>`
-                break;
-            case 2:
-                choice1.innerHTML = `<button onclick="increaseProjectiles(2)" style="position:absolute;left:${canvas.width / 2 - 400}px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">+2 Projectiles</button>`
-                break;
-            case 3:
-                choice1.innerHTML = `<button onclick="addFrostProjectiles(1)" style="position:absolute;left:${canvas.width / 2 - 400}px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">+1 Frost Projectile</button>`
-                break;
-            case 4:
-                choice1.innerHTML = `<button onclick="addLaserProjectiles(1)" style="position:absolute;left:${canvas.width / 2 - 400}px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">Laser Attack</button>`
-                break;
-            case 5:
-                choice1.innerHTML = `<button onclick="speedUpAttacks(1.2)" style="position:absolute;left:${canvas.width / 2 - 400}px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">Faster Attack Speed</button>`
-                break;
-            case 6:
-                choice1.innerHTML = `<button onclick="addSiphon(0.25)" style="position:absolute;left:${canvas.width / 2 - 400}px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">+0.25 Siphon</button>`
-                break;
-            case 7:
-                choice1.innerHTML = `<button onclick="multiplyXPGain(2)" style="position:absolute;left:${canvas.width / 2 - 400}px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">2x XP gain</button>`
-                break;
-            case 8:
-                choice1.innerHTML = `<button onclick="addBomb(1)" style="position:absolute;left:${canvas.width / 2 - 400}px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">Bomb Attack (Aims to Mouse)</button>`
-                break;
-            case 9:
-                choice1.innerHTML = `<button onclick="addTimeWarp(1)" style="position:absolute;left:${canvas.width / 2 - 400}px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">Speed Ability</button>`
-                break;
-            case 10:
-                choice1.innerHTML = `<button onclick="AddPassiveHealing(1)" style="position:absolute;left:${canvas.width / 2 - 400}px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">+1 Passive Healing</button>`
-                break;
-            case 11:
-                choice1.innerHTML = `<button onclick="Gamble(1)" style="position:absolute;left:${canvas.width / 2 - 400}px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">Mystery Box</button>`
-                break;
-            case 12:
-                choice1.innerHTML = `<button onclick="AddProtectorBullet(2)" style="position:absolute;left:${canvas.width / 2 - 400}px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">+2 Protectors</button>`
-                break;
-            case 13:
-                choice1.innerHTML = `<button onclick="TradeoffDeal(2)" style="position:absolute;left:${canvas.width / 2 - 400}px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">x2 Damage but x2 Damage Taken</button>`
-                break;
-            case 14:
-                choice1.innerHTML = `<button onclick="AddShield(1)" style="position:absolute;left:${canvas.width / 2 - 400}px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">Gain Shield</button>`
-                break;
-            case 15:
-                choice1.innerHTML = `<button onclick="BulletDeleterAbility(1)" style="position:absolute;left:${canvas.width / 2 - 400}px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">Bullet Wipe Ability</button>`
-                break;
-        }
+        choice1.innerHTML=`<button onclick="${UPGRADES[randomNum].onclick}" style="position:absolute;left:${canvas.width/2-400}px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">${UPGRADES[randomNum].text}</button>`;
 
         let randomNum2 = Math.floor(Math.random() * NUMUPGRADES);
         while (randomNum == randomNum2 || boughtUpgrades[randomNum2] == 1) {
             randomNum2 = Math.floor(Math.random() * NUMUPGRADES);
         }
+        choice2.innerHTML=`<button onclick="${UPGRADES[randomNum2].onclick}" style="position:absolute;left:${canvas.width/2}px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">${UPGRADES[randomNum2].text}</button>`;
 
-        switch (randomNum2) {
-
-            case 0:
-                choice2.innerHTML = `<button onclick="increaseDamage(1)" style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">+1 Damage</button>`
-                break;
-
-            case 1:
-                choice2.innerHTML = `<button onclick="increaseMaxHealth(10)" style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">+10 Max Health</button>`
-                break;
-
-            case 2:
-                choice2.innerHTML = `<button onclick="increaseProjectiles(2)" style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">+2 projectiles</button>`
-                break;
-            case 3:
-                choice2.innerHTML = `<button onclick="addFrostProjectiles(1)" style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">+1 Frost Projectile</button>`
-                break;
-            case 4:
-                choice2.innerHTML = `<button onclick="addLaserProjectiles(1)" style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">Laser Attack</button>`
-                break;
-            case 5:
-                choice2.innerHTML = `<button onclick="speedUpAttacks(1.2)" style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">Faster Attack Speed</button>`
-                break;
-            case 6:
-                choice2.innerHTML = `<button onclick="addSiphon(0.25)" style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%);top:120px; z-index:3" id="upgrade">+0.25 Siphon</button>`
-                break;
-            case 7:
-                choice2.innerHTML = `<button onclick="multiplyXPGain(2)" style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">2x XP gain</button>`
-                break;
-            case 8:
-                choice2.innerHTML = `<button onclick="addBomb(1)" style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">Bomb Attack (Aims to Mouse)</button>`
-                break;
-            case 9:
-                choice2.innerHTML = `<button onclick="addTimeWarp(1)" style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">Speed Ability</button>`
-                break;
-            case 10:
-                choice2.innerHTML = `<button onclick="AddPassiveHealing(1)" style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">+1 Passive Healing</button>`
-                break;
-            case 11:
-                choice2.innerHTML = `<button onclick="Gamble(1)" style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">Mystery Box</button>`
-                break;
-            case 12:
-                choice2.innerHTML = `<button onclick="AddProtectorBullet(2)" style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">+2 Protectors</button>`
-                break;
-            case 13:
-                choice2.innerHTML = `<button onclick="TradeoffDeal(2)" style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">x2 Damage but x2 Damage Taken</button>`
-                break;
-            case 14:
-                choice2.innerHTML = `<button onclick="AddShield(1)" style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">Gain Shield</button>`
-                break;
-            case 15:
-                choice2.innerHTML = `<button onclick="BulletDeleterAbility(1)" style="position:absolute;left:${canvas.width / 2}px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">Bullet Wipe Ability</button>`
-                break;
-        }
         document.body.appendChild(choice1);
         document.body.appendChild(choice2);
     }

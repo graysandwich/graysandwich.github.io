@@ -34,10 +34,12 @@
                     <script src="helpers.js" defer></script>
                     <script src="game.js" defer></script>
                     <script src="upgrades.js" defer></script>
+                    <script src="enemyGuide.js" defer></script>
+                    <script src="settings.js" defer></script>
                 </div>
         </div>
         <div id="losePage" style="display:none">            
-            <h1 style="text-align: center; font-size: 67px; position: absolute; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0;"><span style="background-color: black; color: white">You Lost</span></h1>
+            <h1 style="text-align: center; font-size: 67px; position: absolute; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0;">You Lost</h1>
             <button onclick="ChangePage('difficultyPage', false)" style="text-align: center; font-size: 67px; position: relative; top: 230px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Restart</button>
 
         </div>
@@ -58,9 +60,13 @@
             <h1 style="text-align: center; font-size: 47px; position: relative; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0; font-family: Black ops one;">A very cool Roguelike Game by graysandwich</h1>
             <h1 style="text-align: center; font-size: 20px; position: relative; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0; font-family: Black ops one;">If the word larp means what i think it does then im larping as a gamedev</h1>
             
-            <button onclick="ChangePage('difficultyPage', false)" style="text-align: center; font-size: 67px; position: relative; top: 150px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">START</button>
-            <button onclick="ChangePage('helpPage', false)" style="text-align: center; font-size: 67px; position: relative; top: 180px; left: 0; width: 100%; z-index: 1000; margin: 0;">How to Play</button>
-            <button onclick="ChangePage('devlogPage', false)" style="text-align: center; font-size: 67px; position: relative; top: 210px; left: 0; width: 100%; z-index: 1000; margin: 0;">Update Log</button>
+            <button onclick="ChangePage('difficultyPage', false)" style="text-align: center; font-size: 67px; position: relative; top: 30px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">START</button>
+            <button onclick="ChangePage('helpPage', false)" style="text-align: center; font-size: 67px; position: relative; top: 60px; left: 0; width: 100%; z-index: 1000; margin: 0;">How to Play</button>
+            <button onclick="ChangePage('devlogPage', false)" style="text-align: center; font-size: 67px; position: relative; top: 90px; left: 0; width: 100%; z-index: 1000; margin: 0;">Update Log</button>
+            <button onclick="ChangePage('settingsPage', false)" style="text-align: center; font-size: 67px; position: relative; top: 120px; left: 0; width: 100%; z-index: 1000; margin: 0;">Settings</button>
+            <button onclick="ChangePage('enemyDescriptionSelectionPage', false)" style="text-align: center; font-size: 67px; position: relative; top: 150px; left: 0; width: 100%; z-index: 1000; margin: 0;">Enemy Guide</button>
+
+
         </div>
         <div id="difficultyPage" style="display:none">
             <h1 style="text-align: center; font-size: 67px; position: relative; top: 7px; left: 0; width: 100%; z-index: 1000; margin: 0;">Choose Your Difficulty</h1>
@@ -103,12 +109,33 @@
             <button onclick="ChangePage('IntroPage', false)" style="text-align: center; font-size: 67px; position: relative; top: 50px; left: 0; width: 100%; z-index: 1000; margin: 0;">Back</button>
 
         </div>
+        <div id="settingsPage" style="display:none; background-color: lightgray;height:100vh">
+            <button onclick="ToggleSettings()" style="text-align: center; font-size: 67px; position: relative; top: 50px; left: 0; width: 100%; z-index: 1000; margin: 0;" id="healthBarSetting">Back</button>
+
+            <button onclick="ChangePage('IntroPage', false)" style="text-align: center; font-size: 67px; position: relative; top: 80px; left: 0; width: 100%; z-index: 1000; margin: 0;">Back</button>
+
+        </div>
         <div id="devlogPage" style="display:none; overflow: auto; height:100%; font-size: 18px; top: 10px; left: 0; width: 100%; z-index: 1000; margin: 0px;">
             <button onclick="ChangePage('IntroPage', false)" style="position:absolute;text-align: center; font-size: 67px; top: 0px; left: 0; width: 100%; z-index: 1000; margin: 0;">Back</button>
 
             <h1>.</h1>
+            
+            <h1>Update 2.0 - July 9, 2026</h1>
+            <ul>
+                <li>Added 1 new upgrade</li>
+                <li>Added 1 new tier 2 boss</li>
+                <li>Added healthbars on all enemies (can be toggled in the new Settings page)</li>
+                <li>Added enemy guide</li>
+                <b>Developer's note:</b> I'm semi-proud of some of the jokes I wrote there please laugh at them
+                <li>Balance Changes:</li>
+                <ul>
+                    <li>Made XP bottles' and health potions' spawn rate scale with amount of time since the last wave's arrival</li>
+                    <b>Developer's note:</b> The spawning of these collectables now scales the same way as enemies do (though they scale a lot slower).
 
-            <h1>Update 2.0 - </h1>
+                </ul>
+            </ul>
+            
+            <h1>Update 2.0 - July 6, 2026</h1>
             <ul>
                 <li>Added new feature: Unlockable characters! These are chosen before the start of the game and can be unlocked though progression. Currently, there are three new characters: Tank, Healer, and Mage. Each character has their own unique strengths and weaknesses.</li>
                 <li>Added 1 new tier 3 enemy</li>
@@ -123,7 +150,7 @@
                     <b>Developer's note:</b> Since there are now multiple characters with different amounts of starting health, it has become a multiplier instead of a flat increase. Easy and medium mode were still too difficult so they get nerfed yet again.
                     <li>Made every boss enemy deal knockback to the player instead of instantly killing them on contact</li>
                     <b>Developer's note:</b> Instakilling the player on contact caused a lot of runs to suddenly die out, and it's always really frustrating when that happens. Now every boss deals knockback and a little bit of damage instead. All the bosses currently in the game either already deal knockback or rely on their projectiles for damage, so this shouldn't be too big of a nerf.
-                    <li>Made health potions survive longer before dissappearing (10s -> 16.67s)</li>
+                    <li>Made health potions survive longer before disappearing (10s -> 16.67s)</li>
 
 
                 </ul>
@@ -187,6 +214,60 @@
         </div>
         <div id="newEnemyPage" style="display:none">
             <h1 style="text-align: center; font-size: 67px; position: absolute; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0px;" id="introText"><span style="background-color: black; color: white">New Enemy Discovered!</span></h1>
+        </div>
+        <div id="enemyDescriptionSelectionPage" style="position:relative; display:none; overflow:auto;height:100vh; background-color: lightgreen;">
+            <h1 style="text-align: center; font-size: 67px; position: relative; top: 7px; left: 0; width: 100%; z-index: 1000; margin: 0;">Enemy Guide</h1>
+            
+            <button onclick="ShowEnemy(1)" style=" font-size:30px; position:absolute; top: 15%; left: 4%; width: 150px; height:150px; z-index: 1000;padding:0px" id="basicEnemyGuideButton"><img src="images/enemy.webp" style="height:100%;width: 100%;" id="basicEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(2)" style=" font-size:30px; position:absolute; top: 15%; left: 15%; width: 150px; height:150px; z-index: 1000;padding:0px" id="shooterEnemyGuideButton"><img src="images/shooterEnemy.webp" style="height:100%;width: 100%;" id="shooterEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(3)" style=" font-size:30px; position:absolute; top: 15%; left: 26%; width: 150px; height:150px; z-index: 1000;padding:0px" id="aimingEnemyGuideButton"><img src="images/aimingEnemy.webp" style="height:100%;width: 100%;" id="aimingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(4)" style=" font-size:30px; position:absolute; top: 15%; left: 37%; width: 150px; height:150px; z-index: 1000;padding:0px" id="homingEnemyGuideButton"><img src="images/homingEnemy.webp" style="height:100%;width: 100%;" id="homingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(5)" style=" font-size:30px; position:absolute; top: 15%; left: 48%; width: 150px; height:150px; z-index: 1000;padding:0px" id="trapperEnemyGuideButton"><img src="images/trapperEnemy.webp" style="height:100%;width: 100%;" id="trapperEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(6)" style=" font-size:30px; position:absolute; top: 15%; left: 59%; width: 150px; height:150px; z-index: 1000;padding:0px" id="zombieEnemyGuideButton"><img src="images/zombieEnemy.webp" style="height:100%;width: 100%;" id="zombieEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(7)" style=" font-size:30px; position:absolute; top: 40%; left: 4%; width: 150px; height:150px; z-index: 1000;padding:0px" id="shieldEnemyGuideButton"><img src="images/shieldEnemy.webp" style="height:100%;width: 100%;" id="shieldEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(8)" style=" font-size:30px; position:absolute; top: 40%; left: 15%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(9)" style=" font-size:30px; position:absolute; top: 40%; left: 26%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(10)" style=" font-size:30px; position:absolute; top: 40%; left: 37%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(11)" style=" font-size:30px; position:absolute; top: 40%; left: 48%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(12)" style=" font-size:30px; position:absolute; top: 40%; left: 59%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(13)" style=" font-size:30px; position:absolute; top: 65%; left: 4%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(14)" style=" font-size:30px; position:absolute; top: 65%; left: 15%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(15)" style=" font-size:30px; position:absolute; top: 65%; left: 26%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(16)" style=" font-size:30px; position:absolute; top: 65%; left: 37%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(17)" style=" font-size:30px; position:absolute; top: 65%; left: 48%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(18)" style=" font-size:30px; position:absolute; top: 65%; left: 59%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(19)" style=" font-size:30px; position:absolute; top: 90%; left: 4%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(20)" style=" font-size:30px; position:absolute; top: 90%; left: 23%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(21)" style=" font-size:30px; position:absolute; top: 90%; left: 42%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(22)" style=" font-size:30px; position:absolute; top: 90%; left: 61%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(23)" style=" font-size:30px; position:absolute; top: 90%; left: 79%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(24)" style=" font-size:30px; position:absolute; top: 125%; left: 4%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(25)" style=" font-size:30px; position:absolute; top: 125%; left: 23%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(26)" style=" font-size:30px; position:absolute; top: 125%; left: 42%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+   
+
+            
+            <!-- <button onclick="Commence(3)" style="text-align: center; font-size: 67px; position: relative; top: 170px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Hard</button>
+            <button onclick="Commence(4)" style="text-align: center; font-size: 67px; position: relative; top: 190px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Extreme Demon</button> -->
+            <button onclick="ChangePage('IntroPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 10px; left: 80%; width: 15%; z-index: 1001; margin: 0px;">Back</button>
+
+        </div>
+        <div id="enemyDescriptionPage" style="display:none">
+            <h1 style="text-align: center; font-size: 67px; position: relative; top: 7px; left: 0; width: 100%; z-index: 1000; margin: 0;">Enemy Guide</h1>
+            
+            <div style="text-align: center;font-family: Black ops one;">
+            <img src="images/enemy.webp" style="position:relative; height:200px; width: 200px; top:125px;display: block;margin:0 auto" id="enemyShowcaseImage"></img>
+            <div style="font-size:30px;position: relative; top:150px;display: block" id="enemySourceText">testing</div>
+            <div style="font-size:30px;position: relative; top:200px;display: block" id="enemyDescriptionText">testing</div>
+            </div>
+
+
+            
+            <!-- <button onclick="Commence(3)" style="text-align: center; font-size: 67px; position: relative; top: 170px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Hard</button>
+            <button onclick="Commence(4)" style="text-align: center; font-size: 67px; position: relative; top: 190px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Extreme Demon</button> -->
+            <button onclick="ChangePage('enemyDescriptionSelectionPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 10px; left: 80%; width: 15%; z-index: 1001; margin: 0px;">Back</button>
+
+
         </div>
     </head>
 </html>

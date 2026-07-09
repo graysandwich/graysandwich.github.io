@@ -34,6 +34,8 @@ function rotateAroundPoint(pivotX, pivotY, objectX, objectY, angleInDegrees) {
 
     return { x: newX, y: newY };
 }
+
+
 var delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 document.addEventListener("mousemove", (e)=>{
@@ -130,10 +132,13 @@ window.addEventListener("beforeunload", (e)=>{
 
     localStorage.setItem("GambleBossFound", GambleBoss.seen);
     localStorage.setItem("SnakeBossFound", SnakeBoss.seen);
+    localStorage.setItem("HealerBossFound", HealerBoss.seen);
     
     localStorage.setItem("TankPlayerUnlocked", TankPlayer.unlocked);
     localStorage.setItem("HealerPlayerUnlocked", HealerPlayer.unlocked);
     localStorage.setItem("MagePlayerUnlocked", MagePlayer.unlocked);
+    
+    localStorage.setItem("ShowHealthbarSetting", showHealthBars);
 });
 document.addEventListener('DOMContentLoaded', () => {
     BasicEnemy.seen=JSON.parse(localStorage.getItem("BasicEnemyFound"));
@@ -165,9 +170,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     GambleBoss.seen=JSON.parse(localStorage.getItem("GambleBossFound"));
     SnakeBoss.seen=JSON.parse(localStorage.getItem("SnakeBossFound"));
+    HealerBoss.seen=JSON.parse(localStorage.getItem("HealerBossFound"));
 
     BasicPlayer.unlocked=true;
     TankPlayer.unlocked=JSON.parse(localStorage.getItem("TankPlayerUnlocked"));
     HealerPlayer.unlocked=JSON.parse(localStorage.getItem("HealerPlayerUnlocked"));
     MagePlayer.unlocked=JSON.parse(localStorage.getItem("MagePlayerUnlocked"));
+
+    if(JSON.parse(localStorage.getItem("ShowHealthbarSetting"))!=null) showHealthBars=JSON.parse(localStorage.getItem("ShowHealthbarSetting"));
+
+
 });

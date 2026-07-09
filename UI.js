@@ -224,7 +224,13 @@ class BossBar {
     }
     Update() {
         this.desiredWidth = this.owner.health / this.owner.maxHealth * 600;
-        requestAnimationFrame(this.DecreaseHealthBar);
+        if(this.desiredWidth==this.image2.width)return;
+        if(this.desiredWidth<this.image2.width){
+            requestAnimationFrame(this.DecreaseHealthBar);
+        }
+        else{
+            requestAnimationFrame(this.IncreaseHealthBar);
+        }
     }
     DecreaseHealthBar() {
         if (this.image2.width - 8 < this.desiredWidth) {
@@ -241,18 +247,19 @@ class BossBar {
     }
 
     IncreaseHealthBar() {
-        if (this.image1.width + 8 > this.desiredWidth) {
-            this.image1.width = this.desiredWidth;
-            this.image1.style.width = this.desiredWidth + "px";
+        if (this.image2.width + 8 > this.desiredWidth) {
+            this.image2.width = this.desiredWidth;
+            this.image2.style.width = this.desiredWidth + "px";
         }
         else {
-            this.image1.width += 8;
-            this.image1.style.width = (parseInt(this.image1.style.width) + 8) + "px";
+            this.image2.width += 8;
+            this.image2.style.width = (parseInt(this.image2.style.width) + 8) + "px";
         }
-        if (this.desiredWidth > this.image1.width) {
+        if (this.desiredWidth < this.image2.width) {
             requestAnimationFrame(this.IncreaseHealthBar)
         }
     }
+
 }
 
 class Ability{

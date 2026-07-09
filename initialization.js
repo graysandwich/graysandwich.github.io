@@ -7,25 +7,8 @@ let protectorBullets=[];
 let newEnemyQueue=[];
 let floatingObjects=[];
 let playerAbilities=[];
-let enemySpawnTimer=0;
-let shooterEnemySpawnTimer=0;
-let aimingEnemySpawnTimer=0;
-let homingEnemySpawnTimer=0;
-let chargingEnemySpawnTimer=0;
-let shieldEnemySpawnTimer=0;
-let trapperEnemySpawnTimer=0;
-let zombieEnemySpawnTimer=0;
-let ghostEnemySpawnTimer=0;
-let poisonEnemySpawnTimer=0;
-let blackHoleEnemySpawnTimer=0;
-let builderEnemySpawnTimer=0;
-let windupEnemySpawnTimer=0;
-let spawnerEnemySpawnTimer=0;
-let mimicEnemySpawnTimer=0;
+let xpBagSpawnTimer=0;
 let healthPotionSpawnTimer=0;
-let selfDestructEnemySpawnTimer=0;
-let machineGunEnemySpawnTimer=0;
-let smokeBombEnemySpawnTimer=0;
 let waveTimer=0;
 let isBossWave=false;
 let movingLeft, movingRight, movingUp, movingDown=false;
@@ -38,11 +21,31 @@ let mouseY=0;
 let currentWave=0;
 let SCALE=0.001;
 let continueFlag=false;
-const NUMUPGRADES=16;
+const NUMUPGRADES=17;
 let boughtUpgrades=new Array(NUMUPGRADES);
 for(let i=0;i<boughtUpgrades.length;i++){
     boughtUpgrades[i]=0;
 }
+let UPGRADES = [
+    { onclick: "increaseDamage(1)",        text: "+1 Damage" },
+    { onclick: "increaseMaxHealth(10)",    text: "+10 Max Health" },
+    { onclick: "increaseProjectiles(2)",   text: "+2 Projectiles" },
+    { onclick: "addFrostProjectiles(1)",   text: "+1 Frost Projectile" },
+    { onclick: "addLaserProjectiles(1)",   text: "Laser Attack" },
+    { onclick: "speedUpAttacks(1.2)",      text: "Faster Attack Speed" },
+    { onclick: "addSiphon(0.25)",          text: "+0.25 Siphon" },
+    { onclick: "multiplyXPGain(2)",        text: "2x XP gain" },
+    { onclick: "addBomb(1)",               text: "Bomb Attack (Aims to Mouse)" },
+    { onclick: "addTimeWarp(1)",           text: "Speed Ability" },
+    { onclick: "AddPassiveHealing(1)",     text: "+1 Passive Healing" },
+    { onclick: "Gamble(1)",                text: "Mystery Box" },
+    { onclick: "AddProtectorBullet(2)",    text: "+2 Protectors" },
+    { onclick: "TradeoffDeal(2)",          text: "x2 Damage but x2 Damage Taken" },
+    { onclick: "AddShield(1)",             text: "Gain Shield" },
+    { onclick: "BulletDeleterAbility(1)",  text: "Bullet Wipe Ability" },
+    { onclick: "IncreaseProjectileSize(1.5)",  text: "Increase Projectile Size" },
+    { onclick: "",  text: "" }
+];
 let timeWarpCounter=0;
 let gambleTimer=0;
 let gambleChoice=0;
@@ -60,6 +63,7 @@ let isUnlockingCharacter=false;
 let chosenCharacter=0;
 let images={};
 let doneLoading=false;
+let showHealthBars=true;
 const imageSources = {
 //   aimingEnemy: 'images/aimingEnemy.webp',
 //   background: 'images/background.webp',
@@ -149,10 +153,10 @@ function SetDifficulty(d){
 function SelectCharacter(character){
     chosenCharacter=character;
     let descriptionText=document.getElementById("descriptionText");
-    document.getElementById("basicPlayer").style.border="";
-    document.getElementById("tankPlayer").style.border="";
-    document.getElementById("healerPlayer").style.border="";
-    document.getElementById("magePlayer").style.border="";
+    list = document.querySelectorAll('[id$="Player"]');
+    for (let i = 0; i < list.length; i++) {
+        list[i].style.border = "";
+    }
     switch(chosenCharacter){
         case 1:
             descriptionText.innerText="The basic character. He is the chosen one (as in he got chosen when I randomly clicked on one of my screenshots for a placeholder image)."
@@ -160,7 +164,7 @@ function SelectCharacter(character){
             break;
         case 2:
             if(TankPlayer.unlocked){
-                descriptionText.innerText="Has high health but is really slow and attacks slowly. Gains a shield every 30 seconds. Spammable meatshield (wait, wrong game)."
+                descriptionText.innerText="Has high health but is really slow and attacks slowly. Gains a slightly weaker shield every 30 seconds. Spammable meatshield (wait, wrong game)."
             }
             else{
                 descriptionText.innerText="LOCKED"
@@ -212,6 +216,9 @@ async function Commence(){
     for(let i=0;i<list.length;i++){
         list[i].style.display="none";
     }
+    for(let i=0;i<boughtUpgrades.length;i++){
+        boughtUpgrades[i]=0;
+    }
     //document.querySelectorAll('img').forEach(img => img.remove());
     if(doneLoading){
         document.getElementById("loadingPage").style.display="none";
@@ -223,26 +230,9 @@ async function Commence(){
         Commence();
     }
 }
-async function Start(){
+function Start(){
 
     gameOver=false;
-    enemySpawnTimer=0;
-    aimingEnemySpawnTimer=0;
-    homingEnemySpawnTimer=0;
-    chargingEnemySpawnTimer=0;
-    shooterEnemySpawnTimer=0;
-    trapperEnemySpawnTimer=0;
-    zombieEnemySpawnTimer=0;
-    ghostEnemySpawnTimer=0;
-    poisonEnemySpawnTimer=0;
-    blackHoleEnemySpawnTimer=0;
-    builderEnemySpawnTimer=0;
-    windupEnemySpawnTimer=0;
-    spawnerEnemySpawnTimer=0;
-    mimicEnemySpawnTimer=0;
-    selfDestructEnemySpawnTimer=0;
-    machineGunEnemySpawnTimer=0;
-    smokeBombEnemySpawnTimer=0;
     
     healthPotionSpawnTimer=Math.random()*600+700;
     xpBagTimer=Math.random()*200+200;
@@ -270,10 +260,6 @@ async function Start(){
     isUnlockingCharacter=false;
     shieldBar=null;
     timeWarpCounter=-1;
-    let boughtUpgrades=new Array(NUMUPGRADES);
-    for(let i=0;i<boughtUpgrades.length;i++){
-        boughtUpgrades[i]=0;
-    }
 
     movingLeft, movingRight, movingUp, movingDown=false;
     page="gamePage";
@@ -321,7 +307,6 @@ async function Start(){
     }
     RandomizeEnemies(2, 0, 0,0,0);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    await delay(100);
     loop();
 
 }

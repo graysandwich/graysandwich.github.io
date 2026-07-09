@@ -80,7 +80,10 @@ function AddProtectorBullet(amount) {
 }
 function AddShield(amount) {
     for (let i = 0; i < amount; i++) {
-        bullets.push(new PlayerShield());
+        let temp=new PlayerShield();
+        temp.health=50;
+        temp.maxHealth=50;
+        bullets.push(temp);
     }
     boughtUpgrades[14]=1;
     ChangePage('gamePage', false)
@@ -243,5 +246,10 @@ function BulletDeleterAbility(amount) {
     
     new BulletDeleterIcon(50);
     boughtUpgrades[15] = 1;
+    ChangePage('gamePage', false)
+}
+function IncreaseProjectileSize(amount) {
+    player.projectileSizeMultiplier *=amount;
+    boughtUpgrades[16]+=0.5;
     ChangePage('gamePage', false)
 }
