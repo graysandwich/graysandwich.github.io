@@ -4090,7 +4090,7 @@ class SpinningBullet extends EnemyBullet {
     move() {
         this.centerX += this.speedX;
         this.centerY += this.speedY;
-        this.angle += 0.1;
+        this.angle += 0.05;
         this.angle %= 2 * Math.PI;
         this.offsetX = 50 * Math.cos(this.angle);
         this.offsetY = 50 * Math.sin(this.angle);
@@ -5029,6 +5029,7 @@ function loop() {
     }
 }
 function GameLogic() {
+    console.log(HealerPlayer.unlocked)
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     if (timeWarpCounter == -1) {
@@ -5200,7 +5201,7 @@ function ChangeWave() {
             SCALE = 0.001;
             if(TankPlayer.unlocked==false){
                 TankPlayer.unlocked=true;
-                newEnemyQueue.push("images/tankPlayer.webp".src);
+                newEnemyQueue.push("images/tankPlayer.webp");
                 isUnlockingCharacter=true;
             }
             break;

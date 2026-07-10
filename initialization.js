@@ -56,7 +56,7 @@ let TIER2UPGRADES=[
     { onclick: "increaseMaxHealth(20)",    text: "+20 Max Health" },
     { onclick: "increaseProjectiles(4)",   text: "+4 Projectiles" },
     { onclick: "HalveCollisionDamage(0.5)",   text: "Enemy Collisions Deal 0.5x Damage" },
-    { onclick: "AddSiphon(0.5)",   text: "+0.5 Siphon" },
+    { onclick: "addSiphon(0.5)",   text: "+0.5 Siphon" },
 ]
 let timeWarpCounter=0;
 let gambleTimer=0;
