@@ -5,6 +5,7 @@ let enemyBullets=[];
 let collectables=[];
 let protectorBullets=[];
 let newEnemyQueue=[];
+let isPlayerUnlocked=[];
 let floatingObjects=[];
 let playerAbilities=[];
 let xpBagSpawnTimer=0;
@@ -21,8 +22,8 @@ let mouseY=0;
 let currentWave=0;
 let SCALE=0.001;
 let continueFlag=false;
-const NUMUPGRADES=17;
-const NUMTIER2UPGRADES=5;
+const NUMUPGRADES=20;
+const NUMTIER2UPGRADES=6;
 let boughtUpgrades=new Array(NUMUPGRADES);
 for(let i=0;i<boughtUpgrades.length;i++){
     boughtUpgrades[i]=0;
@@ -41,14 +42,17 @@ let UPGRADES = [
     { onclick: "addSiphon(0.25)",          text: "+0.25 Siphon" },
     { onclick: "multiplyXPGain(2)",        text: "2x XP gain" },
     { onclick: "addBomb(1)",               text: "Bomb Attack (Aims to Mouse)" },
-    { onclick: "addTimeWarp(1)",           text: "Speed Ability" },
+    { onclick: "addTimeWarp(1)",           text: "Speed Burst Ability" },
     { onclick: "AddPassiveHealing(1)",     text: "+1 Passive Healing" },
     { onclick: "Gamble(1)",                text: "Mystery Box" },
     { onclick: "AddProtectorBullet(2)",    text: "+2 Protectors" },
     { onclick: "TradeoffDeal(2)",          text: "x2 Damage but x2 Damage Taken" },
-    { onclick: "AddShield(1)",             text: "Gain Shield" },
+    { onclick: "AddShield(1)",             text: "Gain 50hp Shield" },
     { onclick: "BulletDeleterAbility(1)",  text: "Bullet Wipe Ability" },
     { onclick: "IncreaseProjectileSize(1.5)",  text: "Increase Projectile Size" },
+    { onclick: "MakeIceBulletsPierce()",  text: "Frost Bullets Pierce Through Enemies" },
+    { onclick: "IncreaseFireDamage(0.25)",  text: "+0.25 Fire Damage" },
+    { onclick: "PassiveSpawns()",  text: "Passively Spawn Souls" },
     { onclick: "",  text: "" }
 ];
 let TIER2UPGRADES=[
@@ -57,6 +61,7 @@ let TIER2UPGRADES=[
     { onclick: "increaseProjectiles(4)",   text: "+4 Projectiles" },
     { onclick: "HalveCollisionDamage(0.5)",   text: "Enemy Collisions Deal 0.5x Damage" },
     { onclick: "addSiphon(0.5)",   text: "+0.5 Siphon" },
+    { onclick: "IncreaseHealthPotionDensity(0.5)",   text: "2x Health Potion Spawn Rate" },
 ]
 let timeWarpCounter=0;
 let gambleTimer=0;
@@ -79,6 +84,7 @@ let showHealthBars=true;
 let killedBoss=false;
 let isLevelling=false;
 let currentPage="";
+let healthPotionSpawnMultiplier=1;
 const imageSources = {
 //   aimingEnemy: 'images/aimingEnemy.webp',
 //   background: 'images/background.webp',
@@ -206,8 +212,19 @@ function SelectCharacter(character){
             }
             document.getElementById("magePlayer").style.border="5px solid red";
             break;
+        case 5:
+            if(NecromancerPlayer.unlocked){
+                descriptionText2.innerText="Spawns the souls of slain enemies. These souls will go towards the nearest enemy and collide with them. No they do not inheit the abilities of the enemy they came from that would be too much effort"
+
+            }
+            else{
+                descriptionText2.innerText="LOCKED"
+            }
+            document.getElementById("necromancerPlayer").style.border="5px solid red";
+            break;
     }
     document.getElementById("startButton").disabled = false; 
+    document.getElementById("startButton2").disabled = false; 
 }
 function loadImage(image){
     return new Promise((resolve, reject) =>{
@@ -234,6 +251,9 @@ async function Commence(){
     for(let i=0;i<boughtUpgrades.length;i++){
         boughtUpgrades[i]=0;
     }
+    boughtUpgrades[17]=1;
+    boughtUpgrades[18]=1;
+    boughtUpgrades[19]=1;
     //document.querySelectorAll('img').forEach(img => img.remove());
     if(doneLoading){
         document.getElementById("loadingPage").style.display="none";
@@ -275,6 +295,7 @@ function Start(){
     isUnlockingCharacter=false;
     shieldBar=null;
     timeWarpCounter=-1;
+    healthPotionSpawnMultiplier=1;
 
     movingLeft, movingRight, movingUp, movingDown=false;
     isLevelling=false;
@@ -287,6 +308,23 @@ function Start(){
     canvas.style.display = "block";
 
     lastTime=Date.now();
+    switch(chosenCharacter){
+        case 1:
+            player=new BasicPlayer();
+            break;
+        case 2:
+            player=new TankPlayer();
+            break;
+        case 3:
+            player=new HealerPlayer();
+            break;
+        case 4:
+            player=new MagePlayer();
+            break;
+        case 5:
+            player=new NecromancerPlayer();
+            break;
+    }
     if(difficulty==1){
         scaleMultiplier=0.5;
         bossMultiplier=0.5;
@@ -308,20 +346,6 @@ function Start(){
         bossMultiplier=2;
     }
     SCALE*=scaleMultiplier
-    switch(chosenCharacter){
-        case 1:
-            player=new BasicPlayer();
-            break;
-        case 2:
-            player=new TankPlayer();
-            break;
-        case 3:
-            player=new HealerPlayer();
-            break;
-        case 4:
-            player=new MagePlayer();
-            break;
-    }
     RandomizeEnemies(2, 0, 0,0,0);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     currentPage="gamePage";

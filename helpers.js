@@ -137,6 +137,7 @@ window.addEventListener("beforeunload", (e)=>{
     localStorage.setItem("TankPlayerUnlocked", TankPlayer.unlocked);
     localStorage.setItem("HealerPlayerUnlocked", HealerPlayer.unlocked);
     localStorage.setItem("MagePlayerUnlocked", MagePlayer.unlocked);
+    localStorage.setItem("NecromancerPlayerUnlocked", NecromancerPlayer.unlocked);
     
     localStorage.setItem("ShowHealthbarSetting", showHealthBars);
 });
@@ -176,6 +177,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if(JSON.parse(localStorage.getItem("TankPlayerUnlocked"))!=null) TankPlayer.unlocked=JSON.parse(localStorage.getItem("TankPlayerUnlocked"));
     if(JSON.parse(localStorage.getItem("HealerPlayerUnlocked"))!=null) HealerPlayer.unlocked=JSON.parse(localStorage.getItem("HealerPlayerUnlocked"));
     if(JSON.parse(localStorage.getItem("MagePlayerUnlocked"))!=null) MagePlayer.unlocked=JSON.parse(localStorage.getItem("MagePlayerUnlocked"));
+    if(JSON.parse(localStorage.getItem("MagePlayerUnlocked"))!=null) NecromancerPlayer.unlocked=JSON.parse(localStorage.getItem("NecromancerPlayerUnlocked"));
+
 
     if(JSON.parse(localStorage.getItem("ShowHealthbarSetting"))!=null) showHealthBars=JSON.parse(localStorage.getItem("ShowHealthbarSetting"));
 

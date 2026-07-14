@@ -47,7 +47,7 @@ function ShowEnemy(enemy){
         case 9:
             sourceImage.src="images/ghostEnemy.webp";
             sourceText.innerText="Source: Ghost Pepper from PvZ 2"
-            descriptionText.innerText="He's still trying to control his invisibility power. Its unpredictability has caused a lot of awkward moments in the past...";
+            descriptionText.innerText="Nobody tell him that if he stays invisible for more than 2 seconds at a time he can actually be a lot more dangerous.";
             break;
         case 10:
             sourceImage.src="images/poisonEnemy.webp";
@@ -72,7 +72,7 @@ function ShowEnemy(enemy){
         case 14:
             sourceImage.src="images/windupEnemy.webp";
             sourceText.innerText="Source: Filibuster Obstructa from The Battle Cats"
-            descriptionText.innerText="Takes 3-5 business days to attack. Still faster than the wizard from Hypixel Skyblock...";
+            descriptionText.innerText="Takes 3-5 business days to attack (Still faster than the wizard from Hypixel Skyblock)";
             break;
         case 15:
             sourceImage.src="images/spawnerEnemy.webp";
@@ -97,7 +97,7 @@ function ShowEnemy(enemy){
         case 19:
             sourceImage.src="images/laserBoss.webp";
             sourceText.innerText="Source: Google Image of laptop"
-            descriptionText.innerText="His laser cannons used to be powered by 20% of all the microchips that exist in this world. Unfortunately, great power also comes with great electricity bills, so he's been forced to downgrade a little.";
+            descriptionText.innerText="His laser cannons used to be powered by 20% of all the microchips that exist in this world. Unfortunately, he couldn't afford the electricity bill for that, so he's been forced to downgrade a little.";
             break;
         case 20:
             sourceImage.src="images/iceBoss.webp";
@@ -112,7 +112,7 @@ function ShowEnemy(enemy){
         case 22:
             sourceImage.src="images/mageFireMode.webp";
             sourceText.innerText="Source: All 3 forms are levels from Geometry Dash. Tidal wave is taken from the level itself while the others are taken from the video thumbnails of the level's completion"
-            descriptionText.innerText="Be grateful that this game wasn't created a few years ago. Then all three forms would have been based off of Hell-themed levels.";
+            descriptionText.innerText="If this game was created a five years ago then all three forms would have been based off of Hell-themed levels...";
             break;
         case 23:
             sourceImage.src="images/bulletHellBoss.webp";

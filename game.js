@@ -53,6 +53,7 @@ class Enemy {
         this.knockbackIFrame=0;
         this.hasHealthBar=true;
         this.healTimer=0;
+        this.dead=false;
         //console.log(this.image);
     }
     draw() {
@@ -329,18 +330,12 @@ class LaserBoss extends Enemy {
             enemyBullets.push(new Laser(this.angle + 1.2, this.x, this.y));
             enemyBullets.push(new Laser(this.angle - 1.2, this.x, this.y));
             this.speed = 0;
-            this.speedTimer = 350;
+            this.speedTimer = 375;
             this.speedTimer-=this.speedTimer*(bossMultiplier-1)*0.4
         }
     }
     special() {
         this.timer();
-        if (this.x > player.x) {
-            this.image.style.transform = "scaleX(-1)";
-        }
-        else {
-            this.image.style.transform = "scaleX(1)";
-        }
     }
 }
 class IceBoss extends Enemy {
@@ -830,7 +825,7 @@ class MageBoss extends Enemy {
         if(this.dead && MagePlayer.unlocked==false){
             MagePlayer.unlocked=true;
             newEnemyQueue.push("images/magePlayer.webp");
-            isUnlockingCharacter=true;
+            isPlayerUnlocked.push(true);
         }
     }
 }
@@ -880,29 +875,29 @@ class BulletHellBoss extends Enemy {
         this.redTimer--;
         if (this.slowCountdown > 0) {
             this.walkTimer -= 0.5;
-            this.loopingShotTimer -= 0.5;
-            this.spiralShotTimer -= 0.5;
-            this.laserTimer -= 0.5;
+            this.loopingShotTimer -= 0.4;
+            this.spiralShotTimer -= 0.4;
+            this.laserTimer -= 0.4;
         }
         else {
-            this.walkTimer--;
-            this.loopingShotTimer--;
-            this.spiralShotTimer--;
-            this.laserTimer--;
+            this.walkTimer-=1;
+            this.loopingShotTimer-=0.8;
+            this.spiralShotTimer-=0.8;
+            this.laserTimer-=0.8;
         }
         if (this.health <= this.maxHealth/3) {
             this.image.src = "images/bulletHellBossEnraged.webp";
             this.bossText.innerHTML = `<div style=" color:red;pointer-events:none; font-size:30px; white-space: nowrap; font-family:'Black Ops One'; text-align:center;" id="bossTitle">VIRUS DETECTED</div>`
 
             if (this.slowCountdown > 0) {
-                this.loopingShotTimer -= 0.5;
-                this.spiralShotTimer -= 0.5;
-                this.laserTimer -= 0.5;
+                this.loopingShotTimer -= 0.4;
+                this.spiralShotTimer -= 0.4;
+                this.laserTimer -= 0.4;
             }
             else {
-                this.loopingShotTimer--;
-                this.spiralShotTimer--;
-                this.laserTimer--;
+                this.loopingShotTimer-=0.8;
+                this.spiralShotTimer-=0.8;
+                this.laserTimer-=0.8;
             }
         }
         if (this.walkTimer <= 0) {
@@ -1671,10 +1666,6 @@ class HealerBoss extends Enemy {
     }
     takeDamage(bullet, index) {
         super.takeDamage(bullet, index);
-        if (this.dead == true) {
-            player.slowed = false;
-            this.frostAura.remove();
-        }
     }
     HealAll(){
 
@@ -2026,7 +2017,8 @@ class HomingEnemy extends Enemy {
         let distanceX = Math.abs(this.x - player.x);
         let distanceY = Math.abs(this.y - player.y);
         const distance = Math.hypot(distanceX, distanceY);
-        if (distance < 300) {
+        //console.log(this.dead);
+        if (distance < 300 && this.dead==false) {
             this.speed = 0;
         }
         else {
@@ -2076,6 +2068,7 @@ class EnemyShield extends Enemy {
         this.width=150;
         this.height=150;
         this.hasHealthBar=false;
+        this.giveXP=false;
         if (this.x < -90) {
             this.offsetX = 60;
             this.offsetY = 0;
@@ -2425,6 +2418,7 @@ class EnemyWall extends Enemy {
         this.hasHealthBar=false;
         this.image.style.zIndex = -1;
         this.canSiphon = false;
+        this.giveXP=false;
         //console.log(this.shootTimer);
     }
     special(){
@@ -2774,6 +2768,7 @@ class MimicEnemy extends Enemy {
         if (this.dead) return;
         ctx.save();
         if(showHealthBars && this.hasHealthBar && this.health<this.maxHealth){
+            this.health=Math.max(this.health,0);
             ctx.fillStyle = "red";
             ctx.fillRect(this.x - this.width / 2-this.width/4, this.y - this.height, this.width*1.5, 15)
             ctx.fillStyle = "green";
@@ -2945,7 +2940,7 @@ class MachineGunEnemy extends Enemy {
         let distanceX = Math.abs(this.x - player.x);
         let distanceY = Math.abs(this.y - player.y);
         const distance = Math.hypot(distanceX, distanceY);
-        if (distance < 400) {
+        if (distance < 400 && this.dead==false) {
             this.speed = 0;
         }
         else {
@@ -3218,6 +3213,33 @@ class FrostBullet extends Bullet {
         this.height*=player.projectileSizeMultiplier;
         this.image.src = "images/frostProjectile.webp";
         this.frostbite = true;
+        this.hitEnemies = new Set();
+    }
+    move(){
+        if (this.slowed) {
+            this.x += this.speedX / 3;
+            this.y += this.speedY / 3;
+        }
+        else {
+            this.x += this.speedX;
+            this.y += this.speedY;
+        }
+        for (let i = enemies.length - 1; i >= 0; i--) {
+
+            if (
+                (enemies[i].x - enemies[i].width / 2) < (this.x + this.width / 2) &&
+                (enemies[i].x + enemies[i].width / 2) > (this.x - this.width / 2) &&
+                (enemies[i].y - enemies[i].height / 2) < (this.y + this.height / 2) &&
+                (enemies[i].y + enemies[i].height / 2) > (this.y - this.height / 2) && enemies[i].ignoreBullets == false && !this.hitEnemies.has(enemies[i])
+            ) {
+                //console.log(enemies[i]+" "+this.damage);
+                enemies[i].takeDamage(this);
+                this.hitEnemies.add(enemies[i]);
+            }
+        }
+        if (this.x < -100 || this.y < -100 || this.x > canvas.width + 100 || this.y >= canvas.height + 100) {
+            this.dead = true;
+        }
     }
 }
 class PlayerLaser extends Bullet {
@@ -3523,6 +3545,76 @@ class WindBullet extends Bullet {
         if (this.x < -100 || this.y < -100 || this.x > canvas.width + 100 || this.y >= canvas.height + 100) {
             this.dead = true;
         }
+    }
+}
+class SummonedEnemy extends Bullet{
+    constructor(speed, health, size, image){
+        super(0,0,health);
+        this.speed=speed;
+        this.health=health;
+        this.image=image;
+        this.width=size;
+        this.height=size;
+    }
+    move(){
+        super.move();
+        if (enemies.length > 0) {
+            let closestEnemy = -1;
+            let enemyDist = 999999;
+            for (let i = 0; i < enemies.length; i++) {
+                let newDist = Math.hypot(Math.abs(enemies[i].x - this.x), Math.abs(enemies[i].y - this.y));
+                if (newDist < enemyDist && enemies[i].ignoreBullets == false) {
+                    enemyDist = newDist;
+                    closestEnemy = i;
+                }
+            }
+            if (closestEnemy != -1) {
+                let distanceX = Math.abs(this.x - enemies[closestEnemy].x);
+                let distanceY = Math.abs(this.y - enemies[closestEnemy].y);
+                let vx = 0;
+                let vy = 0;
+                if (distanceX == 0) {
+                    if (this.y > enemies[closestEnemy].y) {
+                        vy -= this.speed;
+                    }
+                    if (this.y < enemies[closestEnemy].y) {
+                        vy += this.speed;
+                    }
+                }
+                else {
+                    let angle = Math.atan(distanceY / distanceX);
+                    if (this.x > enemies[closestEnemy].x) {
+                        vx -= this.speed * Math.cos(angle);
+                    }
+                    if (this.y > enemies[closestEnemy].y) {
+                        vy -= this.speed * Math.sin(angle);
+                    }
+                    if (this.x < enemies[closestEnemy].x) {
+                        vx += this.speed * Math.cos(angle);
+                    }
+                    if (this.y < enemies[closestEnemy].y) {
+                        vy += this.speed * Math.sin(angle);
+                    }
+                    //console.log(this.x+" "+this.y+" "+Math.sin(angle)+" "+Math.cos(angle)+" "+angle);
+                }
+                this.speedX=vx;
+                this.speedY=vy;
+            }
+            else{
+                this.speedX=0;
+                this.speedY=0;
+            }
+
+        }
+    }
+    draw() {
+        if (this.dead) return;
+        ctx.save();
+        ctx.filter = "grayscale(100%)";
+        ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+        ctx.filter="none";
+
+        ctx.restore();
     }
 }
 
@@ -3898,7 +3990,7 @@ class Laser extends EnemyBullet {
 
                 if (distanceToLine < 30 && forwardDistance > -15) {
                     player.takeDamage(1, this);
-                    this.iFrame = 10;
+                    this.iFrame = 15;
                 }
             }
         }
@@ -4256,6 +4348,7 @@ class Player {
         this.attackSpeedMultiplier=1;
         this.projectileSizeMultiplier=1;
         this.collisionDamageMultiplier=1;
+        this.iceFormBulletsPierce=false;
     }
     takeDamage(damage, bullet) {
         if(bullet.isEnemy){
@@ -4270,7 +4363,7 @@ class Player {
         
         //console.log(this.health);
         floatingObjects.push(new FloatingObject(this.x-this.width/2+Math.random()*this.width,this.y,damage,"red"));
-
+        console.log(damage+" "+bullet);
         if (bullet.frostbite) {
             this.slowCountdown = 120;
         }
@@ -4488,24 +4581,6 @@ class TankPlayer extends Player{
             this.Attack();
         }
         super.act();
-        if(movingLeft){
-            this.image.src=this.normalImage;
-        }
-        if(movingRight){
-            this.image.src=this.mirroredImage;
-        }
-        this.shieldTimer--;
-        if(this.shieldTimer<=0){
-            if(boughtUpgrades[14]==0){
-                bullets.push(new PlayerShield());
-                boughtUpgrades[14]=1;
-            }
-            else{
-                playerShield.health=playerShield.maxHealth;
-                shieldBar.Update();
-            }
-            this.shieldTimer=1800;
-        }
     }
     Attack(){
         
@@ -4578,6 +4653,11 @@ class MagePlayer extends Player{
         boughtUpgrades[0]=1;
         boughtUpgrades[2]=1;
         boughtUpgrades[11]=1;
+        boughtTier2Upgrades[0]=1;
+        boughtTier2Upgrades[2]=1;
+        boughtUpgrades[17]=0;
+        boughtUpgrades[18]=0;
+        this.fireDamage=0.5;
         new ChangeModeIcon(50);
         this.image.src="images/magePlayer.webp";
     }
@@ -4613,7 +4693,7 @@ class MagePlayer extends Player{
                         vx = 7 * Math.cos(angle);
                         vy = 7 * Math.sin(angle);
                     }
-                    bullets[bullets.length] = new PlayerFire(vx, vy, 0.5);
+                    bullets[bullets.length] = new PlayerFire(vx, vy, this.fireDamage);
                 }
 
             }
@@ -4641,6 +4721,70 @@ class MagePlayer extends Player{
                 bullets[bullets.length] = temp;
                 angle += 2 * Math.PI / this.projectiles;
             }
+        }
+    }
+}
+class NecromancerPlayer extends Player{
+    constructor(){
+        super();
+        this.image.src="images/necromancerPlayer.webp";
+        this.health=8;
+        this.maxHealth=8;
+        this.attackSpeed=60;
+        this.damage=1;
+        this.summonQueue=[];
+        this.isSummoning=false;
+        this.summoningCooldown=0;
+        this.passiveSpawning=false;
+        this.passiveSpawnCooldown=0;
+        boughtUpgrades[19]=0;
+        new NecromancyIcon(50);
+    }
+    act(){
+        if (this.bulletCooldown <= 0) {
+            this.bulletCooldown = this.attackSpeed;
+            this.Attack();
+        }
+        if(this.isSummoning){
+            this.summoningCooldown--;
+            if(this.summoningCooldown<=0){
+                this.summoningCooldown=25;
+                if(this.summonQueue.length>0){
+                    let temp=this.summonQueue[0];
+                    temp.x=player.x;
+                    temp.y=player.y;
+                    bullets.push(temp);
+                    this.summonQueue.splice(0,1);
+                }
+                else{
+                    this.isSummoning=false;
+                    this.summoningCooldown=0;
+                }
+            }
+        }
+        this.passiveSpawnCooldown--;
+        if(this.passiveSpawning && this.passiveSpawnCooldown<=0){
+            this.passiveSpawnCooldown=180;
+            let tempImage=new Image();
+            tempImage.src="images/enemy.webp";
+            let temp=new SummonedEnemy(2,3,50,tempImage);
+            temp.x=player.x;
+            temp.y=player.y;
+            bullets.push(temp);
+        }
+    
+        super.act();
+    }
+    Summon(){
+        this.isSummoning=true;
+    }
+    Attack(){
+        
+        let angle = 0;
+        for (let i = 0; i < this.projectiles; i++) {
+            let temp=new Bullet(10 * Math.cos(angle), 10 * Math.sin(angle), this.damage);
+            bullets[bullets.length] = temp;
+            angle += 2 * Math.PI / this.projectiles;
         }
     }
 }
@@ -4692,6 +4836,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 if (!BasicEnemy.seen) {
                     BasicEnemy.seen = true;
                     newEnemyQueue.push("images/enemy.webp");
+                    isPlayerUnlocked.push(false);
                 }
                 break;
             case 2:
@@ -4699,6 +4844,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 if (!ShooterEnemy.seen) {
                     ShooterEnemy.seen = true;
                     newEnemyQueue.push("images/shooterEnemy.webp");
+                    isPlayerUnlocked.push(false);
                 }
                 break;
             case 3:
@@ -4706,6 +4852,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 if (!AimingEnemy.seen) {
                     AimingEnemy.seen = true;
                     newEnemyQueue.push("images/aimingEnemy.webp");
+                    isPlayerUnlocked.push(false);
                 }
                 break;
             case 4:
@@ -4713,6 +4860,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 if (!HomingEnemy.seen) {
                     HomingEnemy.seen = true;
                     newEnemyQueue.push("images/homingEnemy.webp");
+                    isPlayerUnlocked.push(false);
                 }
                 break;
             case 5:
@@ -4720,6 +4868,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 if (!TrapperEnemy.seen) {
                     TrapperEnemy.seen = true;
                     newEnemyQueue.push("images/trapperEnemy.webp");
+                    isPlayerUnlocked.push(false);
                 }
                 break;
             case 6:
@@ -4727,6 +4876,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 if (!ZombieEnemy.seen) {
                     ZombieEnemy.seen = true;
                     newEnemyQueue.push("images/zombieEnemy.webp");
+                    isPlayerUnlocked.push(false);
                 }
                 break;
         }
@@ -4738,6 +4888,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 if (!ChargingEnemy.seen) {
                     ChargingEnemy.seen = true;
                     newEnemyQueue.push("images/chargingEnemy.webp");
+                    isPlayerUnlocked.push(false);
                 }
                 break;
             case 2:
@@ -4745,6 +4896,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 if (!ShieldEnemy.seen) {
                     ShieldEnemy.seen = true;
                     newEnemyQueue.push("images/shieldEnemy.webp");
+                    isPlayerUnlocked.push(false);
                 }
                 break;
             case 3:
@@ -4752,6 +4904,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 if (!GhostEnemy.seen) {
                     GhostEnemy.seen = true;
                     newEnemyQueue.push("images/ghostEnemy.webp");
+                    isPlayerUnlocked.push(false);
                 }
                 break;
             case 4:
@@ -4759,6 +4912,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 if (!PoisonEnemy.seen) {
                     PoisonEnemy.seen = true;
                     newEnemyQueue.push("images/poisonEnemy.webp");
+                    isPlayerUnlocked.push(false);
                 }
                 break;
             case 5:
@@ -4766,6 +4920,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 if (!BlackHoleEnemy.seen) {
                     BlackHoleEnemy.seen = true;
                     newEnemyQueue.push("images/blackHoleEnemy.webp");
+                    isPlayerUnlocked.push(false);
                 }
                 break;
             case 6:
@@ -4773,6 +4928,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 if (!MimicEnemy.seen) {
                     MimicEnemy.seen = true;
                     newEnemyQueue.push("images/mimicEnemyDead.webp");
+                    isPlayerUnlocked.push(false);
                 }
                 break;
         }
@@ -4784,6 +4940,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 if (!BuilderEnemy.seen) {
                     BuilderEnemy.seen = true;
                     newEnemyQueue.push("images/builderEnemy.webp");
+                    isPlayerUnlocked.push(false);
                 }
                 break;
             case 2:
@@ -4791,6 +4948,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 if (!WindupEnemy.seen) {
                     WindupEnemy.seen = true;
                     newEnemyQueue.push("images/windupEnemy.webp");
+                    isPlayerUnlocked.push(false);
                 }
                 break;
             case 3:
@@ -4798,6 +4956,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 if (!SpawnerEnemy.seen) {
                     SpawnerEnemy.seen = true;
                     newEnemyQueue.push("images/spawnerEnemy.webp");
+                    isPlayerUnlocked.push(false);
                 }
                 break;
             case 4:
@@ -4805,6 +4964,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 if (!SelfDestructEnemy.seen) {
                     SelfDestructEnemy.seen = true;
                     newEnemyQueue.push("images/selfDestructEnemy.webp");
+                    isPlayerUnlocked.push(false);
                 }
                 break;
             case 5:
@@ -4812,6 +4972,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 if (!MachineGunEnemy.seen) {
                     MachineGunEnemy.seen = true;
                     newEnemyQueue.push("images/machineGunEnemy.webp");
+                    isPlayerUnlocked.push(false);
                 }
                 break;
             case 6:
@@ -4819,6 +4980,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 if (!SmokeBombEnemy.seen) {
                     SmokeBombEnemy.seen = true;
                     newEnemyQueue.push("images/smokeBombEnemy.webp");
+                    isPlayerUnlocked.push(false);
                 }
                 break;
         }
@@ -4831,6 +4993,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 if (!LaserBoss.seen) {
                     LaserBoss.seen = true;
                     newEnemyQueue.push("images/laserBoss.webp");
+                    isPlayerUnlocked.push(false);
                 }
                 break;
             case 2:
@@ -4838,6 +5001,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 if (!IceBoss.seen) {
                     IceBoss.seen = true;
                     newEnemyQueue.push("images/iceBoss.webp");
+                    isPlayerUnlocked.push(false);
                 }
                 enemies[enemies.length] = boss;
                 break;
@@ -4846,6 +5010,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 if (!BouncyBoss.seen) {
                     BouncyBoss.seen = true;
                     newEnemyQueue.push("images/bouncyBoss.webp");
+                    isPlayerUnlocked.push(false);
                 }
                 enemies[enemies.length] = boss;
                 break;
@@ -4854,6 +5019,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 if (!MageBoss.seen) {
                     MageBoss.seen = true;
                     newEnemyQueue.push("images/mageWaterMode.webp");
+                    isPlayerUnlocked.push(false);
                 }
                 enemies[enemies.length] = boss;
                 break;
@@ -4862,6 +5028,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 if (!BulletHellBoss.seen) {
                     BulletHellBoss.seen = true;
                     newEnemyQueue.push("images/bulletHellBoss.webp");
+                    isPlayerUnlocked.push(false);
                 }
                 SCALE /= 1.2;
                 enemies[enemies.length] = boss;
@@ -4876,6 +5043,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 if (!GambleBoss.seen) {
                     GambleBoss.seen = true;
                     newEnemyQueue.push("images/gambleBoss.webp");
+                    isPlayerUnlocked.push(false);
                 }
                 break;
             case 2:
@@ -4884,6 +5052,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 if (!SnakeBoss.seen) {
                     SnakeBoss.seen = true;
                     newEnemyQueue.push("images/snakeBoss.webp");
+                    isPlayerUnlocked.push(false);
                 }
                 break;
             case 3:
@@ -4892,6 +5061,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 if (!HealerBoss.seen) {
                     HealerBoss.seen = true;
                     newEnemyQueue.push("images/healingBoss.webp");
+                    isPlayerUnlocked.push(false);
                 }
                 break;
         }
@@ -5015,23 +5185,21 @@ function loop() {
     accumulator = Math.min(accumulator, frameRate * 4);
     //console.log(accumulator);
     while (accumulator > frameRate) {
-        if (timeWarpCounter > 0 && timeWarpCounter % 2 == 0) {
-            timeWarpCounter--;
-            background.src = "images/timeWarpBackground.webp";
-        }
-        else {
-            GameLogic();
-            accumulator -= frameRate;
-        }
+    
+        GameLogic();
+        accumulator -= frameRate;
+        
     }
     if (page == "gamePage" && gameOver==false) {
         requestAnimationFrame(loop);
     }
 }
 function GameLogic() {
-    console.log(HealerPlayer.unlocked)
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    if (timeWarpCounter > 0) {
+        background.src = "images/timeWarpBackground.webp";
+    }
     if (timeWarpCounter == -1) {
         background.src = "images/background.webp";
     }
@@ -5057,6 +5225,7 @@ function GameLogic() {
     if (healthPotionSpawnTimer < 0) {
         healthPotionSpawnTimer = Math.random() * 300 + 450;
         healthPotionSpawnTimer /= 1 + timeElapsed * 0.0003;
+        healthPotionSpawnTimer*=healthPotionSpawnMultiplier;
         const newCollectable = new HealthPotion(Math.random() * (canvas.width - canvas.width / 10) + canvas.width / 20, Math.random() * (canvas.height - canvas.height / 10) + canvas.height / 20);
         collectables.push(newCollectable);
         //console.log(newEnemy.health);
@@ -5071,6 +5240,9 @@ function GameLogic() {
         if (enemies[i].dead) {
             if (enemies[i].giveXP) {
                 player.GainXP(enemies[i].value);
+                if(!enemies[i].isBoss && chosenCharacter==5){
+                    player.summonQueue.push(new SummonedEnemy(enemies[i].speed, Math.ceil(enemies[i].maxHealth*0.5), enemies[i].width, enemies[i].image))
+                }
             }
             if (enemies[i].isBoss) {
                 enemies[i].bossBar.image1.remove();
@@ -5148,6 +5320,7 @@ function GameLogic() {
     }
     xpBagTimer--;
     healthPotionSpawnTimer--;
+    timeWarpCounter--;
     if(timeElapsed<7200 || !isBossWave){
         timeElapsed++;
     }
@@ -5202,7 +5375,7 @@ function ChangeWave() {
             if(TankPlayer.unlocked==false){
                 TankPlayer.unlocked=true;
                 newEnemyQueue.push("images/tankPlayer.webp");
-                isUnlockingCharacter=true;
+                isPlayerUnlocked.push(true);
             }
             break;
         case 5:
@@ -5213,11 +5386,11 @@ function ChangeWave() {
         case 6:
             RandomizeEnemies(2, 3, 2, 0, 0);
             isBossWave = false;
-            SCALE = 0.0007;
+            SCALE = 0.0012;
             if(HealerPlayer.unlocked==false){
                 HealerPlayer.unlocked=true;
                 newEnemyQueue.push("images/healerPlayer.webp");
-                isUnlockingCharacter=true;
+                isPlayerUnlocked.push(true);
             }
             break;
         case 7:
@@ -5229,6 +5402,11 @@ function ChangeWave() {
             RandomizeEnemies(2, 2, 2, 1, 0);
             isBossWave = true;
             SCALE = 0.0005;
+            if(difficulty>1 && NecromancerPlayer.unlocked==false){
+                NecromancerPlayer.unlocked=true;
+                newEnemyQueue.push("images/player.webp");
+                isPlayerUnlocked.push(true);
+            }
             break;
         case 8:
             RandomizeEnemies(2, 2, 2, 0, 1);
@@ -5278,6 +5456,7 @@ function ChangePage(id, reset) {
         if (document.getElementById("indicator2")) document.getElementById("indicator2").remove();
         if (document.getElementById("waveText")) document.getElementById("waveText").remove();
     }
+    //console.log(id)
     if(id=="characterSelectionPage"){
         let tankPlayerButton=document.getElementById("tankPlayer");
         let tankPlayerImage=document.getElementById("tankPlayerImage");
@@ -5329,6 +5508,25 @@ function ChangePage(id, reset) {
             magePlayerText.textContent="Mage";
             magePlayerText.style.fontSize="30px";
             magePlayerText.style.top="225px";
+        }
+    }
+    else if(id=="characterSelection2Page"){
+        let necromancyPlayerButton=document.getElementById("necromancerPlayer");
+        let necromancyPlayerImage=document.getElementById("necromancerPlayerImage");
+        let necromancyPlayerText=document.getElementById("necromancerPlayerText");
+        if(NecromancerPlayer.unlocked==false){
+            necromancyPlayerButton.style.pointerEvents="none";
+            necromancyPlayerImage.src="images/black.webp";
+            necromancyPlayerText.textContent="Beat level 7 in Medium, Hard, or Extreme Demon Difficulty to Unlock";
+            necromancyPlayerText.style.fontSize="20px";
+            necromancyPlayerText.style.top="150px";
+        }
+        else{
+            necromancyPlayerButton.style.pointerEvents="auto";
+            necromancyPlayerImage.src="images/necromancerPlayer.webp";
+            necromancyPlayerText.textContent="Necromancer";
+            necromancyPlayerText.style.fontSize="30px";
+            necromancyPlayerText.style.top="225px";
         }
     }
     if(id=="settingsPage"){
@@ -5531,6 +5729,9 @@ async function EndGame(win) {
     for(let i=0;i<playerAbilities.length;i++){
         playerAbilities[i].indicator.text.remove();
         playerAbilities[i].image.remove();
+        if(playerAbilities[i].counterText){
+            playerAbilities[i].counterText.text.remove();    
+        }
     }
     if(shieldBar){
         shieldBar.image1.remove();
@@ -5557,12 +5758,13 @@ async function EndGame(win) {
 
 async function newEnemyText() {
     let text=document.getElementById("introText");
-    if(isUnlockingCharacter==false){
+    text.style.color="white";
+    text.style.backgroundColor="black";
+    if(isPlayerUnlocked[0]==false){
         text.textContent="New Enemy Discovered!";
     }
     else{
         text.textContent="New Character Unlocked!"
-        isUnlockingCharacter=false;
     }
     let image = document.createElement("img");
     image.src = newEnemyQueue[0];
@@ -5580,5 +5782,6 @@ async function newEnemyText() {
     await delay(3000);
     continueFlag = false;
     image.remove();
+    isPlayerUnlocked.splice(0,1);
     ChangePage("gamePage", false);
 }

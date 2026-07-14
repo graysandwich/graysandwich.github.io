@@ -16,10 +16,8 @@ function increaseMaxHealth(amount) {
 
 function increaseProjectiles(amount) {
     player.projectiles += amount;
-    if(amount==2){
-        boughtUpgrades[2] += 0.5;
-    }
-    boughtTier2Upgrades[2]=1;
+    boughtUpgrades[2] += 0.5;
+    boughtTier2Upgrades[2]+=0.5;
     
     ChangePage('gamePage', false)
 }
@@ -263,5 +261,25 @@ function IncreaseProjectileSize(amount) {
 function HalveCollisionDamage(amount) {
     player.collisionDamageMultiplier *=amount;
     boughtTier2Upgrades[3]=1;
+    ChangePage('gamePage', false)
+}
+function IncreaseHealthPotionDensity(amount) {
+    healthPotionSpawnMultiplier *=amount;
+    boughtTier2Upgrades[5]=1;
+    ChangePage('gamePage', false)
+}
+function MakeIceBulletsPierce() {
+    player.iceBulletsPierce=true;
+    boughtUpgrades[17]=1;
+    ChangePage('gamePage', false)
+}
+function IncreaseFireDamage(amount) {
+    player.fireDamage+=amount;
+    boughtUpgrades[18]=1;
+    ChangePage('gamePage', false)
+}
+function PassiveSpawns() {
+    player.passiveSpawning=true;
+    boughtUpgrades[19]=1;
     ChangePage('gamePage', false)
 }

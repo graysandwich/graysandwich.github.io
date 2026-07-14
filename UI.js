@@ -329,7 +329,7 @@ class TimeWarpIcon extends Ability{
     }
     Activate(){
         if(this.cooldown<=0){
-            timeWarpCounter=250;
+            timeWarpCounter=200;
             this.cooldown=600;
             this.indicator.Switch();
         }
@@ -377,6 +377,27 @@ class ChangeModeIcon extends Ability{
                 this.image.src="images/playerWind.webp";
             }
         }
+    }
+}
+class NecromancyIcon extends Ability{
+    constructor(size) {
+        super(size);
+        this.image.src = 'images/necromancerPlayer.webp';
+        this.counterText=new AbilityIndicator();
+        this.counterText.text.style.left=(canvas.width-750)+"px";
+        this.counterText.text.style.top=(40+60*(playerAbilities.length-1))+"px";
+        this.counterText.text.style.color="black";
+    }
+    Activate(){
+        if(this.cooldown<=0){
+            this.cooldown=600;
+            this.indicator.Switch();
+            player.Summon();
+        }
+    }
+    timer(){
+        super.timer();
+        this.counterText.text.textContent=player.summonQueue.length+"x"
     }
 }
 class AbilityIndicator{
