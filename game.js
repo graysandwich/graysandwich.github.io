@@ -4580,6 +4580,24 @@ class TankPlayer extends Player{
             this.bulletCooldown = this.attackSpeed;
             this.Attack();
         }
+        if(movingLeft){
+            this.image.src=this.normalImage;
+        }
+        else if(movingRight){
+            this.image.src=this.mirroredImage;
+        }
+        this.shieldTimer--;
+        if(this.shieldTimer<=0){
+            if(boughtUpgrades[14]==0){
+                bullets.push(new PlayerShield());
+                boughtUpgrades[14]=1;
+            }
+            else{
+                playerShield.health=playerShield.maxHealth;
+                shieldBar.Update();
+            }
+            this.shieldTimer=1800;
+        }
         super.act();
     }
     Attack(){
