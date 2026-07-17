@@ -99,11 +99,8 @@ class LevellingBar {
             if (player.level < 6) {
                 player.nextLevel *= 1.5;
             }
-            else if (player.level < 10) {
+            else{
                 player.nextLevel *= 1.3;
-            }
-            else {
-                player.nextLevel *= 1.2;
             }
             //console.log(player.nextLevel+" "+player.level);
             player.currentExp = 0;
@@ -400,6 +397,20 @@ class NecromancyIcon extends Ability{
         this.counterText.text.textContent=player.summonQueue.length+"x"
     }
 }
+class ShockwaveIcon extends Ability{
+    constructor(size) {
+        super(size);
+        this.image.src = 'images/red.webp';
+
+    }
+    Activate(){
+        if(this.cooldown<=0){
+            this.cooldown=1000;
+            this.indicator.Switch();
+            bullets.push(new Shockwave(player.x, player.y));
+        }
+    }
+}
 class AbilityIndicator{
     constructor(){
         this.text = document.createElement("div"); 
@@ -427,6 +438,9 @@ class AbilityIndicator{
                 break;
             case 3:
                 this.text.textContent = `F`;
+                break;
+            case 4:
+                this.text.textContent = `T`;
                 break;
         }
         document.body.appendChild(this.text);

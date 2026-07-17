@@ -42,7 +42,7 @@ function ShowEnemy(enemy){
         case 8:
             sourceImage.src="images/chargingEnemy.webp";
             sourceText.innerText="Source: Ram Rider from Clash Royale"
-            descriptionText.innerText="Just be glad he doesn't have his evolution unlocked yet.";
+            descriptionText.innerText="Just be glad she doesn't have her evolution unlocked yet.";
             break;
         case 9:
             sourceImage.src="images/ghostEnemy.webp";
@@ -76,7 +76,7 @@ function ShowEnemy(enemy){
             break;
         case 15:
             sourceImage.src="images/spawnerEnemy.webp";
-            sourceText.innerText="Source: Windows folder icon"
+            sourceText.innerText="Source: Starting form is windows folder icon. Spawner form is mob spawner from Minecraft. The + sign particles is the card Evolutionary Leap from PvZ Heroes. The image on death is the Teleport Pad from Hypixel Skyblock"
             descriptionText.innerText="He's tired of people calling it an enchanted end portal frame. It's a Teleport Pad, and it's TELEPORTING the stored enemies in. Thank You.";
             break;
         case 16:

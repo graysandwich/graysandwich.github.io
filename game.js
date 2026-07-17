@@ -23,19 +23,19 @@ class Enemy {
         if (Math.random() < 0.5) {
             this.y = Math.random() * canvas.height;
             if (Math.random() < 0.5) {
-                this.x = -200;
+                this.x = leftBorder-200;
             }
             else {
-                this.x = canvas.width + 200;
+                this.x = rightBorder + 200;
             }
         }
         else {
             this.x = Math.random() * canvas.width;
             if (Math.random() < 0.5) {
-                this.y = -200;
+                this.y = topBorder -200;
             }
             else {
-                this.y = canvas.height + 200;
+                this.y = bottomBorder + 200;
             }
         }
         this.width = 50;
@@ -54,6 +54,26 @@ class Enemy {
         this.hasHealthBar=true;
         this.healTimer=0;
         this.dead=false;
+        this.ignoreKnockback=false;
+        let multiplier=1;
+        switch(currentWave){
+            case 8:
+                multiplier=1.3;
+                break;
+            case 9:
+                multiplier=1.7;
+                break;
+            case 10:
+                multiplier=2.1;
+                break;
+            case 11:
+                multiplier=2.5;
+                break;
+        }
+        this.health*=multiplier;
+        this.maxHealth*=multiplier;
+        this.health=Math.ceil(this.health);
+        this.maxHealth=Math.ceil(this.maxHealth);
         //console.log(this.image);
     }
     draw() {
@@ -202,6 +222,37 @@ class Enemy {
                 bossesLeft--;
                 if (bossesLeft == 0) {
                     ChangeWave();
+                }
+            }
+        }
+    }
+    CheckForCramming(){
+        if(this.ignoreBullets==true){
+            return;
+        }
+        for(let i=0;i<enemies.length;i++){
+            if(!enemies[i].ignoreKnockback && !enemies[i].ignoreBullets && !enemies[i].isBoss){
+                if (
+                    (enemies[i].x - enemies[i].width / 2.5) < (this.x + this.width / 2.5) &&
+                    (enemies[i].x + enemies[i].width / 2.5) > (this.x - this.width / 2.5) &&
+                    (enemies[i].y - enemies[i].height / 2.5) < (this.y + this.height / 2.5) &&
+                    (enemies[i].y + enemies[i].height / 2.5) > (this.y - this.height / 2.5)
+                ) {
+                    if (this.x > enemies[i].x) {
+                        enemies[i].AddForce(-0.5, 0);
+                    }
+                    if (this.x < enemies[i].x) {
+
+                        enemies[i].AddForce(0.5, 0);
+                    }
+                    if (this.y > enemies[i].y) {
+
+                        enemies[i].AddForce(0, -0.5);
+                    }
+                    if (this.y < enemies[i].y) {
+
+                        enemies[i].AddForce(0, 0.5);
+                    }
                 }
             }
         }
@@ -503,6 +554,7 @@ class BouncyBoss extends Enemy {
             this.maxHealth = this.health;
             this.bossBar = new BossBar(this);
             bossBars.push(this.bossBar);
+            this.ignoreKnockback=true;
             
         }
         else {
@@ -554,26 +606,26 @@ class BouncyBoss extends Enemy {
             this.speedX *= 2;
             this.speedY *= 2;
         }
-        if (this.x < (this.width - 50) / 2) {
-            this.x = (this.width - 50) / 2;
+        if (this.x < (this.width - 50) / 2+leftBorder) {
+            this.x = (this.width - 50) / 2+leftBorder;
             this.speedX *= -1.03;
             this.speedY *= 1.03;
             this.makeClone();
         }
-        if (this.y < (this.width - 50) / 2) {
-            this.y = (this.width - 50) / 2;
+        if (this.y < (this.width - 50) / 2+topBorder) {
+            this.y = (this.width - 50) / 2+topBorder;
             this.speedX *= 1.03;
             this.speedY *= -1.03;
             this.makeClone();
         }
-        if (this.x > canvas.width - (this.width - 50) / 2) {
-            this.x = canvas.width - (this.width - 50) / 2;
+        if (this.x > rightBorder - (this.width - 50) / 2) {
+            this.x =rightBorder - (this.width - 50) / 2;
             this.speedX *= -1.03;
             this.speedY *= 1.03;
             this.makeClone();
         }
-        if (this.y > canvas.height - (this.width - 50) / 2) {
-            this.y = canvas.height - (this.width - 50) / 2;
+        if (this.y > bottomBorder - (this.width - 50) / 2) {
+            this.y = bottomBorder - (this.width - 50) / 2;
             this.speedX *= 1.03;
             this.speedY *= -1.03;
             this.makeClone();
@@ -867,6 +919,7 @@ class BulletHellBoss extends Enemy {
         this.spiralShotTimer = 0;
         this.laserTimer = 0;
         this.ignoreShield=true;
+        this.ignoreKnockback=true;
         
     }
     timer() {
@@ -954,6 +1007,7 @@ class BulletHellBoss extends Enemy {
         super.takeDamage(bullet, index);
     }
     move() {
+        this.healTimer--;
         let distanceX = Math.abs(this.x - canvas.width / 2);
         let distanceY = Math.abs(this.y - canvas.height / 2);
         if (this.slowCountdown > 0) {
@@ -1422,6 +1476,7 @@ class SnakeBoss extends Enemy {
         this.delay=(59-bodyCount)*20;
         this.iFrame=0;
         this.explodeTimer=0;
+        this.ignoreKnockback=true;
         SnakeBoss.segments.push(this);
         
     }
@@ -1854,6 +1909,7 @@ class ChargingEnemy extends Enemy {
 
     }
     move() {
+        this.healTimer--;
         if (this.chargeTimer > 0) {
             if (this.slowCountdown > 0) {
                 this.x += this.vx * 4;
@@ -2069,23 +2125,24 @@ class EnemyShield extends Enemy {
         this.height=150;
         this.hasHealthBar=false;
         this.giveXP=false;
-        if (this.x < -90) {
+        this.ignoreKnockback=true;
+        if (this.x < leftBorder-90) {
             this.offsetX = 60;
             this.offsetY = 0;
             this.width = 100;
         }
-        if (this.x > canvas.width + 90) {
+        if (this.x > rightBorder + 90) {
             this.offsetX = -60;
             this.offsetY = 0;
             this.width = 100;
         }
-        if (this.y < -90) {
+        if (this.y < topBorder-90) {
             this.image.src = 'images/shieldRotated.webp';
             this.offsetX = 0;
             this.offsetY = 60;
             this.height = 100;
         }
-        if (this.y > canvas.height + 90) {
+        if (this.y > bottomBorder + 90) {
             this.image.src = 'images/shieldRotated.webp';
             this.offsetX = 0;
             this.offsetY = -60;
@@ -2096,10 +2153,13 @@ class EnemyShield extends Enemy {
     move() {
         this.x = this.owner.x + this.offsetX;
         this.y = this.owner.y + this.offsetY;
+        this.healTimer--;
     }
     takeDamage(bullet, index) {
         floatingObjects.push(new FloatingObject(this.x-this.width/2+Math.random()*this.width,this.y,0,"gray"));
 
+    }
+    CheckForCramming(){
     }
 }
 class TrapperEnemy extends Enemy {
@@ -2161,6 +2221,7 @@ class ZombieEnemy extends Enemy {
         }
         else{   
             this.redTimer--;
+            this.healTimer--;
         }
     }
     takeDamage(bullet, index) {
@@ -2375,6 +2436,7 @@ class BuilderEnemy extends Enemy {
         this.width = 75;
         this.height = 75;
         this.value = 150;
+        this.ignoreKnockback=true;
         //console.log(this.shootTimer);
     }
     timer() {
@@ -2419,6 +2481,8 @@ class EnemyWall extends Enemy {
         this.image.style.zIndex = -1;
         this.canSiphon = false;
         this.giveXP=false;
+        this.ignoreKnockback=true;
+        this.ignoreShield=true;
         //console.log(this.shootTimer);
     }
     special(){
@@ -2467,14 +2531,14 @@ class WindupEnemy extends Enemy {
         if (this.shootTimer > 200) {
             this.speed = 0;
         }
+        if(this.speed==0){ 
+            this.ignoreKnockback=true;
+        }
+        else{
+            this.ignoreKnockback=false;
+        }
         super.move();
         this.speed = savedSpeed;
-        if (this.x > player.x) {
-            this.image.style.transform = "scaleX(-1)";
-        }
-        else {
-            this.image.style.transform = "scaleX(1)";
-        }
     }
     timer() {
         if (this.slowCountdown > 0) {
@@ -2497,7 +2561,7 @@ class WindupEnemy extends Enemy {
                 vy = 3 * Math.sin(angle);
             }
             this.orb = new ChargingOrb(this.x + vx * 20, this.y + vy * 20, vx, vy)
-            enemies.push(this.orb)
+            enemyBullets.push(this.orb)
         }
     }
     special() {
@@ -2529,6 +2593,7 @@ class SpawnerEnemy extends Enemy {
         if (this.shootTimer <= 0 && this.speed > 0) {
             this.speed = 0;
             this.image.src = "images/spawner.webp";
+            this.ignoreKnockback=true;
         }
         if (this.spawnerTimer <= 0 && this.shootTimer <= 0 && !this.releasing) {
             this.spawnerPoints++;
@@ -2677,6 +2742,7 @@ class SpawnerEnemy extends Enemy {
         super.takeDamage(a, b);
         if (this.dead && this.shootTimer <= 0) {
             this.dead = false;
+            this.health=0;
             this.image.src = "images/spawnPortal.webp";
             this.releasing = true;
             this.ignoreBullets = true;
@@ -2696,6 +2762,8 @@ class MimicEnemy extends Enemy {
         this.targetY = Math.random() * (canvas.height - canvas.height / 10) + canvas.height / 20;
         this.moveTimer = 240;
         this.trollTimer = -1;
+        this.ignoreKnockback=true;
+        this.ignoreShield=true;
         //console.log(this.shootTimer);
     }
     timer() {
@@ -2865,6 +2933,7 @@ class SelfDestructEnemy extends Enemy {
         }
         else{
             this.explodeTimer--;
+            this.healTimer=-1;
             if (this.iFrame <= 0 && RectCircleColliding(this, player, this.width / 2, this.x, this.y)) {
                 player.takeDamage(1, this);
                 this.iFrame = 30;
@@ -2888,6 +2957,7 @@ class SelfDestructEnemy extends Enemy {
         this.hasHealthBar=false;
         this.image.src='images/explosion.webp';
         this.redTimer=-1;
+        this.healTimer=-1;
         this.slowCountdown=-1;
         this.ignoreBullets=true;
         this.explodeTimer=422;
@@ -3190,7 +3260,7 @@ class Bullet {
                 this.dead = true;
             }
         }
-        if (this.x < -100 || this.y < -100 || this.x > canvas.width + 100 || this.y >= canvas.height + 100) {
+        if (this.x < leftBorder-100 || this.y < topBorder-100 || this.x > rightBorder + 100 || this.y >= bottomBorder + 100) {
             this.dead = true;
         }
     }
@@ -3235,6 +3305,9 @@ class FrostBullet extends Bullet {
                 //console.log(enemies[i]+" "+this.damage);
                 enemies[i].takeDamage(this);
                 this.hitEnemies.add(enemies[i]);
+                if(!player.iceBulletspierce){
+                    this.dead=true;
+                }
             }
         }
         if (this.x < -100 || this.y < -100 || this.x > canvas.width + 100 || this.y >= canvas.height + 100) {
@@ -3357,6 +3430,27 @@ class ExpandingCircle extends Bullet {
             }
         }
         if(this.timer<=0)this.dead=true;
+
+    }
+}
+class Shockwave extends ExpandingCircle {
+    constructor(x, y) {
+        super(0, 0, 1);
+        this.timer=30;
+        this.height = 25;
+        this.width = 25;
+        this.image.src = "images/frostAura.webp";
+        this.scale = 25;
+    }
+    move() {
+        super.move();
+        for (let i = 0; i < enemies.length; i++) {
+            if (enemies[i].ignoreBullets==false && RectCircleColliding(this, enemies[i], this.width / 2, this.x, this.y)) {
+                let angle=Math.atan2((enemies[i].y-player.y),(enemies[i].x-player.x));
+                enemies[i].AddForce(3*Math.cos(angle), 3*Math.sin(angle));
+            }
+        }
+
 
     }
 }
@@ -3730,6 +3824,7 @@ class HomingBullet extends EnemyBullet {
         let lastSpeedY = 0;
         let distanceX = Math.abs(this.x - player.x);
         let distanceY = Math.abs(this.y - player.y);
+        this.damage=2;
         this.width = "20";
         this.height = "20";
         let angle = Math.atan(distanceY / distanceX);
@@ -3820,8 +3915,8 @@ class Icicle extends EnemyBullet {
     }
     special() {
         this.timer--;
-        if (this.timer == 0 || (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height)) {
-            if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+        if (this.timer == 0 || (this.x < leftBorder || this.x > rightBorder || this.y < topBorder || this.y > bottomBorder)) {
+            if (this.x < leftBorder || this.x > rightBorder || this.y < topBorder || this.y > bottomBorder) {
                 this.dead = true;
             }
             else {
@@ -3950,7 +4045,6 @@ class BlackHole extends EnemyBullet {
         }
         if (this.deathTimer == 0) {
             this.dead = true;
-            this.background.remove();
         }
         this.iFrame--;
     }
@@ -3963,7 +4057,7 @@ class Laser extends EnemyBullet {
         this.spawnAngle = angle;
         this.warningTimer = 60;
         this.despawnTimer = 125;
-        this.height = 2000;
+        this.height = 4000;
         this.width = 10;
         this.image.style.position = "absolute";
         this.image.style.transformOrigin = "center top";
@@ -4312,8 +4406,8 @@ class Player {
         this.image = new Image();
         this.image.src="images/player.webp";
         this.speed = 5;
-        this.x = screen.width / 2;
-        this.y = screen.height / 2;
+        this.x = canvas.width / 2;
+        this.y = canvas.height / 2;
         this.width = 50;
         this.height = 50;
         this.health = 10;
@@ -4348,9 +4442,12 @@ class Player {
         this.attackSpeedMultiplier=1;
         this.projectileSizeMultiplier=1;
         this.collisionDamageMultiplier=1;
-        this.iceFormBulletsPierce=false;
+        this.iceBulletsPierce=false;
     }
     takeDamage(damage, bullet) {
+        console.log(bullet);
+        console.log(damage);
+        if(gameOver)return;
         if(bullet.isEnemy){
             damage*=this.collisionDamageMultiplier;
         }
@@ -4363,7 +4460,6 @@ class Player {
         
         //console.log(this.health);
         floatingObjects.push(new FloatingObject(this.x-this.width/2+Math.random()*this.width,this.y,damage,"red"));
-        console.log(damage+" "+bullet);
         if (bullet.frostbite) {
             this.slowCountdown = 120;
         }
@@ -4467,10 +4563,10 @@ class Player {
         this.x += this.accelerationX;
         this.y += this.accelerationY;
 
-        if (this.x < 0) this.x = 0;
-        if (this.y < 0) this.y = 0;
-        if (this.x > canvas.width) this.x = canvas.width;
-        if (this.y > canvas.height) this.y = canvas.height;
+        if (this.x < leftBorder) this.x = leftBorder;
+        if (this.y < topBorder) this.y = topBorder;
+        if (this.x > rightBorder) this.x = rightBorder;
+        if (this.y > bottomBorder) this.y = bottomBorder;
         if (this.slowed || this.slowCountdown > 0) this.speed *= 2;
         if (timeWarpCounter > 0) {
             this.speed /= 2;
@@ -4534,6 +4630,7 @@ class Player {
 
     }
     GainXP(amount){
+        if(gamemode==4)return;
         this.currentExp+=amount*this.xpMultiplier;
     }
 }
@@ -5065,7 +5162,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 }
                 break;
             case 2:
-                boss = new SnakeBoss(2.5,300,true,59);
+                boss = new SnakeBoss(2.5,300,true,79);
                 enemies[enemies.length] = boss;
                 if (!SnakeBoss.seen) {
                     SnakeBoss.seen = true;
@@ -5208,7 +5305,7 @@ function loop() {
         accumulator -= frameRate;
         
     }
-    if (page == "gamePage" && gameOver==false) {
+    if (page == "gamePage") {
         requestAnimationFrame(loop);
     }
 }
@@ -5227,93 +5324,113 @@ function GameLogic() {
     const cameraX = (canvas.width / 2) - player.x-200;
     const cameraY = (canvas.height / 2) - player.y-100;
     ctx.translate(cameraX, cameraY);
-    
-    ctx.drawImage(background, -50, -50, canvas.width+100, canvas.height+100);
-
-    player.act();
-    SpawnEnemies();
-
-    if (xpBagTimer < 0) {
-        xpBagTimer = Math.random() * 200 + 200;
-        xpBagTimer /= 1 + timeElapsed * 0.0003;
-        const newCollectable = new XPBag(Math.random() * (canvas.width - canvas.width / 10) + canvas.width / 20, Math.random() * (canvas.height - canvas.height / 10) + canvas.height / 20);
-        collectables.push(newCollectable);
-        //console.log(newEnemy.health);
-    }
-    if (healthPotionSpawnTimer < 0) {
-        healthPotionSpawnTimer = Math.random() * 300 + 450;
-        healthPotionSpawnTimer /= 1 + timeElapsed * 0.0003;
-        healthPotionSpawnTimer*=healthPotionSpawnMultiplier;
-        const newCollectable = new HealthPotion(Math.random() * (canvas.width - canvas.width / 10) + canvas.width / 20, Math.random() * (canvas.height - canvas.height / 10) + canvas.height / 20);
-        collectables.push(newCollectable);
-        //console.log(newEnemy.health);
-    }
-    for (let i = bullets.length - 1; i >= 0; i--) {
-        bullets[i].move();
-        if (bullets[i].dead) {
-            bullets.splice(i, 1);
+    if(player.health<=0) ctx.filter = "grayscale(100%)";
+    if(enableShrinking){
+        leftBorder=initialLeftBorder+timeElapsed/6;
+        rightBorder=initialRightBorder-timeElapsed/6;
+        topBorder=initialTopBorder+timeElapsed/6;
+        bottomBorder=initialBottomBorder-timeElapsed/6;
+        if(isBossWave==false){
+            leftBorder=initialLeftBorder+timeElapsed/3;
+            rightBorder=initialRightBorder-timeElapsed/3;
+            topBorder=initialTopBorder+timeElapsed/3;
+            bottomBorder=initialBottomBorder-timeElapsed/3;
         }
     }
-    for (let i = enemies.length - 1; i >= 0; i--) {
-        if (enemies[i].dead) {
-            if (enemies[i].giveXP) {
-                player.GainXP(enemies[i].value);
-                if(!enemies[i].isBoss && chosenCharacter==5){
-                    player.summonQueue.push(new SummonedEnemy(enemies[i].speed, Math.ceil(enemies[i].maxHealth*0.5), enemies[i].width, enemies[i].image))
-                }
-            }
-            if (enemies[i].isBoss) {
-                enemies[i].bossBar.image1.remove();
-                enemies[i].bossBar.image2.remove();
-                enemies[i].bossText.remove();
-                bossesLeft--;
-                if (bossesLeft == 0) {
-                    killedBoss=true;
-                    ChangeWave();
-                }
-            }
-            enemies.splice(i, 1);
+    ctx.drawImage(background, -50+leftBorder, -50+topBorder, rightBorder-leftBorder+100, bottomBorder-topBorder+100);
+    if(gameOver==false){
+        player.act();
+        SpawnEnemies();
+
+        if (xpBagTimer < 0) {
+            xpBagTimer = Math.random() * 200 + 200;
+            xpBagTimer /= 1 + timeElapsed * 0.0003;
+            const newCollectable = new XPBag(Math.random() * (canvas.width - canvas.width / 10) + canvas.width / 20, Math.random() * (canvas.height - canvas.height / 10) + canvas.height / 20);
+            collectables.push(newCollectable);
+            //console.log(newEnemy.health);
         }
-        else {
-            enemies[i].move();
-            enemies[i].special();
+        if (healthPotionSpawnTimer < 0 ) {
+            healthPotionSpawnTimer = Math.random() * 300 + 450;
+            healthPotionSpawnTimer /= 1 + timeElapsed * 0.0003;
+            healthPotionSpawnTimer*=healthPotionSpawnMultiplier;
+            const newCollectable = new HealthPotion(Math.random() * (canvas.width - canvas.width / 10) + canvas.width / 20, Math.random() * (canvas.height - canvas.height / 10) + canvas.height / 20);
+            collectables.push(newCollectable);
+            //console.log(newEnemy.health);
+        }
+        for(let i=mapObjects.length-1;i>=0;i--){
+            mapObjects[i].act();
+        }
+        for (let i = bullets.length - 1; i >= 0; i--) {
+            bullets[i].move();
+            if (bullets[i].dead) {
+                bullets.splice(i, 1);
+            }
+        }
+        for (let i = enemies.length - 1; i >= 0; i--) {
             if (enemies[i].dead) {
                 if (enemies[i].giveXP) {
                     player.GainXP(enemies[i].value);
+                    if(!enemies[i].isBoss && chosenCharacter==5){
+                        player.summonQueue.push(new SummonedEnemy(enemies[i].speed, Math.ceil(enemies[i].maxHealth*0.5), enemies[i].width, enemies[i].image))
+                    }
+                }
+                if (enemies[i].isBoss) {
+                    enemies[i].bossBar.image1.remove();
+                    enemies[i].bossBar.image2.remove();
+                    enemies[i].bossText.remove();
+                    bossesLeft--;
+                    if (bossesLeft == 0) {
+                        if(currentWave==3 || currentWave==5 || currentWave==7){
+                            killedBoss=true;
+                        }
+                        ChangeWave();
+                    }
                 }
                 enemies.splice(i, 1);
             }
+            else {
+                //console.log(enemies[i]);
+                enemies[i].move();
+                enemies[i].CheckForCramming();
+                enemies[i].special();
+                if (enemies[i].dead) {
+                    if (enemies[i].giveXP) {
+                        player.GainXP(enemies[i].value);
+                    }
+                    enemies.splice(i, 1);
+                }
+            }
         }
-    }
-    for (let i = enemyBullets.length - 1; i >= 0; i--) {
-        enemyBullets[i].move();
-        enemyBullets[i].special();
-        if (enemyBullets[i].dead) {
-            enemyBullets.splice(i, 1);
-        }
+        for (let i = enemyBullets.length - 1; i >= 0; i--) {
+            enemyBullets[i].move();
+            enemyBullets[i].special();
+            if (enemyBullets[i].dead) {
+                enemyBullets.splice(i, 1);
+            }
 
-    }
-    for (let i = collectables.length - 1; i >= 0; i--) {
-        collectables[i].act();
-        if (collectables[i].dead) {
-            collectables.splice(i, 1);
         }
-    }
-    for (let i = floatingObjects.length - 1; i >= 0; i--) {
-        floatingObjects[i].move();
-        if (floatingObjects[i].dead) {
-            floatingObjects.splice(i, 1);
+        for (let i = collectables.length - 1; i >= 0; i--) {
+            collectables[i].act();
+            if (collectables[i].dead) {
+                collectables.splice(i, 1);
+            }
         }
-    }
-    for (let i = playerAbilities.length - 1; i >= 0; i--) {
-        playerAbilities[i].timer();
+        for (let i = floatingObjects.length - 1; i >= 0; i--) {
+            floatingObjects[i].move();
+            if (floatingObjects[i].dead) {
+                floatingObjects.splice(i, 1);
+            }
+        }
+        for (let i = playerAbilities.length - 1; i >= 0; i--) {
+            playerAbilities[i].timer();
+        }
     }
     ctx.fillStyle="black"
-    ctx.fillRect(-55, -55, canvas.width+110, 30);
-    ctx.fillRect(-25, canvas.height+25, canvas.width+80, 30);
-    ctx.fillRect(-55, -25, 30, canvas.height+80);
-    ctx.fillRect(canvas.width+25, -25, 30, canvas.height+70);
 
+    LavaTerrain.timer();
+    for(let i=mapObjects.length-1;i>=0;i--){
+        mapObjects[i].draw();
+    }
     for (let i = collectables.length - 1; i >= 0; i--) {
         collectables[i].draw();
     }
@@ -5330,33 +5447,46 @@ function GameLogic() {
     for (let i = floatingObjects.length - 1; i >= 0; i--) {
         floatingObjects[i].draw();
     }
-    if (!isBossWave && timeElapsed >= waveTimer) {
-        ChangeWave();
+    if(gameOver==false){
+        if (!isBossWave && timeElapsed >= waveTimer) {
+            ChangeWave();
+        }
+        if (newEnemyQueue.length > 0) {
+            ChangePage("newEnemyPage");
+        }
+        xpBagTimer--;
+        healthPotionSpawnTimer--;
+        timeWarpCounter--;
+        if(timeElapsed<7200 || !isBossWave){
+            timeElapsed++;
+        }
+        if (isBossWave) {
+            timeElapsed = Math.min(timeElapsed, 3600);
+        }
+        if (player.health <= 0) {
+            EndGame(false);
+            player.health=0;
+        }
+        if(currentPage=="gamePage" && killedBoss==true){
+            ChangePage("upgradePage", false);
+        }
+        if(currentPage=="gamePage" && isLevelling==true){
+            ChangePage("upgradePage", false);
+        }
+        levellingBar.Update();
+        healthBar.Update();
     }
-    if (newEnemyQueue.length > 0) {
-        ChangePage("newEnemyPage");
+    if(gamemode==4){
+        if(currentWave<=5 && player.level<currentWave*3){
+            player.currentExp+=100000;
+        }
+        else if(currentWave>5 && currentWave<=7 && player.level<5*3+(currentWave-5)*2){
+            player.currentExp+=100000;
+        }
+        else if(currentWave>7 && currentWave<=11 && player.level<5*3+(2)*2+(currentWave-7)){
+            player.currentExp+=100000;
+        }
     }
-    xpBagTimer--;
-    healthPotionSpawnTimer--;
-    timeWarpCounter--;
-    if(timeElapsed<7200 || !isBossWave){
-        timeElapsed++;
-    }
-    if (isBossWave) {
-        timeElapsed = Math.min(timeElapsed, 3600);
-    }
-    if (player.health <= 0) {
-        EndGame(false);
-        player.health=0;
-    }
-    if(currentPage=="gamePage" && killedBoss==true){
-        ChangePage("upgradePage", false);
-    }
-    if(currentPage=="gamePage" && isLevelling==true){
-        ChangePage("upgradePage", false);
-    }
-    levellingBar.Update();
-    healthBar.Update();
     ctx.restore();
     //console.log(enemyBullets.length);
 
@@ -5404,7 +5534,7 @@ function ChangeWave() {
         case 6:
             RandomizeEnemies(2, 3, 2, 0, 0);
             isBossWave = false;
-            SCALE = 0.0012;
+            SCALE = 0.0015;
             if(HealerPlayer.unlocked==false){
                 HealerPlayer.unlocked=true;
                 newEnemyQueue.push("images/healerPlayer.webp");
@@ -5422,28 +5552,36 @@ function ChangeWave() {
             SCALE = 0.0005;
             if(difficulty>1 && NecromancerPlayer.unlocked==false){
                 NecromancerPlayer.unlocked=true;
-                newEnemyQueue.push("images/player.webp");
+                newEnemyQueue.push("images/necromancerPlayer.webp");
                 isPlayerUnlocked.push(true);
             }
             break;
-        case 8:
-            RandomizeEnemies(2, 2, 2, 0, 1);
-            isBossWave = true;
-            SCALE = 0.0005;
-            break;
         case 9:
-            RandomizeEnemies(2, 2, 1, 2, 0);
+            RandomizeEnemies(2, 2, 3, 0, 1);
             isBossWave = true;
-            SCALE = 0.0005;
+            SCALE = 0.0007;
             break;
         case 10:
-            RandomizeEnemies(2, 2, 2, 1, 1);
+            RandomizeEnemies(2, 2, 1, 2, 0);
             isBossWave = true;
-            SCALE = 0.0005;
+            SCALE = 0.0006;
             break;
         case 11:
+            RandomizeEnemies(2, 2, 2, 1, 1);
+            isBossWave = true;
+            SCALE = 0.0006;
+            break;
+        case 12:
             EndGame(true);
             break;
+    }
+    if(gamemode==3){
+        mapObjects=[];
+        mapObjects.push(new Wall(-55+leftBorder, -55+topBorder, (rightBorder-leftBorder)+110, 30));
+        mapObjects.push(new Wall(-25+leftBorder, bottomBorder+25, (rightBorder-leftBorder)+80, 30));
+        mapObjects.push(new Wall(-55+leftBorder, -25+topBorder, 30,(bottomBorder-topBorder)+80));
+        mapObjects.push(new Wall(rightBorder+25, -25+topBorder, 30, (bottomBorder-topBorder)+70));
+        CreateTiles();
     }
     SCALE*=scaleMultiplier
     originalScale=SCALE;
@@ -5451,8 +5589,8 @@ function ChangeWave() {
 
 function ChangePage(id, reset) {
     if (continueFlag) return;
-    //console.log(id);
-    if (gameOver && id == "upgradePage") {
+    console.log(id);
+    if ((gameOver && id == "upgradePage")) {
         return;
     }
     currentPage=id;
@@ -5729,7 +5867,15 @@ function ChangePage(id, reset) {
 
 async function EndGame(win) {
     gameOver = true;
-    await delay(1500);
+    if(win){
+        enemies=[];
+        enemyBullets=[];
+        await delay(1500);
+    }
+    else{
+        
+        await delay(3000);
+    }
     ctx.strokeStyle = 'white';
     canvas.style.display = "none";
     if(healthBar){

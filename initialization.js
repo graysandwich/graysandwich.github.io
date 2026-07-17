@@ -8,6 +8,7 @@ let newEnemyQueue=[];
 let isPlayerUnlocked=[];
 let floatingObjects=[];
 let playerAbilities=[];
+let mapObjects=[];
 let xpBagSpawnTimer=0;
 let healthPotionSpawnTimer=0;
 let waveTimer=0;
@@ -23,7 +24,7 @@ let currentWave=0;
 let SCALE=0.001;
 let continueFlag=false;
 const NUMUPGRADES=20;
-const NUMTIER2UPGRADES=6;
+const NUMTIER2UPGRADES=7;
 let boughtUpgrades=new Array(NUMUPGRADES);
 for(let i=0;i<boughtUpgrades.length;i++){
     boughtUpgrades[i]=0;
@@ -62,6 +63,7 @@ let TIER2UPGRADES=[
     { onclick: "HalveCollisionDamage(0.5)",   text: "Enemy Collisions Deal 0.5x Damage" },
     { onclick: "addSiphon(0.5)",   text: "+0.5 Siphon" },
     { onclick: "IncreaseHealthPotionDensity(0.5)",   text: "2x Health Potion Spawn Rate" },
+    { onclick: "AddShockwave()",   text: "Shockwave Ability" },
 ]
 let timeWarpCounter=0;
 let gambleTimer=0;
@@ -85,6 +87,12 @@ let killedBoss=false;
 let isLevelling=false;
 let currentPage="";
 let healthPotionSpawnMultiplier=1;
+let mapType=2;
+let gamemode=0;
+let topBorder, bottomBorder, leftBorder, rightBorder, initialTopBorder, initialBottomBorder, initialLeftBorder, initialRightBorder;
+let enableShrinking=false;
+let tiles=[];
+let visited=[];
 const imageSources = {
 //   aimingEnemy: 'images/aimingEnemy.webp',
 //   background: 'images/background.webp',
@@ -226,6 +234,10 @@ function SelectCharacter(character){
     document.getElementById("startButton").disabled = false; 
     document.getElementById("startButton2").disabled = false; 
 }
+function SelectMode(mode){
+    gamemode=mode;
+    ChangePage('difficultyPage', false)
+}
 function loadImage(image){
     return new Promise((resolve, reject) =>{
         const img=new Image();
@@ -243,7 +255,6 @@ async function preloadImages(){
     return;
 }
 async function Commence(){
-    
     list=document.querySelectorAll('div[id$="Page"]');
     for(let i=0;i<list.length;i++){
         list[i].style.display="none";
@@ -255,15 +266,12 @@ async function Commence(){
     boughtUpgrades[18]=1;
     boughtUpgrades[19]=1;
     //document.querySelectorAll('img').forEach(img => img.remove());
-    if(doneLoading){
-        document.getElementById("loadingPage").style.display="none";
-        Start();
-    }
-    else{
-        document.getElementById("gamePage").style.display="block";
-        await delay(0.1);
-        Commence();
-    }
+    document.getElementById("loadingPage").style.display="block";
+    Start();
+    await delay(0.1);
+    document.getElementById("loadingPage").style.display="none";
+    document.getElementById("gamePage").style.display="block";
+    loop();
 }
 function Start(){
 
@@ -284,6 +292,9 @@ function Start(){
     newEnemyQueue=[];
     floatingObjects=[];
     playerAbilities=[];
+    mapObjects=[];
+    tiles=[];
+    visited=[]
     healthBar=new HealthBar();
     levellingBar=new LevellingBar();
     waveText=new WaveText();
@@ -300,6 +311,7 @@ function Start(){
     movingLeft, movingRight, movingUp, movingDown=false;
     isLevelling=false;
     killedBoss=false;
+    enableShrinking=false;
     page="gamePage";
     
     
@@ -346,10 +358,336 @@ function Start(){
         bossMultiplier=2;
     }
     SCALE*=scaleMultiplier
-    RandomizeEnemies(2, 0, 0,0,0);
+
+    switch(gamemode){
+        case 1:
+            mapType=1;
+            break;
+        case 2:
+            mapType=2;
+            break;
+        case 3:
+            mapType=1;
+            break;
+        case 4:
+            mapType=1;
+            currentWave=2;
+            boughtUpgrades[1]=1;
+            boughtUpgrades[6]=1;
+            boughtUpgrades[7]=1;
+            boughtUpgrades[10]=1;
+            player.health*=2;
+            boughtTier2Upgrades[4]=1;
+            boughtTier2Upgrades[5]=1;   
+            break;
+    }
+    if(mapType==1){
+        topBorder=0;
+        leftBorder=0;
+        rightBorder=canvas.width;
+        bottomBorder=canvas.height;
+    }
+    else if(mapType==2){
+        topBorder=-canvas.height/4;
+        leftBorder=-canvas.width/4;
+        rightBorder=canvas.width*1.25;
+        bottomBorder=canvas.height*1.25;
+        enableShrinking=true;
+
+    }
+    if(gamemode==3){
+        CreateTiles();
+    }
+    mapObjects.push(new Wall(-55+leftBorder, -55+topBorder, (rightBorder-leftBorder)+110, 30));
+    mapObjects.push(new Wall(-25+leftBorder, bottomBorder+25, (rightBorder-leftBorder)+80, 30));
+    mapObjects.push(new Wall(-55+leftBorder, -25+topBorder, 30,(bottomBorder-topBorder)+80));
+    mapObjects.push(new Wall(rightBorder+25, -25+topBorder, 30, (bottomBorder-topBorder)+70));
+    initialLeftBorder=leftBorder;
+    initialRightBorder=rightBorder;
+    initialTopBorder=topBorder;
+    initialBottomBorder=bottomBorder;
+    if(gamemode!=4){
+        RandomizeEnemies(2, 0, 0,0,0);
+    }
+    else{
+        ChangeWave();
+    }
+    
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
     currentPage="gamePage";
-    loop();
 
 }
-preloadImages();
+function CreateTiles(){
+    let sizeX=(rightBorder-leftBorder)/50+1
+    let sizeY=(bottomBorder-topBorder)/50+1
+    let randomNums=[];
+    let temperatures=[];
+    for(let i=0;i<=sizeX;i+=1){
+        tiles[i]=[];
+        visited[i]=[];
+        temperatures[i]=[];
+        randomNums[i]=[];
+        for(let j=0;j<=sizeY;j+=1){
+        
+            tiles[i][j]=-1;
+            visited[i][j]=0;
+            randomNums[i][j]=Math.random()*6-3;
+            temperatures[i][j]=0;
+        }
+    }
+    for(let x=0;x<=sizeX;x+=1){
+        for(let y=0;y<=sizeY;y+=1){
+            let average=randomNums[x][y];
+            let count=1;
+            if(x>0){
+                average+=randomNums[x-1][y];
+                count++;
+            }
+            if(x<tiles.length-1){
+                average+=randomNums[x+1][y];
+                count++;
+            }
+            if(y>0){
+                average+=randomNums[x][y-1];
+                count++;
+            }
+            if(y<tiles[0].length-1){
+                average+=randomNums[x][y+1];
+                count++;
+            }
+            if(x>0 && y>0){
+                average+=randomNums[x-1][y-1];
+                count++;
+            }
+            if(x<tiles.length-1 && y>0 ){
+                average+=randomNums[x+1][y-1];
+                count++;
+            }
+            if(x>0 && y<tiles[0].length-1){
+                average+=randomNums[x-1][y+1];
+                count++;
+            }
+            if(x<tiles.length-1 && y<tiles[0].length-1 && visited[x+1][y+1]==1){
+                average+=randomNums[x+1][y+1];
+                count++;
+            }
+            average/=count;
+            temperatures[x][y]=average;
+
+        }
+    }
+    for(let x=0;x<=sizeX;x+=1){
+        for(let y=0;y<=sizeY;y+=1){
+            let average=temperatures[x][y];
+            let count=1;
+            if(x>0){
+                average+=temperatures[x-1][y];
+                count++;
+            }
+            if(x<tiles.length-1){
+                average+=temperatures[x+1][y];
+                count++;
+            }
+            if(y>0){
+                average+=temperatures[x][y-1];
+                count++;
+            }
+            if(y<tiles[0].length-1){
+                average+=temperatures[x][y+1];
+                count++;
+            }
+            if(x>0 && y>0 ){
+                average+=temperatures[x-1][y-1];
+                count++;
+            }
+            if(x<tiles.length-1 && y>0 ){
+                average+=temperatures[x+1][y-1];
+                count++;
+            }
+            if(x>0 && y<tiles[0].length-1){
+                average+=temperatures[x-1][y+1];
+                count++;
+            }
+            if(x<tiles.length-1 && y<tiles[0].length-1){
+                average+=temperatures[x+1][y+1];
+                count++;
+            }
+            average/=count;
+            randomNums[x][y]=average;
+
+        }
+    }
+    for(let x=0;x<=sizeX;x+=1){
+        for(let y=0;y<=sizeY;y+=1){
+            let average=randomNums[x][y];
+            let count=1;
+            if(x>0){
+                average+=randomNums[x-1][y];
+                count++;
+            }
+            if(x<tiles.length-1){
+                average+=randomNums[x+1][y];
+                count++;
+            }
+            if(y>0 && visited[x][y-1]==1){
+                average+=randomNums[x][y-1];
+                count++;
+            }
+            if(y<tiles[0].length-1){
+                average+=randomNums[x][y+1];
+                count++;
+            }
+            if(x>0 && y>0){
+                average+=randomNums[x-1][y-1];
+                count++;
+            }
+            if(x<tiles.length-1 && y>0 ){
+                average+=randomNums[x+1][y-1];
+                count++;
+            }
+            if(x>0 && y<tiles[0].length-1 ){
+                average+=randomNums[x-1][y+1];
+                count++;
+            }
+            if(x<tiles.length-1 && y<tiles[0].length-1){
+                average+=randomNums[x+1][y+1];
+                count++;
+            }
+            average/=count;
+            temperatures[x][y]=average;
+
+        }
+    }
+    console.log(temperatures);
+    //console.log(tiles);
+    //InitializeTiles(Math.ceil(Math.random()*sizeX),Math.ceil(Math.random()*sizeY));
+    for(let i=0;i<=sizeX;i++){
+        for(let j=0;j<=sizeY;j++){
+            if(temperatures[i][j]<=-0.5){
+                tiles[i][j]=1;
+            }
+            else if(temperatures[i][j]>=0.75){
+                tiles[i][j]=3;
+            }
+            else if(temperatures[i][j]>=0.5){
+                tiles[i][j]=2;
+            }
+        }
+    }
+    let x=0;
+    let y=0;
+    for(let i=Math.floor(sizeX/2)-3;i<=Math.ceil(sizeX/2)+3;i+=1){
+        for(let j=Math.floor(sizeY/2)-3;j<=Math.ceil(sizeY/2)+3;j+=1){
+            tiles[i][j]=0;
+        }
+    }
+    for(let i=0;i<=rightBorder-leftBorder;i+=50){
+        for(let j=0;j<=bottomBorder-topBorder;j+=50){
+            if(x>0 && x<sizeX && y>0 && y<sizeY){
+                let commonTile=tiles[x-1][y];
+                //console.log(tiles[x][y]+" common: "+tiles[x-1][y]+" "+tiles[x+1][y]+" "+tiles[x][y+1]+" "+tiles[x][y-1])
+                if(commonTile==tiles[x+1][y] && commonTile==tiles[x][y-1] && commonTile==tiles[x][y+1]){
+                    tiles[x][y]=commonTile;
+                }
+            }
+            switch(tiles[x][y]){
+                case 0:
+                    break;
+                case 1:
+                    mapObjects.push(new WaterTerrain(i,j,50,50));
+                    break;
+                case 2:
+                    mapObjects.push(new LavaTerrain(i,j,50,50,1, "#D1290D", "#3c0b04"));
+                    break;
+                case 3:
+                    mapObjects.push(new LavaTerrain(i,j,50,50,2, "#410c0c", "#150401"));
+                    break;
+            }
+            //mapObjects.push(new TestTerrain(i,j,50,50,temperatures[x][y]))
+            y++;
+        }
+        x++;
+        y=0;
+    }
+}
+function CheckTile(x,y,counts, value){
+    if(x>=0 && x<tiles.length && y>=0 && y<=tiles[0].length && visited[x][y]==1){
+        counts[tiles[x][y]]+=value;
+    }
+    return counts;
+}
+function InitializeTiles(x,y){
+    visited[x][y]=1;
+    let weights=[1, 1, 1];
+    let counts=[0,0,0];
+    for(let i=-1;i<=1;i++){
+        for(let j=-1;j<=1;j++){
+            if(Math.abs(1)<=1 && Math.abs(j)<=1){
+                counts=CheckTile(x+i, y+j, counts, 1);
+            }
+            else{
+                counts=CheckTile(x+i, y+j, counts, 0.25);
+            }
+        }
+    }
+    // if(x>0 && visited[x-1][y]==1){
+    //     counts[tiles[x-1][y]]++;
+    // }
+    // if(x<tiles.length-1 && visited[x+1][y]==1){
+    //     counts[tiles[x+1][y]]++;
+    // }
+    // if(y>0 && visited[x][y-1]==1){
+    //     counts[tiles[x][y-1]]++;
+    // }
+    // if(y<tiles[0].length-1 && visited[x][y+1]==1){
+    //     counts[tiles[x][y+1]]++;
+    // }
+    // if(x>0 && y>0 && visited[x-1][y-1]==1){
+    //     counts[tiles[x-1][y-1]]++;
+    // }
+    // if(x<tiles.length-1 && y>0 && visited[x+1][y-1]==1){
+    //     counts[tiles[x+1][y-1]]++;
+    // }
+    // if(x>0 && y<tiles[0].length-1 && visited[x-1][y+1]==1){
+    //     counts[tiles[x-1][y+1]]++;
+    // }
+    // if(x<tiles.length-1 && y<tiles[0].length-1 && visited[x+1][y+1]==1){
+    //     counts[tiles[x+1][y+1]]++;
+    // }
+    //console.log(weights)
+    weights[0]+=counts[0]*counts[0]*2.5;
+    weights[1]+=counts[1]*counts[1];
+    weights[2]+=counts[2]*counts[2]*0.5;
+    if(counts[1]>0){
+        weights[2]=0;
+    }
+    if(counts[2]>0){
+        weights[1]=0;
+    }
+    let totalWeight=0;
+    for(let i=0;i<weights.length;i++){
+        totalWeight+=weights[i];
+    }
+    let value=Math.random()*totalWeight;
+    let index=0;
+    value-=weights[index]
+    while(value>0){
+        index++;
+        value-=weights[index];
+    }
+    tiles[x][y]=index;
+    
+    if(x>0 && visited[x-1][y]==0){
+        InitializeTiles(x-1, y)
+    }
+    if(x<tiles.length-1 && visited[x+1][y]==0){
+        InitializeTiles(x+1, y)
+    }
+    if(y>0 && visited[x][y-1]==0){
+        InitializeTiles(x, y-1)
+    }
+    if(y<tiles.length-1 && visited[x][y+1]==0){
+        InitializeTiles(x, y+1)
+    }
+}

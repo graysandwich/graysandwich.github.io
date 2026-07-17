@@ -44,42 +44,46 @@ document.addEventListener("mousemove", (e)=>{
 })
 document.addEventListener("keydown", (e)=>{ 
     if(page=="gamePage"){
-        if(e.key==='w'){
+        let key=e.key.toLowerCase();
+        if(key==='w'){
             movingUp=true;
         }
-        if(e.key==='a'){
+        if(key==='a'){
             movingLeft=true;
         }
-        if(e.key==='d'){
+        if(key==='d'){
             movingRight=true;
         }
-        if(e.key==='s'){
+        if(key==='s'){
             movingDown=true;
         }
-        if(e.key=="c"){
+        if(key=="c"){
             player.currentExp+=10000;
         }
-        if(e.key=="p"){
+        if(key=="p"){
             ChangeWave(); 
         }
-        if(e.key=="o"){
+        if(key=="o"){
             for(let i=0;i<enemies.length;i++){
                 enemies[i].takeDamage(new Bullet(1,1,20), i);
             }
         }
-        if(e.key=="q" && playerAbilities.length>0){
+        if(key=="q" && playerAbilities.length>0){
             playerAbilities[0].Activate();
         }
-        if(e.key=="e" && playerAbilities.length>1){
+        if(key=="e" && playerAbilities.length>1){
             playerAbilities[1].Activate();
         }
-        if(e.key=="r" && playerAbilities.length>2){
+        if(key=="r" && playerAbilities.length>2){
             playerAbilities[2].Activate();
         }
-        if(e.key=="f" && playerAbilities.length>3){
+        if(key=="f" && playerAbilities.length>3){
             playerAbilities[3].Activate();
         }
-        if (['w', 'a', 's', 'd'].includes(e.key)) {
+        if(key=="t" && playerAbilities.length>4){
+            playerAbilities[4].Activate();
+        }
+        if (['w', 'a', 's', 'd'].includes(key)) {
             e.preventDefault();
         }
     }
@@ -87,16 +91,17 @@ document.addEventListener("keydown", (e)=>{
 })
 
 document.addEventListener("keyup", (e)=>{
-    if(e.key==='w'){
+    let key=e.key.toLowerCase();
+    if(key==='w'){
         movingUp=false;
     }
-    else if(e.key==='a'){
+    else if(key==='a'){
         movingLeft=false;
     }
-    else if(e.key==='d'){
+    else if(key==='d'){
         movingRight=false;
     }
-    else if(e.key==='s'){
+    else if(key==='s'){
         movingDown=false;
     }
     

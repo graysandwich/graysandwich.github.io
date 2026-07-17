@@ -1,8 +1,6 @@
 function increaseDamage(amount) {
     player.damage += amount;
-    if(amount==1){
-        boughtUpgrades[0] = 1;
-    }
+    boughtUpgrades[0] = 1;
     boughtTier2Upgrades[0]=1;
     
     ChangePage('gamePage', false)
@@ -17,7 +15,7 @@ function increaseMaxHealth(amount) {
 function increaseProjectiles(amount) {
     player.projectiles += amount;
     boughtUpgrades[2] += 0.5;
-    boughtTier2Upgrades[2]+=0.5;
+    boughtTier2Upgrades[2]=1;
     
     ChangePage('gamePage', false)
 }
@@ -35,6 +33,7 @@ function addLaserProjectiles(amount) {
 function speedUpAttacks(amount) {
     player.attackSpeed /= amount;
     player.attackSpeedMultiplier/=amount;
+    boughtUpgrades[5]+=0.25;
     ChangePage('gamePage', false)
 }
 function addSiphon(amount) {
@@ -281,5 +280,11 @@ function IncreaseFireDamage(amount) {
 function PassiveSpawns() {
     player.passiveSpawning=true;
     boughtUpgrades[19]=1;
+    ChangePage('gamePage', false)
+}
+function AddShockwave(amount) {
+    
+    new ShockwaveIcon(50);
+    boughtTier2Upgrades[6] = 1;
     ChangePage('gamePage', false)
 }
