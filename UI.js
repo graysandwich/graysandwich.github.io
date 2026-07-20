@@ -22,7 +22,23 @@ class HealthBar {
         document.body.appendChild(this.image1);
     }
     Update() {
-        this.desiredWidth = Math.ceil(player.health / player.maxHealth * 400);
+        if(player.rebirth>0){
+            this.image1.src="images/purple.webp";
+        }
+        else{
+            this.image1.src="images/green.webp";
+        }
+        if(player.rebirthTimer>0){
+            this.image1.src="images/pureWhite.webp"
+            this.image1.style.border="2px solid black";
+            this.image1.style.top="59px";
+            this.desiredWidth = Math.ceil(player.rebirthTimer / 300 * 400);
+        }
+        else{
+            this.image1.style.border="";
+            this.image1.style.top="60px";
+            this.desiredWidth = Math.ceil(player.health / player.maxHealth * 400);
+        }
         if (this.desiredWidth < this.image1.width) {
             requestAnimationFrame(DecreaseHealthBar);
         }
@@ -99,8 +115,14 @@ class LevellingBar {
             if (player.level < 6) {
                 player.nextLevel *= 1.5;
             }
-            else{
+            else if (player.level<12){
                 player.nextLevel *= 1.3;
+            }
+            else{
+                player.nextLevel *= 1.2;
+            }
+            if(chosenCharacter==6){
+                player.rebirth++;
             }
             //console.log(player.nextLevel+" "+player.level);
             player.currentExp = 0;
@@ -409,6 +431,40 @@ class ShockwaveIcon extends Ability{
             this.indicator.Switch();
             bullets.push(new Shockwave(player.x, player.y));
         }
+    }
+}
+class RebirthsIcon {
+    constructor(size) {
+        this.image=new Image();
+        this.image.src = 'images/pheonixPlayer.webp';
+        this.image.style.position = 'absolute';
+        
+        this.image.width = size;
+        this.image.height = size;
+        this.image.style.left = size + "px";
+        this.image.style.top = size + "px";
+        this.image.style.left = (canvas.width - 800) + "px";
+        this.image.style.top = (40)+"px";
+        this.image.style.transform = "translate(-50%, -50%)";
+        this.image.style.zIndex = 2;
+        this.image.id = "pheonixIcon";
+        document.body.appendChild(this.image);
+
+        this.text = document.createElement("div"); 
+        this.text.style.position = "absolute";
+        this.text.style.left = (canvas.width - 730) + "px";
+        this.text.style.top = (40)+"px";
+        this.text.style.zIndex = "2";
+        this.text.style.transform = "translate(-50%, -50%)";
+        this.text.style.pointerEvents = "none";
+        this.text.style.fontSize = "50px";
+        this.text.style.textAlign = "center";
+        this.text.style.whiteSpace = "nowrap";
+        this.text.style.fontFamily = "Black Ops One";
+        this.text.style.color = "red";
+        this.text.id = "pheonixText";
+        document.body.appendChild(this.text);
+
     }
 }
 class AbilityIndicator{

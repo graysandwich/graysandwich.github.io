@@ -121,6 +121,7 @@ window.addEventListener("beforeunload", (e)=>{
     localStorage.setItem("ShieldEnemyFound", ShieldEnemy.seen);
     localStorage.setItem("BlackHoleEnemyFound", BlackHoleEnemy.seen);
     localStorage.setItem("MimicEnemyFound", MimicEnemy.seen);
+    localStorage.setItem("SplitterEnemy", SplitterEnemy.seen);
 
     localStorage.setItem("WindupEnemyFound", WindupEnemy.seen);
     localStorage.setItem("BuilderEnemyFound", BuilderEnemy.seen);
@@ -143,6 +144,7 @@ window.addEventListener("beforeunload", (e)=>{
     localStorage.setItem("HealerPlayerUnlocked", HealerPlayer.unlocked);
     localStorage.setItem("MagePlayerUnlocked", MagePlayer.unlocked);
     localStorage.setItem("NecromancerPlayerUnlocked", NecromancerPlayer.unlocked);
+    localStorage.setItem("PheonixPlayerUnlocked", PheonixPlayer.unlocked);
     
     localStorage.setItem("ShowHealthbarSetting", showHealthBars);
 });
@@ -160,6 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ShieldEnemy.seen=JSON.parse(localStorage.getItem("ShieldEnemyFound"));
     BlackHoleEnemy.seen=JSON.parse(localStorage.getItem("BlackHoleEnemyFound"));
     MimicEnemy.seen=JSON.parse(localStorage.getItem("MimicEnemyFound"));
+    SplitterEnemy.seen=JSON.parse(localStorage.getItem("SplitterEnemy"));
 
     WindupEnemy.seen=JSON.parse(localStorage.getItem("WindupEnemyFound"));
     BuilderEnemy.seen=JSON.parse(localStorage.getItem("BuilderEnemyFound"));
@@ -182,7 +185,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if(JSON.parse(localStorage.getItem("TankPlayerUnlocked"))!=null) TankPlayer.unlocked=JSON.parse(localStorage.getItem("TankPlayerUnlocked"));
     if(JSON.parse(localStorage.getItem("HealerPlayerUnlocked"))!=null) HealerPlayer.unlocked=JSON.parse(localStorage.getItem("HealerPlayerUnlocked"));
     if(JSON.parse(localStorage.getItem("MagePlayerUnlocked"))!=null) MagePlayer.unlocked=JSON.parse(localStorage.getItem("MagePlayerUnlocked"));
-    if(JSON.parse(localStorage.getItem("MagePlayerUnlocked"))!=null) NecromancerPlayer.unlocked=JSON.parse(localStorage.getItem("NecromancerPlayerUnlocked"));
+    if(JSON.parse(localStorage.getItem("NecromancerPlayerUnlocked"))!=null) NecromancerPlayer.unlocked=JSON.parse(localStorage.getItem("NecromancerPlayerUnlocked"));
+    if(JSON.parse(localStorage.getItem("PheonixPlayerUnlocked"))!=null) PheonixPlayer.unlocked=JSON.parse(localStorage.getItem("PheonixPlayerUnlocked"));
+
 
 
     if(JSON.parse(localStorage.getItem("ShowHealthbarSetting"))!=null) showHealthBars=JSON.parse(localStorage.getItem("ShowHealthbarSetting"));

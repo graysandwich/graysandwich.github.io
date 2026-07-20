@@ -14,7 +14,12 @@ function increaseMaxHealth(amount) {
 
 function increaseProjectiles(amount) {
     player.projectiles += amount;
-    boughtUpgrades[2] += 0.5;
+    if(amount==4){
+        boughtUpgrades[2]=1;
+    }
+    else{
+        boughtUpgrades[2] += 0.5;
+    }
     boughtTier2Upgrades[2]=1;
     
     ChangePage('gamePage', false)
@@ -142,7 +147,7 @@ function Roll() {
                 gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:green; font-size:75px;background-color:gray;" id="upgrade">+2 Projectiles</div>`
                 break;
             case 7:
-                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:green; font-size:75px;background-color:gray;" id="upgrade">+0.25 Siphon</div>`
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:green; font-size:75px;background-color:gray;" id="upgrade">+0.25 Lifesteal</div>`
                 break;
             case 8:
                 gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:blue; font-size:75px;background-color:gray;" id="upgrade">+4 Projectiles</div>`
@@ -286,5 +291,20 @@ function AddShockwave(amount) {
     
     new ShockwaveIcon(50);
     boughtTier2Upgrades[6] = 1;
+    ChangePage('gamePage', false)
+}
+function IncreaseTornadoDamage(amount) {
+    player.tornadoDamage+=amount;
+    boughtUpgrades[20]+=0.5;
+    ChangePage('gamePage', false)
+}
+function AddRebirth(amount) {
+    player.rebirth+=amount;
+    boughtTier2Upgrades[7]=1;
+    ChangePage('gamePage', false)
+}
+function AddWindAttack(amount) {
+    if(chosenCharacter!=4)player.windProjectiles+=amount;
+    else player.projectiles+=amount;
     ChangePage('gamePage', false)
 }

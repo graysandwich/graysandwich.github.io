@@ -23,8 +23,8 @@ let mouseY=0;
 let currentWave=0;
 let SCALE=0.001;
 let continueFlag=false;
-const NUMUPGRADES=20;
-const NUMTIER2UPGRADES=7;
+const NUMUPGRADES=21;
+const NUMTIER2UPGRADES=9;
 let boughtUpgrades=new Array(NUMUPGRADES);
 for(let i=0;i<boughtUpgrades.length;i++){
     boughtUpgrades[i]=0;
@@ -40,7 +40,7 @@ let UPGRADES = [
     { onclick: "addFrostProjectiles(1)",   text: "+1 Frost Projectile" },
     { onclick: "addLaserProjectiles(1)",   text: "Laser Attack" },
     { onclick: "speedUpAttacks(1.2)",      text: "Faster Attack Speed" },
-    { onclick: "addSiphon(0.25)",          text: "+0.25 Siphon" },
+    { onclick: "addSiphon(0.25)",          text: "+0.25 Lifesteal" },
     { onclick: "multiplyXPGain(2)",        text: "2x XP gain" },
     { onclick: "addBomb(1)",               text: "Bomb Attack (Aims to Mouse)" },
     { onclick: "addTimeWarp(1)",           text: "Speed Burst Ability" },
@@ -54,17 +54,20 @@ let UPGRADES = [
     { onclick: "MakeIceBulletsPierce()",  text: "Frost Bullets Pierce Through Enemies" },
     { onclick: "IncreaseFireDamage(0.25)",  text: "+0.25 Fire Damage" },
     { onclick: "PassiveSpawns()",  text: "Passively Spawn Souls" },
-    { onclick: "",  text: "" }
+    { onclick: "IncreaseTornadoDamage(0.5)",  text: "+0.5 Tornado Damage" },
 ];
 let TIER2UPGRADES=[
     { onclick: "increaseDamage(2)",        text: "+2 Damage" },
     { onclick: "increaseMaxHealth(20)",    text: "+20 Max Health" },
     { onclick: "increaseProjectiles(4)",   text: "+4 Projectiles" },
     { onclick: "HalveCollisionDamage(0.5)",   text: "Enemy Collisions Deal 0.5x Damage" },
-    { onclick: "addSiphon(0.5)",   text: "+0.5 Siphon" },
+    { onclick: "addSiphon(0.5)",   text: "+0.5 Lifesteal" },
     { onclick: "IncreaseHealthPotionDensity(0.5)",   text: "2x Health Potion Spawn Rate" },
     { onclick: "AddShockwave()",   text: "Shockwave Ability" },
+    { onclick: "AddRebirth(1)",   text: "Rebirth On Death" },
+    { onclick: "AddWindAttack(2)",   text: "+2 Wind Projectiles" },
 ]
+
 let timeWarpCounter=0;
 let gambleTimer=0;
 let gambleChoice=0;
@@ -202,7 +205,7 @@ function SelectCharacter(character){
             break;
         case 3:
             if(HealerPlayer.unlocked){
-                descriptionText.innerText="Starts with passive healing and siphon. Gets 2x healing from all sources. Taking damage gives XP. Is not the impostor."
+                descriptionText.innerText="Starts with passive healing and Lifesteal. Gets 2x healing from all sources. Taking damage gives XP. Is not the impostor."
 
             }
             else{
@@ -229,6 +232,16 @@ function SelectCharacter(character){
                 descriptionText2.innerText="LOCKED"
             }
             document.getElementById("necromancerPlayer").style.border="5px solid red";
+            break;
+        case 6:
+            if(PheonixPlayer.unlocked){
+                descriptionText2.innerText="Has low health but gains 1 rebirth every level. Max health cannot be increased in any way. (I know the image isn't the best but it was either this or another BTD6 reference)"
+
+            }
+            else{
+                descriptionText2.innerText="LOCKED"
+            }
+            document.getElementById("pheonixPlayer").style.border="5px solid red";
             break;
     }
     document.getElementById("startButton").disabled = false; 
@@ -265,6 +278,7 @@ async function Commence(){
     boughtUpgrades[17]=1;
     boughtUpgrades[18]=1;
     boughtUpgrades[19]=1;
+    boughtUpgrades[20]=1;
     //document.querySelectorAll('img').forEach(img => img.remove());
     document.getElementById("loadingPage").style.display="block";
     Start();
@@ -335,6 +349,9 @@ function Start(){
             break;
         case 5:
             player=new NecromancerPlayer();
+            break;
+        case 6:
+            player=new PheonixPlayer();
             break;
     }
     if(difficulty==1){
@@ -573,6 +590,9 @@ function CreateTiles(){
             else if(temperatures[i][j]>=0.5){
                 tiles[i][j]=2;
             }
+            else if(i>0 && i<sizeX-1 && j>0 && j<sizeY-1 && Math.abs(temperatures[i][j])<=0.005){
+                tiles[i][j]=4;
+            }
         }
     }
     let x=0;
@@ -602,6 +622,9 @@ function CreateTiles(){
                     break;
                 case 3:
                     mapObjects.push(new LavaTerrain(i,j,50,50,2, "#410c0c", "#150401"));
+                    break;
+                case 4:
+                    mapObjects.push(new HealTerrain(i,j,50,50, "#169848", "#0e4615"));
                     break;
             }
             //mapObjects.push(new TestTerrain(i,j,50,50,temperatures[x][y]))

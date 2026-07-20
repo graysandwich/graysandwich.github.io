@@ -67,7 +67,7 @@ function ShowEnemy(enemy){
         case 13:
             sourceImage.src="images/builderEnemy.webp";
             sourceText.innerText="Source: Roblox Bacon Hair default avatar"
-            descriptionText.innerText="Is bullying bacon hairs still a thing? What happened to the guest666 stuff? He's still stuck in the past, building stud walls the old-fashioned way.";
+            descriptionText.innerText="Is bullying bacon hairs still a thing? What happened to the guest666 stuff? He's still stuck in the past, building stud walls the old-fashioned way. (Now you may proceed to tell me about Roblox memes that existed before I was born and how the examples I listed here are actually not that old)";
             break;
         case 14:
             sourceImage.src="images/windupEnemy.webp";
@@ -107,7 +107,7 @@ function ShowEnemy(enemy){
         case 21:
             sourceImage.src="images/bouncyBoss.webp";
             sourceText.innerText="Source: Thwomp from Mario"
-            descriptionText.innerText="Graysandwich LLC maintains that any reference to a certain video game character is purely coincidental and fictitious. The word \"thwomp\" refers to the onomatopoeia of an object falling on the ground. Please read our non-existant Terms of Service for further information. If a video game company from Japan would like to sue Graysandwich LLC, then I guess that means this game actually became popular so I would not complain.";
+            descriptionText.innerText="Graysandwich LLC maintains that any reference to a certain video game character is purely coincidental and fictitious. The word \"thwomp\" refers to the onomatopoeia of an object falling on the ground. Please read our Terms of Service for further information. If a video game company from Japan would like to sue Graysandwich LLC, then I guess that means this game actually became popular so I would not complain.";
             break;
         case 22:
             sourceImage.src="images/mageFireMode.webp";
@@ -133,6 +133,11 @@ function ShowEnemy(enemy){
             sourceImage.src="images/healingBoss.webp";
             sourceText.innerText="Source: A deck called Heal Midrose taken from the Database of decks in the PvZ Heroes Discord server"
             descriptionText.innerText="If you feel extremely frustrated fighting her, then she's being accurate to the source material. Spams Sunshrooms like Rustbolt mains were spamming Quarterly Bonus.";
+            break;
+        case 27:
+            sourceImage.src="images/splitterEnemy.webp";
+            sourceText.innerText="Source: The boss Splitty from the game \"Will You Snail?\""
+            descriptionText.innerText="He was voted \"Most Obscure Reference\", in his yearbook. Nobody seems to care though.";
             break;
     }
 }

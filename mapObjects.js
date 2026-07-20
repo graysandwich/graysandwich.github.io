@@ -97,7 +97,7 @@ class WaterTerrain{
     }
 }
 class LavaTerrain{
-    static iFrame=60;
+    static iFrame=0;
     constructor(x, y, width, height, damage, color, alternateColor){
         this.x=x;
         this.y=y;
@@ -110,13 +110,53 @@ class LavaTerrain{
         this.color=color;
         this.alternateColor=alternateColor;
         this.changeColorTimer=0;
+        this.image=new Image();
+        if(this.damage==1)this.image.src="images/lava.webp"
+        if(this.damage==2)this.image.src="images/strongerLava.webp"
     }
     static timer(){
         LavaTerrain.iFrame--;
     }
     act(){
         this.changeColorTimer--;
-        if(this.changeColorTimer<=0){
+        if(
+            (player.x - player.width / 2+10) < (this.x + this.width / 2) &&
+            (player.x + player.width / 2-10) > (this.x - this.width / 2) &&
+            (player.y - player.height / 2+10) < (this.y + this.height / 2) &&
+            (player.y + player.height / 2-10) > (this.y - this.height / 2))
+        {
+            if(LavaTerrain.iFrame<=0){
+                LavaTerrain.iFrame=60;
+                player.takeDamage(this.damage,this);
+
+            }
+            
+        }
+    }
+    draw(){
+        ctx.save();
+        ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+        ctx.restore();
+
+    }
+}
+class HealTerrain{
+    constructor(x, y, width, height, color, alternateColor){
+        this.x=x;
+        this.y=y;
+        this.initialX=x;
+        this.initialY=y;
+        this.width=width;
+        this.height=height;
+        this.orignalColor=color;
+        this.color=color;
+        this.alternateColor=alternateColor;
+        this.iFrame=0;
+    }
+    act(){
+        this.iFrame--;
+        this.changeColorTimer--;
+        if(this.iFrame<=0){
             
             this.color=this.orignalColor;
         }
@@ -124,13 +164,12 @@ class LavaTerrain{
             (player.x - player.width / 2+10) < (this.x + this.width / 2) &&
             (player.x + player.width / 2-10) > (this.x - this.width / 2) &&
             (player.y - player.height / 2+10) < (this.y + this.height / 2) &&
-            (player.y + player.height / 2-10) > (this.y - this.height / 2))
+            (player.y + player.height / 2-10) > (this.y - this.height / 2) && this.iFrame<=0)
         {
             this.color=this.alternateColor;
-            this.changeColorTimer=30;
-            if(LavaTerrain.iFrame<=0){
-                LavaTerrain.iFrame=60;
-                player.takeDamage(this.damage,this);
+            if(this.iFrame<=0){
+                this.iFrame=120;
+                player.Heal(1);
 
             }
             
