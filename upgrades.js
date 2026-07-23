@@ -1,7 +1,7 @@
 function increaseDamage(amount) {
     player.damage += amount;
-    boughtUpgrades[0] = 1;
-    boughtTier2Upgrades[0]=1;
+    boughtUpgrades[0]+=0.5;
+    boughtTier2Upgrades[0]+=0.5;
     
     ChangePage('gamePage', false)
 }
@@ -14,18 +14,16 @@ function increaseMaxHealth(amount) {
 
 function increaseProjectiles(amount) {
     player.projectiles += amount;
-    if(amount==4){
-        boughtUpgrades[2]=1;
-    }
-    else{
-        boughtUpgrades[2] += 0.5;
-    }
-    boughtTier2Upgrades[2]=1;
+    boughtUpgrades[2]+=0.5;
+    boughtTier2Upgrades[2]+=0.5;
     
     ChangePage('gamePage', false)
 }
 
 function addFrostProjectiles(amount) {
+    if(player.frostProjectiles==0){
+        boughtUpgrades[22]=0;
+    }
     player.frostProjectiles += amount;
     player.frostProjectileMaxCooldown = 100 / player.frostProjectiles;
     ChangePage('gamePage', false)
@@ -33,6 +31,7 @@ function addFrostProjectiles(amount) {
 function addLaserProjectiles(amount) {
     bullets.push(new PlayerLaser(-Math.PI / 2, player.x, player.y))
     boughtUpgrades[4] = 1;
+    boughtUpgrades[24]=0;
     ChangePage('gamePage', false)
 }
 function speedUpAttacks(amount) {
@@ -54,6 +53,7 @@ function addBomb(amount) {
     player.bombCount += amount;
     new BombIcon(50);
     boughtUpgrades[8] = 1;
+    boughtUpgrades[23]=0;
     ChangePage('gamePage', false)
 }
 function addTimeWarp(amount) {
@@ -103,19 +103,19 @@ function Roll() {
         let prevChoice = gambleChoice;
         while (prevChoice == gambleChoice) {
 
-            if (randomNum < 20) {
+            if (randomNum < 15) {
                 gambleChoice = Math.floor(Math.random() * 2);
             }
-            else if (randomNum < 60) {
-                gambleChoice = Math.floor(Math.random() * 3) + 2;
+            else if (randomNum < 47) {
+                gambleChoice = Math.floor(Math.random() * 2) + 2;
             }
-            else if (randomNum < 80) {
-                gambleChoice = Math.floor(Math.random() * 3) + 5;
+            else if (randomNum < 74) {
+                gambleChoice = Math.floor(Math.random() * 4) + 4;
             }
-            else if (randomNum < 90) {
+            else if (randomNum < 88) {
                 gambleChoice = Math.floor(Math.random() * 2) + 8;
             }
-            else if (randomNum < 97) {
+            else if (randomNum < 95) {
                 gambleChoice = Math.floor(Math.random() * 2) + 10;
             }
             else {
@@ -141,7 +141,7 @@ function Roll() {
                 gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:black; font-size:75px;background-color:gray;" id="upgrade">+2 Speed</div>`
                 break;
             case 5:
-                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:green; font-size:75px;background-color:gray;" id="upgrade">+1 Damage</div>`
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:green; font-size:75px;background-color:gray;" id="upgrade">+0.5 Damage</div>`
                 break;
             case 6:
                 gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:green; font-size:75px;background-color:gray;" id="upgrade">+2 Projectiles</div>`
@@ -156,13 +156,13 @@ function Roll() {
                 gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:blue; font-size:75px;background-color:gray;" id="upgrade">+20 Max Health</div>`
                 break;
             case 10:
-                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:purple; font-size:75px;background-color:gray;" id="upgrade">+2 Damage</div>`
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:purple; font-size:75px;background-color:gray;" id="upgrade">+1 Damage</div>`
                 break;
             case 11:
                 gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:purple; font-size:75px;background-color:gray;" id="upgrade">x3 XP multiplier</div>`
                 break;
             case 12:
-                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:yellow; font-size:75px;background-color:gray;" id="upgrade">+3 Damage</div>`
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:yellow; font-size:75px;background-color:gray;" id="upgrade">+1.5 Damage</div>`
                 break;
             case 13:
                 gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:yellow; font-size:75px;background-color:gray; " id="upgrade">+40 Max Health</div>`
@@ -216,7 +216,7 @@ function Roll() {
                 ChangePage('gamePage', false)
                 break;
             case 5:
-                increaseDamage(1);
+                increaseDamage(0.5);
                 break;
             case 6:
                 increaseProjectiles(2);
@@ -231,13 +231,13 @@ function Roll() {
                 increaseMaxHealth(20);
                 break;
             case 10:
-                increaseDamage(2);
+                increaseDamage(1);
                 break;
             case 11:
                 multiplyXPGain(3);
                 break;
             case 12:
-                increaseDamage(3);
+                increaseDamage(1.5);
                 break;
             case 13:
                 increaseMaxHealth(40);
@@ -279,7 +279,7 @@ function MakeIceBulletsPierce() {
 }
 function IncreaseFireDamage(amount) {
     player.fireDamage+=amount;
-    boughtUpgrades[18]=1;
+    boughtUpgrades[18]+=0.5;
     ChangePage('gamePage', false)
 }
 function PassiveSpawns() {
@@ -306,5 +306,23 @@ function AddRebirth(amount) {
 function AddWindAttack(amount) {
     if(chosenCharacter!=4)player.windProjectiles+=amount;
     else player.projectiles+=amount;
+    ChangePage('gamePage', false)
+}
+function AddSpeed(amount) {
+    player.speed +=1;
+    ChangePage('gamePage', false)
+}
+function IncreaseSlowedDamage(amount){
+    player.slowedDamageMultiplier=1.5;
+    boughtTier2Upgrades[22]=1;
+    ChangePage('gamePage', false)
+}
+function IncreaseBombDamage(amount){
+    player.bombDamage+=4;
+    ChangePage('gamePage', false)
+}
+function IncreaseLaserDamage(amount){
+    player.laserDamage+=amount;
+    boughtUpgrades[24]+=0.25;
     ChangePage('gamePage', false)
 }

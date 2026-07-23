@@ -23,7 +23,7 @@ let mouseY=0;
 let currentWave=0;
 let SCALE=0.001;
 let continueFlag=false;
-const NUMUPGRADES=21;
+const NUMUPGRADES=25;
 const NUMTIER2UPGRADES=9;
 let boughtUpgrades=new Array(NUMUPGRADES);
 for(let i=0;i<boughtUpgrades.length;i++){
@@ -34,7 +34,7 @@ for(let i=0;i<boughtTier2Upgrades.length;i++){
     boughtTier2Upgrades[i]=0;
 }
 let UPGRADES = [
-    { onclick: "increaseDamage(1)",        text: "+1 Damage" },
+    { onclick: "increaseDamage(0.5)",        text: "+0.5 Damage" },
     { onclick: "increaseMaxHealth(10)",    text: "+10 Max Health" },
     { onclick: "increaseProjectiles(2)",   text: "+2 Projectiles" },
     { onclick: "addFrostProjectiles(1)",   text: "+1 Frost Projectile" },
@@ -55,9 +55,14 @@ let UPGRADES = [
     { onclick: "IncreaseFireDamage(0.25)",  text: "+0.25 Fire Damage" },
     { onclick: "PassiveSpawns()",  text: "Passively Spawn Souls" },
     { onclick: "IncreaseTornadoDamage(0.5)",  text: "+0.5 Tornado Damage" },
+    { onclick: "AddSpeed(2)",     text: "+2 Speed" },
+    { onclick: "IncreaseSlowedDamage(2)",     text: "Slowed Enemies Take 2x Damage" },
+    { onclick: "IncreaseBombDamage(4)",     text: "+4 Bomb Damage" },
+    { onclick: "IncreaseLaserDamage(0.5)",   text: "+0.5 Laser Damage" },
+
 ];
 let TIER2UPGRADES=[
-    { onclick: "increaseDamage(2)",        text: "+2 Damage" },
+    { onclick: "increaseDamage(1)",        text: "+1 Damage" },
     { onclick: "increaseMaxHealth(20)",    text: "+20 Max Health" },
     { onclick: "increaseProjectiles(4)",   text: "+4 Projectiles" },
     { onclick: "HalveCollisionDamage(0.5)",   text: "Enemy Collisions Deal 0.5x Damage" },
@@ -65,7 +70,7 @@ let TIER2UPGRADES=[
     { onclick: "IncreaseHealthPotionDensity(0.5)",   text: "2x Health Potion Spawn Rate" },
     { onclick: "AddShockwave()",   text: "Shockwave Ability" },
     { onclick: "AddRebirth(1)",   text: "Rebirth On Death" },
-    { onclick: "AddWindAttack(2)",   text: "+2 Wind Projectiles" },
+    { onclick: "AddWindAttack(2)",   text: "+2 Tornado Projectiles" },
 ]
 
 let timeWarpCounter=0;
@@ -249,7 +254,12 @@ function SelectCharacter(character){
 }
 function SelectMode(mode){
     gamemode=mode;
-    ChangePage('difficultyPage', false)
+    if(mode==0){
+        difficulty=1;
+        chosenCharacter=1;
+        Commence();
+    }
+    else ChangePage('difficultyPage', false)
 }
 function loadImage(image){
     return new Promise((resolve, reject) =>{
@@ -279,10 +289,13 @@ async function Commence(){
     boughtUpgrades[18]=1;
     boughtUpgrades[19]=1;
     boughtUpgrades[20]=1;
+    boughtUpgrades[22]=1;
+    boughtUpgrades[23]=1;
+    boughtUpgrades[24]=1;
     //document.querySelectorAll('img').forEach(img => img.remove());
     document.getElementById("loadingPage").style.display="block";
     Start();
-    await delay(0.1);
+    if(gamemode!=0)await delay(0.1);
     document.getElementById("loadingPage").style.display="none";
     document.getElementById("gamePage").style.display="block";
     loop();
@@ -377,6 +390,19 @@ function Start(){
     SCALE*=scaleMultiplier
 
     switch(gamemode){
+        case 0:
+            if(!document.getElementById("tutorialText")){
+                new TutorialText(50);
+            }
+            else{
+                document.getElementById("tutorialText").textContent="\(Fullscreen encouraged, press escape to go back\)"
+                TutorialText.index=-1;
+                TutorialText.fadeTimer=0;
+                TutorialText.timer=0;
+                TutorialText.canChangeWave=false;
+            }
+            mapType=1;
+            break;
         case 1:
             mapType=1;
             break;
@@ -423,13 +449,17 @@ function Start(){
     initialRightBorder=rightBorder;
     initialTopBorder=topBorder;
     initialBottomBorder=bottomBorder;
-    if(gamemode!=4){
-        RandomizeEnemies(2, 0, 0,0,0);
+    InitializeStats();
+    if(gamemode==0){
+        DisableAllEnemies();
+        BasicEnemy.isActive=true;
     }
-    else{
+    else if(gamemode==4){
         ChangeWave();
     }
-    
+    else{
+        RandomizeEnemies(2, 0, 0,0,0);
+    }
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     currentPage="gamePage";

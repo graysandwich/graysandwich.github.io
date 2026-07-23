@@ -64,7 +64,7 @@
             <button onclick="SelectMode(1)" style="text-align: center; font-size: 67px; position: absolute; top: 25%; left: 0px; width: 50%; z-index: 1000; margin: 0px;">PLAY</button>
             <button onclick="ChangePage('gamemodeSelectionPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 25%; left: 50%; width: 50%; z-index: 1000; margin: 0px;">Other Modes</button>
 
-            <button onclick="ChangePage('helpPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 40%; left: 0; width: 100%; z-index: 1000; margin: 0;">How to Play</button>
+            <button onclick="SelectMode(0)" style="text-align: center; font-size: 67px; position: absolute; top: 40%; left: 0; width: 100%; z-index: 1000; margin: 0;">Tutorial</button>
             <button onclick="ChangePage('devlogPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 55%; left: 0; width: 100%; z-index: 1000; margin: 0;">Update Log</button>
             <button onclick="ChangePage('settingsPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 70%; left: 0; width: 100%; z-index: 1000; margin: 0;">Settings</button>
             <button onclick="ChangePage('enemyDescriptionSelectionPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 85%; left: 0; width: 100%; z-index: 1000; margin: 0;">Enemy Guide</button>
@@ -153,12 +153,47 @@
 
             <h1>.</h1>
             
+            <h1>Update 3.2 - July 23, 2026</h1>
+            <ul>
+                <li>Added a proper tutorial</li>
+                <li>Added 1 new upgrade</li>
+                <b>Developer's note:</b> I need upgrade ideas help
+                <li>Added 3 new upgrades. These upgrades can be unlocked after a previous upgrade has already been obtained (e.g. +0.5 laser damage can only be obtained after Add Laser has been chosen)</li>
+                <b>Developer's note:</b> nvm i got some ideas but i still need more
+                <li>Balance Changes:</li>
+                <ul>
+                    <li>Increased the time it takes for Database's projectile to stop homing on the player (2s -> 4s)</li>
+                    <li>Decreased Database's time between attacks (2.67s -> 6s at hard difficulty)</li>
+                    <li>Added four projectiles to Database's attacks. These extra projectiles will fire in the four cardinal directions.</li>
+                    <b>Developer's note:</b> Database's attacks were too easy to dodge.
+                    <li>Increased Splitty's time between attacks (3s -> 3.5s)</li>
+                    <b>Developer's note:</b> Splitty's attacks were difficult to dodge (which is intended) so a nerf to attack speed should make it less oppressive.
+                    <li>Increased rate of healing for Passive Healing upgrade (8s -> 5s)</li>
+                    <b>Developer's note:</b> Would you rather: Get +1 health every 8 seconds (+1 passive healing) or kill 4 enemies every 8 seconds (+0.25 siphon). Yeah passive healing was useless especially in the lategame hopefully this makes it less useless
+                    <li>Increased bomb attack's duration before explosion dissappears (1s ->1.25s)</li>
+                    <li>Increased bomb attack's damage(3 -> 4)</li>
+                    <b>Developer's note:</b> Bomb attack was also pretty useless since it barely did anything after wave 3. It just didnt hit enough enemies and didn't do enough damage.
+                    <li>Increased the amount of times +0.25 Fire Damage could be obtained (1 -> 2)</li>
+                    <li>Decreased the damage increase of the +1 damage upgrade (+1 damage -> +0.5 damage). The upgrade has also been renamed to match the damage boost it new gives.</li>
+                    <li>Decreased the damage increase of the +2 damage special upgrade (+2 damage -> +1 damage). The upgrade has also been renamed to match the damage boost it new gives.</li>
+                    <li>Increased the amount of times +0.5 Damage could be obtained (1 -> 2)</li>
+                    <li>Allowed (the new) +1 damage to be obtained even if the player already has a +0.5 damage upgrade</li>
+                    <li>Allowed +4 projectiles to be obtained even if the player already has a +2 projectiles upgrade</li>
+                    <b>Developer's note:</b> Ever since it was added to the game (it was the first upgrade I ever added), +1 damage has always been the best upgrade and an instant pick if it was available. Because of this, upgrades that synergized with it (such as +2 projectiles and Increase Attack Speed) were also instant picks. By decreasing the damage buff it gets, it becomes less overpowered and upgrades such as Increase Projectiles can now be changed more freely. Hopefully this nerf, along with the other balance changes, will make choosing between which upgrade to get more challenging.
+                    <li>Buffed Mystery Box's chances of getting a good upgrade</li>
+                    <li>Moved +2 speed from Common to Uncommon rarity in Mystery Boxes</li>
+                    <li>Halved every damage boost in Mystery Boxes</li>
+                    <b>Developer's note:</b> Mystery box used to have a 60% chance of being either useless or bad. Now it has a 47% chance. +2 speed also never fit in the common tier so it was moved up. The damage boost nerf is just to match the nerf to the original upgrade.
+                    <li>Made bosses immune to knockback</li>
+                    
+
+                </ul>
+            </ul>
             <h1>Update 3.1 - July 20, 2026</h1>
             <ul>
                 <li>Added 1 new character</li>
                 <li>Added 1 new enemy</li>
                 <li>Added 1 new special upgrade</li>
-                <b>Developer's note:</b> This wave was actually always in the code but a bug that I somehow did not notice for months made it never appear in-game.
                 <li>Balance Changes:</li>
                 <ul>
                     <li>Reworked healing from Database's main attack (Original: +1 health to all enemies in range of heal aura, including herself. Updated: Full heals all enemies in range of heal aura, excluding herself)</li>

@@ -467,6 +467,76 @@ class RebirthsIcon {
 
     }
 }
+class TutorialText {
+    static index=-1;
+    static textOrder=["Welcome to Crossover, a game with art assets taken from all kinds of different places. WASD to move.", "As you can see, the player automatically shoots bullets.","Your job is simple: kill all the enemies and survive for as long as possible.", "Killing enemies gives experience points, and getting enough experience points will reward an upgrade.", "Experience bottles and health potions will periodically spawn. Collect them for XP and healing!","Now, let's put your skills to the test!","", "Congratulations on completing the tutorial!"]
+    static fadeTimer=0;
+    static timer=0;
+    static canChangeWave=false;
+    constructor(size) {
+
+        this.text = document.createElement("div"); 
+        this.text.style.position = "absolute";
+        this.text.style.left = (screen.width/2) + "px";
+        this.text.style.top = (250)+"px";
+        this.text.style.zIndex = "2";
+        this.text.style.transform = "translate(-50%, -50%)";
+        this.text.style.pointerEvents = "none";
+        this.text.style.fontSize = "50px";
+        this.text.style.textAlign = "center";
+        this.text.style.fontFamily = "Black Ops One";
+        this.text.style.color = " rgb(45, 169, 90)";
+        this.text.style.width="1500px"
+        this.text.id = "tutorialText";
+        this.text.textContent="\(Fullscreen encouraged, press escape to go back\)"
+        document.body.appendChild(this.text);
+
+    }
+    static Update(){
+        TutorialText.timer++;
+        //console.log(document.getElementById("tutorialText").style.left+" "+document.getElementById("tutorialText").style.top);
+        TutorialText.fadeTimer--;
+        if(TutorialText.index<4 && (TutorialText.timer==60 || TutorialText.timer==540 || TutorialText.timer==840)){
+            TutorialText.fadeTimer=30;
+        }
+        if(player.currentExp>40 && TutorialText.index<3 && TutorialText.fadeTimer<0){
+            TutorialText.fadeTimer=30;
+        }
+        if(player.level>1 && TutorialText.index<4 && TutorialText.fadeTimer<0){
+            TutorialText.fadeTimer=30;
+            TutorialText.timer=0;
+        }
+        //console.log(TutorialText.index+" "+TutorialText.timer+" "+currentWave);
+        if(TutorialText.timer==480 && TutorialText.index==4){
+            //console.log(TutorialText.index+" "+TutorialText.timer+" done");
+            TutorialText.fadeTimer=30;
+            bossMultiplier=0.3;
+            TutorialText.canChangeWave=true;
+        }
+        if(TutorialText.timer==720 && TutorialText.index==5){
+            TutorialText.fadeTimer=30;
+        }
+        if(currentWave==4 && TutorialText.index==6 && TutorialText.fadeTimer<0){
+            DisableAllEnemies();
+            TutorialText.fadeTimer=30;
+            TutorialText.timer=0;
+        }
+        if(TutorialText.index==7 && TutorialText.timer==300){
+            EndTutorial();
+        }
+        if(TutorialText.fadeTimer>0){
+            document.getElementById("tutorialText").style.color="rgba(45, 169, 90,"+(TutorialText.fadeTimer/30)+")";
+        }
+        else{
+            document.getElementById("tutorialText").style.color="rgb(45, 169, 90, 1)";
+        }
+        if(TutorialText.fadeTimer==0){
+
+            TutorialText.index++;
+            document.getElementById("tutorialText").textContent=TutorialText.textOrder[this.index];
+        }
+    }
+}
 class AbilityIndicator{
     constructor(){
         this.text = document.createElement("div"); 
@@ -515,7 +585,7 @@ class WaveText {
         this.size = size;
         this.text = document.createElement("div");
         this.text.style.position = "absolute";
-        this.text.style.left = "90px";
+        this.text.style.left = "100px";
         this.text.style.top = "30px";
         this.text.style.zIndex = "2";
         this.text.style.transform = "translate(-50%, -50%)";
@@ -524,6 +594,7 @@ class WaveText {
         this.text.style.whiteSpace = "nowrap";
         this.text.style.color = "black";
         this.text.style.fontFamily="Black ops one";
+        this.text.style.textAlign="left";
         this.text.id = "waveText";
         this.text.innerHTML = `<b>Wave 1</b>`;
         document.body.appendChild(this.text);

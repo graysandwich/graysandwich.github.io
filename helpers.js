@@ -83,13 +83,63 @@ document.addEventListener("keydown", (e)=>{
         if(key=="t" && playerAbilities.length>4){
             playerAbilities[4].Activate();
         }
+        if(e.key=="Escape" && gamemode==0){
+            EndTutorial();
+        }
         if (['w', 'a', 's', 'd'].includes(key)) {
             e.preventDefault();
         }
     }
         
 })
+async function EndTutorial(){
 
+    gameOver = true;
+    await delay(100);
+    ctx.strokeStyle = 'white';
+    canvas.style.display = "none";
+    if(healthBar){
+        healthBar.image1.remove();
+        healthBar.image2.remove();
+    }
+    if(levellingBar){
+        levellingBar.image1.remove();
+        levellingBar.image2.remove();
+    }
+    if(document.getElementById("waveText")){
+        document.getElementById("waveText").remove()
+    }
+    document.getElementById("tutorialText").innerText="";
+
+    for(let i=0;i<bossBars.length;i++){
+        bossBars[i].image1.remove();
+        bossBars[i].image2.remove();
+    }
+    for(let i=0;i<playerAbilities.length;i++){
+        playerAbilities[i].indicator.text.remove();
+        playerAbilities[i].image.remove();
+        if(playerAbilities[i].counterText){
+            playerAbilities[i].counterText.text.remove();    
+        }
+    }
+    if(shieldBar){
+        shieldBar.image1.remove();
+        shieldBar.image2.remove();
+    }
+
+    
+    chosenCharacter=0;
+    let descriptionText=document.getElementById("descriptionText");
+    
+    descriptionText.innerText="";
+    list = document.querySelectorAll('[id$="Player"]');
+    for (let i = 0; i < list.length; i++) {
+        list[i].style.border = "";
+    }
+    document.getElementById("startButton").disabled = true; 
+
+    ChangePage("IntroPage", false);
+}
 document.addEventListener("keyup", (e)=>{
     let key=e.key.toLowerCase();
     if(key==='w'){
