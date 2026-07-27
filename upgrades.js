@@ -7,8 +7,11 @@ function increaseDamage(amount) {
 }
 
 function increaseMaxHealth(amount) {
-    player.health += amount;
-    player.maxHealth += amount;
+    if(chosenCharacter!=6){
+        player.health += amount;
+        player.maxHealth += amount;
+        player.originalMaxHealth+=amount;
+    }
     ChangePage('gamePage', false)
 }
 
@@ -60,6 +63,7 @@ function addTimeWarp(amount) {
     player.timeWarp += amount;
     new TimeWarpIcon(50);
     boughtUpgrades[9] = 1;
+    boughtUpgrades[25] = 0;
     ChangePage('gamePage', false)
 }
 function AddPassiveHealing(amount) {
@@ -76,6 +80,7 @@ function Gamble(numGambles) {
         
         choice1.remove();
         choice2.remove();
+        if(choice3) choice3.remove();
 
         Roll();
     }
@@ -129,7 +134,7 @@ function Roll() {
                 gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:red; font-size:75px; background-color:gray" id="upgrade">-3 health</div>`
                 break;
             case 1:
-                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:red; font-size:75px;background-color:gray;" id="upgrade">-1 Speed</div>`
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:red; font-size:75px;background-color:gray;" id="upgrade">Decrease Speed</div>`
                 break;
             case 2:
                 gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:black; font-size:75px;background-color:gray;" id="upgrade">Nothing</div>`
@@ -138,7 +143,7 @@ function Roll() {
                 gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:black; font-size:75px;background-color:gray;" id="upgrade">Heal 10</div>`
                 break;
             case 4:
-                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:black; font-size:75px;background-color:gray;" id="upgrade">+2 Speed</div>`
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:black; font-size:75px;background-color:gray;" id="upgrade">Increase Speed</div>`
                 break;
             case 5:
                 gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:green; font-size:75px;background-color:gray;" id="upgrade">+0.5 Damage</div>`
@@ -314,7 +319,7 @@ function AddSpeed(amount) {
 }
 function IncreaseSlowedDamage(amount){
     player.slowedDamageMultiplier=1.5;
-    boughtTier2Upgrades[22]=1;
+    boughtUpgrades[22]=1;
     ChangePage('gamePage', false)
 }
 function IncreaseBombDamage(amount){
@@ -323,6 +328,10 @@ function IncreaseBombDamage(amount){
 }
 function IncreaseLaserDamage(amount){
     player.laserDamage+=amount;
-    boughtUpgrades[24]+=0.25;
+    ChangePage('gamePage', false)
+}
+function AddTimeStop(amount) {
+    TimeWarpIcon.version=1;
+    boughtUpgrades[25] = 1;
     ChangePage('gamePage', false)
 }

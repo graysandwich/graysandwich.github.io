@@ -11,6 +11,8 @@ class Enemy {
     static index=0;
     static health=0;
     static speed=0;
+    static healthMultiplier=1;
+    static speedMultiplier=1;
     constructor(speed, health) {
         this.image = new Image();
         this.image.src = 'images/enemy.webp';
@@ -59,20 +61,22 @@ class Enemy {
         let multiplier=1;
         switch(currentWave){
             case 8:
-                multiplier=1.3;
+                multiplier=1.2;
                 break;
             case 9:
-                multiplier=1.6;
+                multiplier=1.4;
                 break;
             case 10:
-                multiplier=1.9;
+                multiplier=1.7;
                 break;
             case 11:
-                multiplier=2.2;
+                multiplier=2;
                 break;
         }
+        multiplier*=Enemy.healthMultiplier;
         this.health*=multiplier;
         this.maxHealth*=multiplier;
+        this.speed*=Enemy.speedMultiplier
         this.health=Math.ceil(this.health);
         this.maxHealth=Math.ceil(this.maxHealth);
         //console.log(this.image);
@@ -337,6 +341,7 @@ class LaserBoss extends Enemy {
         this.bossText.style.top = (25 + bossBars.length * 75) + "px";
         this.bossText.style.zIndex = 2;
         this.bossText.style.transform = "translate(-50%, -50%)";
+        this.bossText.id="bossText";
         document.body.appendChild(this.bossText);
         //console.log(this.shootTimer);
         this.stage = 0;
@@ -421,6 +426,7 @@ class IceBoss extends Enemy {
         this.bossText.style.top = (25 + bossBars.length * 75) + "px";
         this.bossText.style.zIndex = 2;
         this.bossText.style.transform = "translate(-50%, -50%)";
+        this.bossText.id="bossText";
         //console.log(bossText.style.transform+" tradsnf");
 
         document.body.appendChild(this.bossText);
@@ -551,6 +557,7 @@ class BouncyBoss extends Enemy {
             this.bossText.style.top = (25 + bossBars.length * 75) + "px";
             this.bossText.style.zIndex = 2;
             this.bossText.style.transform = "translate(-50%, -50%)";
+            this.bossText.id="bossText";
             document.body.appendChild(this.bossText);
             this.ignoreShield=true;
             this.health=Math.ceil(this.health*bossMultiplier);
@@ -769,6 +776,7 @@ class MageBoss extends Enemy {
         this.bossText.style.top = (25 + bossBars.length * 75) + "px";
         this.bossText.style.zIndex = 2;
         this.bossText.style.transform = "translate(-50%, -50%)";
+        this.bossText.id="bossText";
         //console.log(bossText.style.transform+" tradsnf");
 
         document.body.appendChild(this.bossText);
@@ -907,6 +915,7 @@ class BulletHellBoss extends Enemy {
         this.bossText.style.top = (25 + bossBars.length * 75) + "px";
         this.bossText.style.zIndex = 2;
         this.bossText.style.transform = "translate(-50%, -50%)";
+        this.bossText.id="bossText";
         //console.log(bossText.style.transform+" tradsnf");
 
         document.body.appendChild(this.bossText);
@@ -1084,6 +1093,7 @@ class GambleBoss extends Enemy {
         this.bossText.style.top = (25 + bossBars.length * 75) + "px";
         this.bossText.style.zIndex = 2;
         this.bossText.style.transform = "translate(-50%, -50%)";
+        this.bossText.id="bossText";
         //console.log(bossText.style.transform+" tradsnf");
 
         document.body.appendChild(this.bossText);
@@ -1449,6 +1459,7 @@ class SnakeBoss extends Enemy {
             this.bossText.style.top = (25 + bossBars.length * 75) + "px";
             this.bossText.style.zIndex = 2;
             this.bossText.style.transform = "translate(-50%, -50%)";
+            this.bossText.id="bossText";
             document.body.appendChild(this.bossText);
             this.bossBar = new BossBar(this);
             bossBars.push(this.bossBar);
@@ -1662,6 +1673,7 @@ class HealerBoss extends Enemy {
         this.bossText.style.top = (25 + bossBars.length * 75) + "px";
         this.bossText.style.zIndex = 2;
         this.bossText.style.transform = "translate(-50%, -50%)";
+        this.bossText.id="bossText";
         //console.log(bossText.style.transform+" tradsnf");
 
         document.body.appendChild(this.bossText);
@@ -1954,17 +1966,15 @@ class ChargingEnemy extends Enemy {
                 if (this.y < player.y) {
                     this.vy = this.speed * Math.sin(this.angle);
                 }
-                this.x += this.vx;
-                this.y += this.vy;
             }
 
             if (this.slowCountdown > 0) {
-                this.x += this.vx / 2;
-                this.y += this.vy / 2;
-            }
-            else {
                 this.x += this.vx;
                 this.y += this.vy;
+            }
+            else {
+                this.x += this.vx*2;
+                this.y += this.vy*2;
             }
         }
         this.x+=this.accelerationX;
@@ -2087,7 +2097,7 @@ class HomingEnemy extends Enemy {
             this.speed = 0;
         }
         else {
-            this.speed = 3;
+            this.speed = 3*Enemy.speedMultiplier;
         }
     }
 }
@@ -3024,7 +3034,7 @@ class MachineGunEnemy extends Enemy {
             this.speed = 0;
         }
         else {
-            this.speed = 3;
+            this.speed = 3*Enemy.speedMultiplier;
         }
     }
     
@@ -3264,7 +3274,40 @@ class SplitterEnemy extends Enemy {
         
     
 }
-const ENEMYTYPES=[BasicEnemy,ShooterEnemy,AimingEnemy,HomingEnemy,TrapperEnemy,ZombieEnemy,ShieldEnemy,ChargingEnemy,GhostEnemy,PoisonEnemy,BlackHoleEnemy,MimicEnemy,BuilderEnemy,WindupEnemy,SpawnerEnemy,SelfDestructEnemy,MachineGunEnemy,SmokeBombEnemy,SplitterEnemy];
+class TeleporterEnemy extends Enemy {
+    constructor(speed, health) {
+        super(speed, health);
+        this.image.src = 'images/teleporterEnemy.webp';
+        this.value = 30;
+        this.width=75;
+        this.height=75;    
+        //console.log(this.shootTimer);
+    }
+    timer() {
+    }
+    takeDamage(a, b){
+        super.takeDamage(a, b)
+        let distanceX = player.x - this.x;
+        let distanceY = player.y - this.y;
+        let distance = distanceX * distanceX + distanceY * distanceY;
+        let vx = 0;
+        let vy = 0;
+
+        if (distance > 0) {
+            let angle = Math.atan2(distanceY, distanceX);
+            vx = 35 * Math.cos(angle);
+            vy = 35 * Math.sin(angle);
+        }
+        this.x+=vx;
+        this.y+=vy;
+    }
+    special() {
+        this.timer();
+    }
+        
+    
+}
+const ENEMYTYPES=[BasicEnemy,ShooterEnemy,AimingEnemy,HomingEnemy,TrapperEnemy,ZombieEnemy,ShieldEnemy,ChargingEnemy,GhostEnemy,PoisonEnemy,BlackHoleEnemy,MimicEnemy,BuilderEnemy,WindupEnemy,SpawnerEnemy,SelfDestructEnemy,MachineGunEnemy,SmokeBombEnemy,SplitterEnemy,TeleporterEnemy];
 
 /*
 ^ ENEMIES
@@ -3485,7 +3528,7 @@ class PlayerBomb extends Bullet {
         if (this.shootTimer > 0) {
             for (let i = 0; i < enemies.length; i++) {
                 if (enemies[i].ignoreBullets == false && RectCircleColliding(this, enemies[i], this.width / 2, this.x, this.y)) {
-                    this.explodeTimer = 30;
+                    this.explodeTimer = 45;
                     this.shootTimer = 0;
                     this.image.src = "images/explosion.webp";
                 }
@@ -4495,7 +4538,8 @@ class XPBag extends Collectable{
     act() {
         super.act();
         if (this.x < player.x + player.width && this.x + this.width - this.width / 6 > player.x && this.y < player.y + player.height && this.y + this.height - this.width / 6 > player.y) {
-            player.GainXP(this.size / 2 * (1 + player.level * 0.2));
+
+            player.GainXP(this.size / 2 * (1+player.level*player.level/5*0.15));
             this.dead = true;
         }
     }
@@ -4559,583 +4603,6 @@ class FloatingObject{
     }
 }
 
-class Player {
-    static unlocked=false;
-    constructor() {
-        this.image = new Image();
-        this.image.src="images/player.webp";
-        this.speed = 5;
-        this.x = canvas.width / 2;
-        this.y = canvas.height / 2;
-        this.width = 50;
-        this.height = 50;
-        this.currentExp = 0;
-        this.nextLevel = 100;
-        this.damage = 1;
-        this.health = 10;
-        this.maxHealth = 10;
-        this.projectiles = 4;
-        this.slowed = false;
-        this.frostProjectiles = 0;
-        this.frostProjectileCooldown = 60;
-        this.frostProjectileMaxCooldown = 80;
-        this.laserProjectiles = 0;
-        this.slowCountdown = 0;
-        this.attackSpeed = 30;
-        this.bulletCooldown = 0;
-        this.siphon = 0;
-        this.redTimer = 0;
-        this.bombTimer = 1;
-        this.bombCount = 0;
-        this.xpMultiplier = 1;
-        this.accelerationX = 0;
-        this.accelerationY = 0;
-        this.timeWarpTimer = 0;
-        this.timeWarp = 0;
-        this.passiveHealing = 0;
-        this.passiveHealingTimer = 0;
-        this.damageMultiplier = 1;
-        this.damageTakenMultiplier = 1;
-        this.level = 1;
-        this.healMultiplier=1;
-        this.attackSpeedMultiplier=1;
-        this.projectileSizeMultiplier=1;
-        this.collisionDamageMultiplier=1;
-        this.iceBulletsPierce=false;
-        this.rebirth=0;
-        this.rebirthTimer=0;
-        this.windProjectiles=0;
-        this.windProjectileCooldown=60;
-        this.slowedDamageMultiplier=1;
-        this.bombDamage=4;
-        this.laserDamage=1;
-    }
-    takeDamage(damage, bullet) {
-        if(this.rebirthTimer>0){
-            return;
-        }
-        console.log(bullet);
-        console.log(damage);
-        if(gameOver)return;
-        if(bullet.isEnemy){
-            damage*=this.collisionDamageMultiplier;
-        }
-        if(playerShield!=null){
-            playerShield.takeDamage(damage);
-            return;
-        }
-        damage *= this.damageTakenMultiplier;
-        this.health -= damage;
-        
-        //console.log(this.health);
-        floatingObjects.push(new FloatingObject(this.x-this.width/2+Math.random()*this.width,this.y,damage,"red"));
-        if (bullet.frostbite) {
-            this.slowCountdown = 120;
-        }
-        this.redTimer = 10;
-        if(this.health<=0 && this.rebirth>0){
-            bullets.push(new Shockwave(this.x, this.y));
-            this.health=this.maxHealth/2;
-            this.rebirth--;
-            this.rebirthTimer=300;
-        }
-    }
-    act() {
-        if(gameOver)return;
-        if (this.frostProjectiles > 0 && this.frostProjectileCooldown <= 0) {
-            this.frostProjectileCooldown = this.frostProjectileMaxCooldown;
-            if (enemies.length > 0) {
-                let closestEnemy = -1;
-                let enemyDist = 999999;
-                for (let i = 0; i < enemies.length; i++) {
-                    let newDist = Math.hypot(Math.abs(enemies[i].x - this.x), Math.abs(enemies[i].y - this.y));
-                    if (newDist < enemyDist && enemies[i].ignoreBullets == false) {
-                        enemyDist = newDist;
-                        closestEnemy = i;
-                    }
-                }
-                if (closestEnemy != -1) {
-                    let distanceX = Math.abs(this.x - enemies[closestEnemy].x);
-                    let distanceY = Math.abs(this.y - enemies[closestEnemy].y);
-                    let vx = 0;
-                    let vy = 0;
-                    if (distanceX == 0) {
-                        if (this.y > enemies[closestEnemy].y) {
-                            vy -= this.speed;
-                        }
-                        if (this.y < enemies[closestEnemy].y) {
-                            vy += this.speed;
-                        }
-                    }
-                    else {
-                        let angle = Math.atan(distanceY / distanceX);
-                        if (this.x > enemies[closestEnemy].x) {
-                            vx -= this.speed * Math.cos(angle);
-                        }
-                        if (this.y > enemies[closestEnemy].y) {
-                            vy -= this.speed * Math.sin(angle);
-                        }
-                        if (this.x < enemies[closestEnemy].x) {
-                            vx += this.speed * Math.cos(angle);
-                        }
-                        if (this.y < enemies[closestEnemy].y) {
-                            vy += this.speed * Math.sin(angle);
-                        }
-                        //console.log(this.x+" "+this.y+" "+Math.sin(angle)+" "+Math.cos(angle)+" "+angle);
-                    }
-                    bullets[bullets.length] = new FrostBullet(vx, vy, 1);
-                }
-                else {
-                    bullets[bullets.length] = new FrostBullet(10, 0, 1);
-                }
-
-            }
-            else {
-                bullets[bullets.length] = new FrostBullet(10, 0, 1);
-            }
-
-        }
-        if(this.windProjectiles>0 && chosenCharacter!=4 && this.windProjectileCooldown<0){
-            this.windProjectileCooldown=60;
-            let angle = 0;
-            for (let i = 0; i < this.windProjectiles; i++) {
-                let temp=new WindBullet(10 * Math.cos(angle), 10 * Math.sin(angle), 0);
-                bullets[bullets.length] = temp;
-                angle += 2 * Math.PI / this.windProjectiles;
-            }
-        }
-        //console.log(this.slowed);
-        if (this.slowed || this.slowCountdown > 0) {
-            this.speed /= 2;
-            ProtectorBullet.slowed=true;
-        }
-        else{
-            ProtectorBullet.slowed=false;
-        }
-        if (timeWarpCounter > 0) {
-            this.speed *= 2;
-        }
-        if (movingUp && movingLeft) {
-            this.y -= this.speed / 1.4142;
-            this.x -= this.speed / 1.4142;
-        }
-        else if (movingUp && movingRight) {
-            this.y -= this.speed / 1.4142;
-            this.x += this.speed / 1.4142;
-        }
-        else if (movingDown && movingRight) {
-            this.y += this.speed / 1.4142;
-            this.x += this.speed / 1.4142;
-        }
-        else if (movingDown && movingLeft) {
-            this.y += this.speed / 1.4142;
-            this.x -= this.speed / 1.4142;
-        }
-        else {
-            if (movingUp) {
-                this.y -= this.speed;
-            }
-            if (movingDown) {
-                this.y += this.speed;
-            }
-            if (movingRight) {
-                this.x += this.speed;
-            }
-            if (movingLeft) {
-                this.x -= this.speed;
-            }
-        }
-        this.x += this.accelerationX;
-        this.y += this.accelerationY;
-
-        if (this.x < leftBorder) this.x = leftBorder;
-        if (this.y < topBorder) this.y = topBorder;
-        if (this.x > rightBorder) this.x = rightBorder;
-        if (this.y > bottomBorder) this.y = bottomBorder;
-        if (this.slowed || this.slowCountdown > 0) this.speed *= 2;
-        if (timeWarpCounter > 0) {
-            this.speed /= 2;
-        }
-        if (this.passiveHealingTimer <= 0 && this.passiveHealing > 0) {
-            this.passiveHealingTimer = 300;
-
-            this.Heal(this.passiveHealing);
-        }
-        this.Timers();
-    }
-    Timers() {
-        this.frostProjectileCooldown--;
-        this.slowCountdown--;
-        this.bulletCooldown--;
-        this.bombTimer--;
-        this.timeWarpTimer--;
-        this.redTimer--;
-        this.passiveHealingTimer--;
-        this.rebirthTimer--;
-        this.windProjectileCooldown--;
-        this.accelerationX /= 1.05;
-        this.accelerationY /= 1.05;
-
-    }
-    AddForce(x, y) {
-        this.accelerationX += x;
-        this.accelerationY += y;
-    }
-    draw() {
-        if (this.dead) return;
-        ctx.save();
-        if (this.rebirthTimer > 0) {
-            ctx.globalCompositeOperation = 'source-over';
-            ctx.filter = 'brightness(500%)';
-            ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
-        }
-        else if(this.healTimer>0){
-            ctx.globalCompositeOperation = 'source-over';
-            ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
-            ctx.globalCompositeOperation = 'multiply';
-            ctx.fillStyle = 'lime';
-            ctx.fillRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
-        }
-        else if (this.redTimer > 0) {
-            ctx.globalCompositeOperation = 'source-over';
-            ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
-            ctx.globalCompositeOperation = 'multiply';
-            ctx.fillStyle = 'rgba(84, 0, 0, 0.6)';
-            ctx.fillRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
-        }
-        else if (this.slowCountdown > 0 || this.slowed==true) {
-            ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
-            ctx.globalCompositeOperation = 'multiply';
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-            ctx.fillRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
-        }
-        else {
-            ctx.drawImage(this.image, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
-        }
-
-        ctx.restore();
-    }
-    Heal(amount){
-        amount*=this.healMultiplier;
-        this.health = Math.min(this.maxHealth, this.health+amount);
-        floatingObjects.push(new FloatingObject(this.x-this.width/2+Math.random()*this.width,this.y,amount,"green"));
-
-    }
-    GainXP(amount){
-        if(gamemode==4)return;
-        this.currentExp+=amount*this.xpMultiplier;
-    }
-}
-class BasicPlayer extends Player{
-    constructor(){
-        super();
-        this.image.src="images/player.webp";
-    }
-    act(){
-        if (this.bulletCooldown <= 0) {
-            this.bulletCooldown = this.attackSpeed;
-            this.Attack();
-        }
-        super.act();
-    }
-    Attack(){
-        
-        let angle = 0;
-        for (let i = 0; i < this.projectiles; i++) {
-            let temp=new Bullet(10 * Math.cos(angle), 10 * Math.sin(angle), this.damage);
-            bullets[bullets.length] = temp;
-            angle += 2 * Math.PI / this.projectiles;
-        }
-    }
-}
-class TankPlayer extends Player{
-    constructor(){
-        super();
-        this.width=65;
-        this.height=65;
-        this.speed=3.5;
-        this.health=35;
-        this.maxHealth=35;
-        this.attackSpeed=70;
-        this.nextLevel=120;
-        this.damage=2;
-        this.image.src="images/tankPlayer.webp";
-        this.normalImage="images/tankPlayer.webp";
-        this.mirroredImage="images/tankPlayerMirrored.webp";
-        this.shieldTimer=1800;
-    }
-    act(){
-        if (this.bulletCooldown <= 0) {
-            this.bulletCooldown = this.attackSpeed;
-            this.Attack();
-        }
-        if(movingLeft){
-            this.image.src=this.normalImage;
-        }
-        else if(movingRight){
-            this.image.src=this.mirroredImage;
-        }
-        this.shieldTimer--;
-        if(this.shieldTimer<=0){
-            if(boughtUpgrades[14]==0){
-                bullets.push(new PlayerShield());
-                boughtUpgrades[14]=1;
-            }
-            else{
-                playerShield.health=playerShield.maxHealth;
-                shieldBar.Update();
-            }
-            this.shieldTimer=1800;
-        }
-        super.act();
-    }
-    Attack(){
-        
-        let angle = 0;
-        for (let i = 0; i < this.projectiles; i++) {
-            bullets[bullets.length] = new Bullet(10 * Math.cos(angle), 10 * Math.sin(angle), this.damage);
-            angle += 2 * Math.PI / this.projectiles;
-        }
-    }
-}
-class HealerPlayer extends Player{
-    constructor(){
-        super();
-        this.speed=4.5;
-        this.health=12;
-        this.maxHealth=12;
-        this.attackSpeed=70;
-        this.nextLevel=100;
-        this.damage=1;
-        this.passiveHealing=1;
-        this.siphon=0.25;
-        this.healMultiplier=2;
-        this.normalMode="images/healerPlayer.webp";
-        this.image.src=this.normalMode;
-    }
-    act(){
-        if (this.bulletCooldown <= 0) {
-            this.bulletCooldown = this.attackSpeed;
-            this.Attack();
-        }
-        super.act();
-    }
-    Attack(){
-        
-        let angle = 0;
-        for (let i = 0; i < this.projectiles; i++) {
-            bullets[bullets.length] = new Bullet(10 * Math.cos(angle), 10 * Math.sin(angle), this.damage);
-            angle += 2 * Math.PI / this.projectiles;
-        }
-    }
-    takeDamage(damage, bullet) {
-        if(playerShield!=null){
-            playerShield.takeDamage(damage);
-            return;
-        }
-        damage *= this.damageTakenMultiplier;
-        this.health -= damage;
-        this.GainXP(10*damage);
-        
-        //console.log(this.health);
-        floatingObjects.push(new FloatingObject(this.x-this.width/2+Math.random()*this.width,this.y,damage,"red"));
-
-        if (this.health <= 0) {
-            EndGame(false);
-        }
-        if (bullet.frostbite) {
-            this.slowCountdown = 120;
-        }
-        this.redTimer = 10;
-    }
-}
-class MagePlayer extends Player{
-    //1=fire mode, 2=ice mode, 3=air mode
-    constructor(){
-        super();
-        this.health=10;
-        this.maxHealth=10;
-        this.attackSpeed=5;
-        this.mode=1;
-        
-        boughtUpgrades[0]=1;
-        boughtUpgrades[2]=1;
-        boughtUpgrades[11]=1;
-        boughtTier2Upgrades[0]=1;
-        boughtTier2Upgrades[2]=1;
-        boughtUpgrades[17]=0;
-        boughtUpgrades[18]=0;
-        boughtUpgrades[20]=0;
-        boughtUpgrades[22]=0;
-        this.fireDamage=0.5;
-        this.tornadoDamage=0;
-        new ChangeModeIcon(50);
-        this.image.src="images/magePlayer.webp";
-    }
-    act(){
-        if (this.bulletCooldown <= 0) {
-            this.bulletCooldown = this.attackSpeed*this.attackSpeedMultiplier;
-            this.Attack();
-        }
-        super.act();
-    }
-    Attack(){
-        if(this.mode==1){
-            if (enemies.length > 0) {
-                let closestEnemy = -1;
-                let enemyDist = 999999;
-                for (let i = 0; i < enemies.length; i++) {
-                    let newDist = Math.hypot(Math.abs(enemies[i].x - this.x), Math.abs(enemies[i].y - this.y));
-                    if (newDist < enemyDist && enemies[i].ignoreBullets == false) {
-                        enemyDist = newDist;
-                        closestEnemy = i;
-                    }
-                }
-                if (closestEnemy != -1) {
-                    let distanceX = enemies[closestEnemy].x - this.x;
-                    let distanceY = enemies[closestEnemy].y-this.y;
-                    let distance=distanceX * distanceX + distanceY * distanceY;
-                    let vx = 0;
-                    let vy = 0;
-
-                    if (distance > 0) {
-                        let angle = Math.atan2(distanceY, distanceX);
-                        angle += Math.random()*1.2 - 0.6;
-                        vx = 7 * Math.cos(angle);
-                        vy = 7 * Math.sin(angle);
-                    }
-                    bullets[bullets.length] = new PlayerFire(vx, vy, this.fireDamage);
-                }
-
-            }
-
-        
-        }
-        else if(this.mode==2){
-            let angle = 0;
-            
-            for (let i = 0; i < 4; i++) {
-                let temp=new FrostBullet(10 * Math.cos(angle), 10 * Math.sin(angle), this.damage);
-                temp.image.src="images/playerIceBullet.webp"
-                temp.width=30;
-                temp.height=30;
-                temp.width*=player.projectileSizeMultiplier;
-                temp.height*=player.projectileSizeMultiplier;
-                bullets[bullets.length] = temp;
-                angle += 2 * Math.PI / 4;
-            }
-        }
-        else if(this.mode==3){
-            let angle = Math.PI/4;
-            for (let i = 0; i < this.projectiles; i++) {
-                let temp=new WindBullet(10 * Math.cos(angle), 10 * Math.sin(angle), this.tornadoDamage);
-                bullets[bullets.length] = temp;
-                angle += 2 * Math.PI / this.projectiles;
-            }
-        }
-    }
-}
-class NecromancerPlayer extends Player{
-    constructor(){
-        super();
-        this.image.src="images/necromancerPlayer.webp";
-        this.health=8;
-        this.maxHealth=8;
-        this.attackSpeed=60;
-        this.damage=1;
-        this.summonQueue=[];
-        this.isSummoning=false;
-        this.summoningCooldown=0;
-        this.passiveSpawning=false;
-        this.passiveSpawnCooldown=0;
-        boughtUpgrades[19]=0;
-        new NecromancyIcon(50);
-    }
-    act(){
-        if (this.bulletCooldown <= 0) {
-            this.bulletCooldown = this.attackSpeed;
-            this.Attack();
-        }
-        if(this.isSummoning){
-            this.summoningCooldown--;
-            if(this.summoningCooldown<=0){
-                this.summoningCooldown=25;
-                if(this.summonQueue.length>0){
-                    let temp=this.summonQueue[0];
-                    temp.x=player.x;
-                    temp.y=player.y;
-                    bullets.push(temp);
-                    this.summonQueue.splice(0,1);
-                }
-                else{
-                    this.isSummoning=false;
-                    this.summoningCooldown=0;
-                }
-            }
-        }
-        this.passiveSpawnCooldown--;
-        if(this.passiveSpawning && this.passiveSpawnCooldown<=0){
-            this.passiveSpawnCooldown=180;
-            let tempImage=new Image();
-            tempImage.src="images/enemy.webp";
-            let temp=new SummonedEnemy(2,3,50,tempImage);
-            temp.x=player.x;
-            temp.y=player.y;
-            bullets.push(temp);
-        }
-    
-        super.act();
-    }
-    Summon(){
-        this.isSummoning=true;
-    }
-    Attack(){
-        
-        let angle = 0;
-        for (let i = 0; i < this.projectiles; i++) {
-            let temp=new Bullet(10 * Math.cos(angle), 10 * Math.sin(angle), this.damage);
-            bullets[bullets.length] = temp;
-            angle += 2 * Math.PI / this.projectiles;
-        }
-    }
-}
-class PheonixPlayer extends Player{
-    //has 10 revives but has low base health that cannot be increased
-    constructor(){
-        super();
-        this.width=50;
-        this.height=50;
-        this.speed=6;
-        this.health=6;
-        this.maxHealth=6;
-        this.attackSpeed=75;
-        this.nextLevel=150;
-        this.damage=1;
-        this.rebirth=1;
-        this.image.src="images/pheonixPlayer.webp"
-        new RebirthsIcon(50);
-        boughtUpgrades[1]=1;
-        boughtTier2Upgrades[1]=1;
-    }
-    act(){
-        this.maxHealth=6;
-        document.getElementById("pheonixText").textContent="x"+this.rebirth;
-        if (this.bulletCooldown <= 0) {
-            this.bulletCooldown = this.attackSpeed;
-            this.Attack();
-        }
-        super.act();
-    }
-    Attack(){
-        
-        let angle = 0;
-        for (let i = 0; i < this.projectiles; i++) {
-            let temp=new PiercingBullet(10 * Math.cos(angle), 10 * Math.sin(angle), this.damage);
-            bullets[bullets.length] = temp;
-            angle += 2 * Math.PI / this.projectiles;
-        }
-    }
-}
 
 
 //Tier 1: Enemy, ShooterEnemy, AimingEnemy, HomingEnemy
@@ -5147,7 +4614,7 @@ const worldDiv = document.getElementById("world");
 function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Boss) {
     bossesLeft = numTier1Boss+numTier2Boss;
     let tier1 = [1, 2, 3, 4, 5, 6];
-    let tier2 = [1, 2, 3, 4, 5, 6];
+    let tier2 = [1, 2, 3, 4, 5, 6, 7];
     let tier3 = [1, 2, 3, 4, 5, 6, 7];
     let tier1Bosses = [1, 2, 3, 4, 5];
     let tier2Bosses = [1, 2, 3];
@@ -5259,6 +4726,14 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                     isPlayerUnlocked.push(false);
                 }
                 break;
+            case 7:
+                TeleporterEnemy.isActive = true;
+                if (!TeleporterEnemy.seen) {
+                    TeleporterEnemy.seen = true;
+                    newEnemyQueue.push("images/teleporterEnemy.webp");
+                    isPlayerUnlocked.push(false);
+                }
+                break;
         }
     }
     for (let i = 0; i < numTier3; i++) {
@@ -5351,7 +4826,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 enemies[enemies.length] = boss;
                 break;
             case 4:
-                boss = new MageBoss(2, 100, true);
+                boss = new MageBoss(2.5, 100, true);
                 if (!MageBoss.seen) {
                     MageBoss.seen = true;
                     newEnemyQueue.push("images/mageWaterMode.webp");
@@ -5457,6 +4932,12 @@ function InitializeStats(){
     HomingEnemy.health=2;
     HomingEnemy.speed=1;
     
+    TeleporterEnemy.baseTimer=800;
+    TeleporterEnemy.randomTimer=500;
+    TeleporterEnemy.index=19;
+    TeleporterEnemy.health=9;
+    TeleporterEnemy.speed=2;
+
     ShieldEnemy.baseTimer=900;
     ShieldEnemy.randomTimer=750;
     ShieldEnemy.index=6;
@@ -5540,7 +5021,7 @@ function InitializeStats(){
     SplitterEnemy.index=18;
     SplitterEnemy.health=15;
     SplitterEnemy.speed=1.5;
-    SplitterEnemy.isActive=true;
+    
 }
 
 function loop() {
@@ -5561,6 +5042,7 @@ function loop() {
 }
 function GameLogic() {
     //console.log("test");
+    timeWarpCounter--;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     if (timeWarpCounter > 0) {
@@ -5591,94 +5073,11 @@ function GameLogic() {
     ctx.drawImage(background, -50+leftBorder, -50+topBorder, rightBorder-leftBorder+100, bottomBorder-topBorder+100);
     if(gameOver==false){
         player.act();
-        SpawnEnemies();
-
-        if (!(gamemode==0 && player.level<2) && xpBagTimer < 0) {
-            xpBagTimer = Math.random() * 200 + 200;
-            xpBagTimer /= 1 + timeElapsed * 0.0003;
-            const newCollectable = new XPBag(Math.random() * (canvas.width - canvas.width / 10) + canvas.width / 20, Math.random() * (canvas.height - canvas.height / 10) + canvas.height / 20);
-            collectables.push(newCollectable);
-            //console.log(newEnemy.health);
-        }
-        if (!(gamemode==0 && player.level<2) && healthPotionSpawnTimer < 0 ) {
-            healthPotionSpawnTimer = Math.random() * 300 + 450;
-            healthPotionSpawnTimer /= 1 + timeElapsed * 0.0003;
-            healthPotionSpawnTimer*=healthPotionSpawnMultiplier;
-            const newCollectable = new HealthPotion(Math.random() * (canvas.width - canvas.width / 10) + canvas.width / 20, Math.random() * (canvas.height - canvas.height / 10) + canvas.height / 20);
-            collectables.push(newCollectable);
-            //console.log(newEnemy.health);
-        }
-        for(let i=mapObjects.length-1;i>=0;i--){
-            mapObjects[i].act();
-        }
-        for (let i = bullets.length - 1; i >= 0; i--) {
-            bullets[i].move();
-            if (bullets[i].dead) {
-                bullets.splice(i, 1);
-            }
-        }
-        for (let i = enemies.length - 1; i >= 0; i--) {
-            if (enemies[i].dead) {
-                if (enemies[i].giveXP) {
-                    player.GainXP(enemies[i].value);
-                    if(!enemies[i].isBoss && chosenCharacter==5){
-                        player.summonQueue.push(new SummonedEnemy(enemies[i].speed, Math.ceil(enemies[i].maxHealth*0.5), enemies[i].width, enemies[i].image))
-                    }
-                }
-                if (enemies[i].isBoss) {
-                    enemies[i].bossBar.image1.remove();
-                    enemies[i].bossBar.image2.remove();
-                    enemies[i].bossText.remove();
-                    bossesLeft--;
-                    if (bossesLeft == 0) {
-                        if(currentWave==3 || currentWave==5 || currentWave==7){
-                            killedBoss=true;
-                        }
-                        ChangeWave();
-                    }
-                }
-                enemies.splice(i, 1);
-            }
-            else {
-                //console.log(enemies[i]);
-                enemies[i].move();
-                enemies[i].CheckForCramming();
-                enemies[i].special();
-                if (enemies[i].dead) {
-                    if (enemies[i].giveXP) {
-                        player.GainXP(enemies[i].value);
-                    }
-                    enemies.splice(i, 1);
-                }
-            }
-        }
-        for (let i = enemyBullets.length - 1; i >= 0; i--) {
-            enemyBullets[i].move();
-            enemyBullets[i].special();
-            if (enemyBullets[i].dead) {
-                enemyBullets.splice(i, 1);
-            }
-
-        }
-        for (let i = collectables.length - 1; i >= 0; i--) {
-            collectables[i].act();
-            if (collectables[i].dead) {
-                collectables.splice(i, 1);
-            }
-        }
-        for (let i = floatingObjects.length - 1; i >= 0; i--) {
-            floatingObjects[i].move();
-            if (floatingObjects[i].dead) {
-                floatingObjects.splice(i, 1);
-            }
-        }
-        for (let i = playerAbilities.length - 1; i >= 0; i--) {
-            playerAbilities[i].timer();
-        }
+        Actions();
+        
     }
     ctx.fillStyle="black"
 
-    LavaTerrain.timer();
     for(let i=mapObjects.length-1;i>=0;i--){
         mapObjects[i].draw();
     }
@@ -5698,16 +5097,15 @@ function GameLogic() {
     for (let i = floatingObjects.length - 1; i >= 0; i--) {
         floatingObjects[i].draw();
     }
-    if(gameOver==false){
+    if(gameOver==false && !(timeWarpCounter>0 && TimeWarpIcon.version==1)){
         if (!isBossWave && timeElapsed >= waveTimer && !(gamemode==0 && TutorialText.canChangeWave==false)) {
             ChangeWave();
         }
-        if (newEnemyQueue.length > 0 && gamemode!=0) {
+        if (newEnemyQueue.length > 0 && gamemode!=0 && currentPage=="gamePage") {
             ChangePage("newEnemyPage");
         }
         xpBagTimer--;
         healthPotionSpawnTimer--;
-        timeWarpCounter--;
         if(timeElapsed<7200 || !isBossWave){
             timeElapsed++;
         }
@@ -5746,6 +5144,113 @@ function GameLogic() {
 
 
 }
+function Actions(){
+    
+    SpawnEnemies();
+
+    for (let i = bullets.length - 1; i >= 0; i--) {
+        bullets[i].move();
+        if (bullets[i].dead) {
+            bullets.splice(i, 1);
+        }
+    }
+    if((timeWarpCounter>0 && TimeWarpIcon.version==1)){
+        return;
+    }
+    if (!(gamemode==0 && player.level<2) && xpBagTimer < 0) {
+        xpBagTimer = Math.random() * 200 + 200;
+        xpBagTimer /= 1 + timeElapsed * 0.0003;
+        const newCollectable = new XPBag(Math.random() * (canvas.width - canvas.width / 10) + canvas.width / 20, Math.random() * (canvas.height - canvas.height / 10) + canvas.height / 20);
+        collectables.push(newCollectable);
+        //console.log(newEnemy.health);
+    }
+    if (!(gamemode==0 && player.level<2) && healthPotionSpawnTimer < 0 ) {
+        healthPotionSpawnTimer = Math.random() * 300 + 450;
+        healthPotionSpawnTimer /= 1 + timeElapsed * 0.0003;
+        healthPotionSpawnTimer*=healthPotionSpawnMultiplier;
+        const newCollectable = new HealthPotion(Math.random() * (canvas.width - canvas.width / 10) + canvas.width / 20, Math.random() * (canvas.height - canvas.height / 10) + canvas.height / 20);
+        collectables.push(newCollectable);
+        //console.log(newEnemy.health);
+    }
+    for(let i=mapObjects.length-1;i>=0;i--){
+        mapObjects[i].act();
+    }
+    for (let i = enemies.length - 1; i >= 0; i--) {
+        if (enemies[i].dead) {
+            if (enemies[i].giveXP) {
+                player.GainXP(enemies[i].value);
+                if(!enemies[i].isBoss && chosenCharacter==5){
+                    player.summonQueue.push(new SummonedEnemy(enemies[i].speed, Math.ceil(enemies[i].maxHealth*0.5), enemies[i].width, enemies[i].image))
+                }
+            }
+            if (enemies[i].isBoss) {
+                let index=0;
+                enemies[i].bossText.remove();
+                for(let j=bossBars.length-1;j>=0;j--){
+                    if(bossBars[j].owner.dead==true){
+                        index=j;
+                        bossBars[j].image1.remove();
+                        bossBars[j].image2.remove();
+                        bossBars.splice(j, 1);
+                    }
+                }
+                for(let j=index;j<bossBars.length;j++){
+                    bossBars[j].image1.style.top=(parseInt(bossBars[j].image1.style.top)-75)+"px";
+                    bossBars[j].image2.style.top=(parseInt(bossBars[j].image2.style.top)-75)+"px";
+
+                }
+                bossTexts = document.querySelectorAll('[id$="bossText"]');
+                for (let j = index; j < bossTexts.length; j++) {
+                    bossTexts[j].style.top=(parseInt(bossTexts[j].style.top)-75)+"px";
+                }
+                bossesLeft--;
+                if (bossesLeft == 0) {
+                    if(currentWave==3 || currentWave==5 || currentWave==7){
+                        killedBoss=true;
+                    }
+                    ChangeWave();
+                }
+            }
+            enemies.splice(i, 1);
+        }
+        else {
+            //console.log(enemies[i]);
+            enemies[i].move();
+            enemies[i].CheckForCramming();
+            enemies[i].special();
+            if (enemies[i].dead) {
+                if (enemies[i].giveXP) {
+                    player.GainXP(enemies[i].value);
+                }
+                enemies.splice(i, 1);
+            }
+        }
+    }
+    for (let i = enemyBullets.length - 1; i >= 0; i--) {
+        enemyBullets[i].move();
+        enemyBullets[i].special();
+        if (enemyBullets[i].dead) {
+            enemyBullets.splice(i, 1);
+        }
+
+    }
+    for (let i = collectables.length - 1; i >= 0; i--) {
+        collectables[i].act();
+        if (collectables[i].dead) {
+            collectables.splice(i, 1);
+        }
+    }
+    for (let i = floatingObjects.length - 1; i >= 0; i--) {
+        floatingObjects[i].move();
+        if (floatingObjects[i].dead) {
+            floatingObjects.splice(i, 1);
+        }
+    }
+    for (let i = playerAbilities.length - 1; i >= 0; i--) {
+        playerAbilities[i].timer();
+    }
+    LavaTerrain.timer();
+}
 function SpawnEnemies() {
     if(gamemode==0 && currentWave==1 && timeElapsed<=840){
         return;
@@ -5761,7 +5266,6 @@ function ChangeWave() {
     currentWave++;
     waveText.Update();
     timeElapsed = 0;
-    bossBars = new Array();
     switch (currentWave) {
         case 2:
             if(gamemode==0){
@@ -5850,6 +5354,10 @@ function ChangeWave() {
         mapObjects.push(new Wall(-55+leftBorder, -25+topBorder, 30,(bottomBorder-topBorder)+80));
         mapObjects.push(new Wall(rightBorder+25, -25+topBorder, 30, (bottomBorder-topBorder)+70));
         CreateTiles();
+    }
+    else if(gamemode==5){
+        upgradingEnemy=true;
+        ChangePage("upgradePage", false);
     }
     SCALE*=scaleMultiplier
     originalScale=SCALE;
@@ -6097,6 +5605,10 @@ function ChangePage(id, reset) {
             images[26].src="images/splitterEnemy.webp";
             images[26].style.pointerEvents="auto";
         }
+        if(TeleporterEnemy.seen){
+            images[27].src="images/teleporterEnemy.webp";
+            images[27].style.pointerEvents="auto";
+        }
     }
     if (id == "gamePage") {
         if(choice1){
@@ -6104,6 +5616,9 @@ function ChangePage(id, reset) {
         }
         if(choice2){
             choice2.remove();
+        }
+        if(choice3){
+            choice3.remove();
         }
         if (reset) Start();
         else {
@@ -6115,34 +5630,68 @@ function ChangePage(id, reset) {
         paused = true;
         choice1 = document.createElement("div");
         choice2 = document.createElement("div");
-        if(killedBoss==false){
+        choice3 = document.createElement("div");
+        if(upgradingEnemy==true){
+            document.getElementById("upgradeText").style.color="red";
+            document.getElementById('upgradeText').textContent="Pick Your Poison";
+            Enemy.healthMultiplier=1;
+            Enemy.speedMultiplier=1;
+            player.slowCountdown=0;
+            if(player.maxHealthHalved){
+                player.maxHealth=player.originalMaxHealth;
+                player.maxHealthHalved=false;
+                player.healMultiplier*=2;
+            }
+            player.canHeal=true;
+            player.constantDamageAmount=0;
+            let randomNum = Math.floor(Math.random() * NUMENEMYUPGRADES);
+            choice1.innerHTML=`<button onmouseover="this.style.backgroundColor='#65000B'" onmouseout="this.style.backgroundColor='#9B111E'" onclick="${ENEMYUPGRADES[randomNum].onclick}" style="position:absolute;left:${screen.width/2-200}px;transform:translateX(-50%);top:30%;width:15%;height:30%;z-index:3;background-color:#9B111E; font-size:150%;font-family:'black ops one'" id="upgrade">${ENEMYUPGRADES[randomNum].text}</button>`;
+
+            let randomNum2 = Math.floor(Math.random() * NUMENEMYUPGRADES);
+            while (randomNum == randomNum2) {
+                randomNum2 = Math.floor(Math.random() * NUMENEMYUPGRADES);
+            }
+            choice2.innerHTML=`<button onmouseover="this.style.backgroundColor='#65000B'" onmouseout="this.style.backgroundColor='#9B111E'" onclick="${ENEMYUPGRADES[randomNum2].onclick}" style="position:absolute;left:${screen.width/2+200}px;transform:translateX(-50%);top:30%;width:15%;height:30%;z-index:3;background-color:#9B111E; font-size:150%;font-family:'black ops one'" id="upgrade">${ENEMYUPGRADES[randomNum2].text}</button>`;
+            isLevelling=false;
+            upgradingEnemy=false;
+        }
+        else if(killedBoss==false){
             document.getElementById("upgradeText").style.color="white";
+            document.getElementById('upgradeText').textContent="Choose Your Upgrade";
             let randomNum = Math.floor(Math.random() * NUMUPGRADES);
             while (boughtUpgrades[randomNum] == 1) {
                 randomNum = Math.floor(Math.random() * NUMUPGRADES);
             }
-            choice1.innerHTML=`<button onclick="${UPGRADES[randomNum].onclick}" style="position:absolute;left:${canvas.width/2-400}px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">${UPGRADES[randomNum].text}</button>`;
+            choice1.innerHTML=`<button onmouseover="this.style.backgroundColor='#00CCFF'" onmouseout="this.style.backgroundColor='cyan'" onclick="${UPGRADES[randomNum].onclick}" style="position:absolute;left:${screen.width/2-400}px;transform:translateX(-50%);top:30%;width:15%;height:30%;z-index:3;background-color:cyan; font-size:150%;font-family:'black ops one'" id="upgrade">${UPGRADES[randomNum].text}</button>`;
 
             let randomNum2 = Math.floor(Math.random() * NUMUPGRADES);
             while (randomNum == randomNum2 || boughtUpgrades[randomNum2] == 1) {
                 randomNum2 = Math.floor(Math.random() * NUMUPGRADES);
             }
-            choice2.innerHTML=`<button onclick="${UPGRADES[randomNum2].onclick}" style="position:absolute;left:${canvas.width/2}px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">${UPGRADES[randomNum2].text}</button>`;
+            choice2.innerHTML=`<button onmouseover="this.style.backgroundColor='#00CCFF'" onmouseout="this.style.backgroundColor='cyan'" onclick="${UPGRADES[randomNum2].onclick}" style="position:absolute;left:${screen.width/2}px;transform:translateX(-50%);top:30%;width:15%;height:30%;z-index:3;background-color:cyan; font-size:150%;font-family:'black ops one'" id="upgrade">${UPGRADES[randomNum2].text}</button>`;
+            
+            let randomNum3 = Math.floor(Math.random() * NUMUPGRADES);
+            while (randomNum == randomNum3 || randomNum3==randomNum2 || boughtUpgrades[randomNum3] == 1) {
+                randomNum3 = Math.floor(Math.random() * NUMUPGRADES);
+            }
+            choice3.innerHTML=`<button onmouseover="this.style.backgroundColor='#00CCFF'" onmouseout="this.style.backgroundColor='cyan'" onclick="${UPGRADES[randomNum3].onclick}" style="position:absolute;left:${screen.width/2+400}px;transform:translateX(-50%);top:30%;width:15%;height:30%;z-index:3;background-color:cyan; font-size:150%;font-family:'black ops one'" id="upgrade">${UPGRADES[randomNum3].text}</button>`;
+            document.body.appendChild(choice3);
             isLevelling=false;
         }
         else{
             document.getElementById("upgradeText").style.color="yellow";
+            document.getElementById('upgradeText').textContent="Choose Your Upgrade";
             let randomNum = Math.floor(Math.random() * NUMTIER2UPGRADES);
             while (boughtTier2Upgrades[randomNum] == 1) {
                 randomNum = Math.floor(Math.random() * NUMTIER2UPGRADES);
             }
-            choice1.innerHTML=`<button onclick="${TIER2UPGRADES[randomNum].onclick}" style="position:absolute;left:${canvas.width/2-400}px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">${TIER2UPGRADES[randomNum].text}</button>`;
+            choice1.innerHTML=`<button onmouseover="this.style.backgroundColor='#E4D00A'" onmouseout="this.style.backgroundColor='yellow'" onclick="${TIER2UPGRADES[randomNum].onclick}" style="position:absolute;left:${screen.width/2-200}px;transform:translateX(-50%);top:30%;width:15%;height:30%;z-index:3;background-color:yellow; font-size:150%;font-family:'black ops one'" id="upgrade">${TIER2UPGRADES[randomNum].text}</button>`;
 
             let randomNum2 = Math.floor(Math.random() * NUMTIER2UPGRADES);
             while (randomNum == randomNum2 || boughtTier2Upgrades[randomNum2] == 1) {
                 randomNum2 = Math.floor(Math.random() * NUMTIER2UPGRADES);
             }
-            choice2.innerHTML=`<button onclick="${TIER2UPGRADES[randomNum2].onclick}" style="position:absolute;left:${canvas.width/2}px; transform:translateX(-50%); top:120px; z-index:3" id="upgrade">${TIER2UPGRADES[randomNum2].text}</button>`;
+            choice2.innerHTML=`<button onmouseover="this.style.backgroundColor='#E4D00A'" onmouseout="this.style.backgroundColor='yellow'" onclick="${TIER2UPGRADES[randomNum2].onclick}" style="position:absolute;left:${screen.width/2+200}px;transform:translateX(-50%);top:30%;width:15%;height:30%;z-index:3;background-color:yellow; font-size:150%;font-family:'black ops one'" id="upgrade">${TIER2UPGRADES[randomNum2].text}</button>`;
             killedBoss=false;
         }
         document.body.appendChild(choice1);
@@ -6161,8 +5710,6 @@ async function EndGame(win) {
         return;
     }
     if(win){
-        enemies=[];
-        enemyBullets=[];
         await delay(1500);
     }
     else{
@@ -6185,6 +5732,9 @@ async function EndGame(win) {
     if(document.getElementById("pheonixText")){
         document.getElementById("pheonixText").remove()
     }
+    if(document.getElementById("modifierText")){
+        document.getElementById("modifierText").remove();
+    }
     for(let i=0;i<bossBars.length;i++){
         bossBars[i].image1.remove();
         bossBars[i].image2.remove();
@@ -6204,11 +5754,18 @@ async function EndGame(win) {
     chosenCharacter=0;
     let descriptionText=document.getElementById("descriptionText");
     descriptionText.innerText="";
+    let gamemodeDescriptionText=document.getElementById("gamemodeDescriptionText");
+    gamemodeDescriptionText.innerText="";
     list = document.querySelectorAll('[id$="Player"]');
     for (let i = 0; i < list.length; i++) {
         list[i].style.border = "";
     }
+    list = document.querySelectorAll('[id$="gamemodeSelectionButton"]');
+    for (let i = 0; i < list.length; i++) {
+        list[i].style.border = "";
+    }
     document.getElementById("startButton").disabled = true; 
+    document.getElementById("difficultyConfirmationButton").disabled=true;
 
     if(win==true){
         ChangePage("winPage",true);

@@ -56,7 +56,7 @@ class Wall{
         }
     }
     draw(){
-        ctx.fillStyle="black";
+        ctx.fillStyle="#4A4A4A";
         ctx.fillRect(this.x, this.y, this.width, this.height);
 
     }

@@ -15,7 +15,7 @@ let waveTimer=0;
 let isBossWave=false;
 let movingLeft, movingRight, movingUp, movingDown=false;
 let page="gamePage";
-let healthBar, levellingBar, bossBars, boss, waveText, background, gambleText, choice1, choice2, shieldBar, playerShield;
+let healthBar, levellingBar, bossBars, boss, waveText, background, gambleText, choice1, choice2, choice3, shieldBar, playerShield;
 let xpBagTimer=Math.random()*200+200;
 let timeElapsed=0;
 let mouseX=0;
@@ -23,8 +23,11 @@ let mouseY=0;
 let currentWave=0;
 let SCALE=0.001;
 let continueFlag=false;
-const NUMUPGRADES=25;
+let speedMultiplier=0;
+let upgradingEnemy=false;
+const NUMUPGRADES=26;
 const NUMTIER2UPGRADES=9;
+const NUMENEMYUPGRADES=8;
 let boughtUpgrades=new Array(NUMUPGRADES);
 for(let i=0;i<boughtUpgrades.length;i++){
     boughtUpgrades[i]=0;
@@ -55,10 +58,11 @@ let UPGRADES = [
     { onclick: "IncreaseFireDamage(0.25)",  text: "+0.25 Fire Damage" },
     { onclick: "PassiveSpawns()",  text: "Passively Spawn Souls" },
     { onclick: "IncreaseTornadoDamage(0.5)",  text: "+0.5 Tornado Damage" },
-    { onclick: "AddSpeed(2)",     text: "+2 Speed" },
+    { onclick: "AddSpeed(2)",     text: "Increase Movement Speed" },
     { onclick: "IncreaseSlowedDamage(2)",     text: "Slowed Enemies Take 2x Damage" },
     { onclick: "IncreaseBombDamage(4)",     text: "+4 Bomb Damage" },
     { onclick: "IncreaseLaserDamage(0.5)",   text: "+0.5 Laser Damage" },
+    { onclick: "AddTimeStop()",   text: "Speed Burst -> Time Stop" },
 
 ];
 let TIER2UPGRADES=[
@@ -72,7 +76,17 @@ let TIER2UPGRADES=[
     { onclick: "AddRebirth(1)",   text: "Rebirth On Death" },
     { onclick: "AddWindAttack(2)",   text: "+2 Tornado Projectiles" },
 ]
-
+let ENEMYUPGRADES=[
+    { onclick: "IncreaseEnemyHealth(1.5)",        text: "Healthier Enemies" },
+    { onclick: "IncreaseEnemySpeed(1.5)",    text: "Faster Enemies" },
+    { onclick: "SpawnBoss()",   text: "Spawn a Random Boss with half HP" },
+    { onclick: "HalveMaxHealth()",   text: "Max Health and Healing Both Get Halved" },
+    { onclick: "SlowPlayer()",   text: "Player is Slowed Until Next Wave" },
+    { onclick: "RemoveHealing()",   text: "No Healing" },
+    { onclick: "AddConstantDamage()",   text: "Player Takes 1 Damage every 4 Seconds" },
+    { onclick: "IncreaseScale(2)",   text: "Next Wave has 2x More Enemies" },
+]
+const RESTRICTEDUPGRADES=[17, 18, 19, 20, 22, 23, 24, 25]
 let timeWarpCounter=0;
 let gambleTimer=0;
 let gambleChoice=0;
@@ -259,7 +273,33 @@ function SelectMode(mode){
         chosenCharacter=1;
         Commence();
     }
-    else ChangePage('difficultyPage', false)
+    else if(mode==1){
+        ChangePage("difficultyPage", false);
+    }
+    else{
+        
+        gamemodes = document.querySelectorAll('[id$="gamemodeSelectionButton"]');
+        for (let i = 0; i < gamemodes.length; i++) {
+            gamemodes[i].style.border="";
+        }
+        switch(mode){
+            case 2:
+                document.getElementById("gamemodeDescriptionText").innerText="The map border is large, but shrinks as the wave goes on."
+                break;
+            case 3:
+                document.getElementById("gamemodeDescriptionText").innerText="Three types of harmful terrain are added: Water, Magma, Lava. There is also a rare terrain that heals the player. Terrain generates using the Temu Perlin Noise Algorithm™"
+                break;
+            case 4:
+                document.getElementById("gamemodeDescriptionText").innerText="Upgrades that provide healing (except for Mystery Box) are disabled. XP gain is disabled. The player gains a set amount of levels every wave that decreases over time."
+                break;
+            case 5:
+                document.getElementById("gamemodeDescriptionText").innerText="Every wave, pick between two negative effects. The player's max health is doubled."
+                break;
+        }
+        gamemodes[mode-2].style.border="5px solid red";
+        document.getElementById("difficultyConfirmationButton").disabled=false;
+        
+    }
 }
 function loadImage(image){
     return new Promise((resolve, reject) =>{
@@ -285,13 +325,9 @@ async function Commence(){
     for(let i=0;i<boughtUpgrades.length;i++){
         boughtUpgrades[i]=0;
     }
-    boughtUpgrades[17]=1;
-    boughtUpgrades[18]=1;
-    boughtUpgrades[19]=1;
-    boughtUpgrades[20]=1;
-    boughtUpgrades[22]=1;
-    boughtUpgrades[23]=1;
-    boughtUpgrades[24]=1;
+    for(let i=0;i<RESTRICTEDUPGRADES.length;i++){
+        boughtUpgrades[RESTRICTEDUPGRADES[i]]=1;
+    }
     //document.querySelectorAll('img').forEach(img => img.remove());
     document.getElementById("loadingPage").style.display="block";
     Start();
@@ -334,7 +370,8 @@ function Start(){
     shieldBar=null;
     timeWarpCounter=-1;
     healthPotionSpawnMultiplier=1;
-
+    speedMultiplier=0;
+    upgradingEnemy=false;
     movingLeft, movingRight, movingUp, movingDown=false;
     isLevelling=false;
     killedBoss=false;
@@ -349,22 +386,22 @@ function Start(){
     lastTime=Date.now();
     switch(chosenCharacter){
         case 1:
-            player=new BasicPlayer();
+            player=new BasicPlayer(10);
             break;
         case 2:
-            player=new TankPlayer();
+            player=new TankPlayer(35);
             break;
         case 3:
-            player=new HealerPlayer();
+            player=new HealerPlayer(12);
             break;
         case 4:
-            player=new MagePlayer();
+            player=new MagePlayer(10);
             break;
         case 5:
-            player=new NecromancerPlayer();
+            player=new NecromancerPlayer(8);
             break;
         case 6:
-            player=new PheonixPlayer();
+            player=new PheonixPlayer(6);
             break;
     }
     if(difficulty==1){
@@ -419,9 +456,14 @@ function Start(){
             boughtUpgrades[6]=1;
             boughtUpgrades[7]=1;
             boughtUpgrades[10]=1;
-            player.health*=2;
             boughtTier2Upgrades[4]=1;
             boughtTier2Upgrades[5]=1;   
+            break;
+        case 5:
+            mapType=1;
+            player.health*=2;
+            player.maxHealth*=2;
+            new ModifierText();
             break;
     }
     if(mapType==1){
@@ -438,6 +480,7 @@ function Start(){
         enableShrinking=true;
 
     }
+    player.orignalMaxHealth=player.maxHealth
     if(gamemode==3){
         CreateTiles();
     }

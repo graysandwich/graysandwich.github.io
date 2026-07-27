@@ -5,7 +5,7 @@ function ShowEnemy(enemy){
     let descriptionText=document.getElementById("enemyDescriptionText");
     switch(enemy){
         case 1:
-            sourceImage.src="images/Enemy.webp";
+            sourceImage.src="images/enemy.webp";
             sourceText.innerText="Source: MCSR Ranked logo"
             descriptionText.innerText="Had one too many of his opponents get lucky strays. Now he's out for vengeance.";
             break;
@@ -51,8 +51,8 @@ function ShowEnemy(enemy){
             break;
         case 10:
             sourceImage.src="images/poisonEnemy.webp";
-            sourceText.innerText="Source: Reddit logo"
-            descriptionText.innerText="Fought with Twitter for weeks to get this job. Turns out, he's a natural at throwing toxicity.";
+            sourceText.innerText="Source: Twitter logo"
+            descriptionText.innerText="He initially lost to Reddit when applying for this position. However, after weeks of unrelenting effort, he finally managed to get his rival cancelled and stole his job. Is an expert at launching toxicity.";
             break;
         case 11:
             sourceImage.src="images/blackHoleEnemy.webp";
@@ -127,7 +127,7 @@ function ShowEnemy(enemy){
         case 25:
             sourceImage.src="images/snakeBoss.webp";
             sourceText.innerText="Source: slither.io snake"
-            descriptionText.innerText="Ran out of pixels from the pixel store. No further questions.";
+            descriptionText.innerText="Ran out of pixels. No further questions.";
             break;
         case 26:
             sourceImage.src="images/healingBoss.webp";
@@ -138,6 +138,11 @@ function ShowEnemy(enemy){
             sourceImage.src="images/splitterEnemy.webp";
             sourceText.innerText="Source: The boss Splitty from the game \"Will You Snail?\""
             descriptionText.innerText="He was voted \"Most Obscure Reference\", in his yearbook. Nobody seems to care though.";
+            break;
+        case 28:
+            sourceImage.src="images/teleporterEnemy.webp";
+            sourceText.innerText="Source: The \"Ender Conehead\" Variant of the conehead zombie in PvZ TD mod. Sunflower on the top left exists because that was the best image I could get."
+            descriptionText.innerText="He is honored to be joining from the PvZ BRUTAL MODE EX+ ULTRA MEGA IMPOSSIBLE EDITIO- wait wrong mod close enough though";
             break;
     }
 }

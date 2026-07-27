@@ -33,7 +33,9 @@
                     <script src="initialization.js" defer></script>
                     <script src="helpers.js" defer></script>
                     <script src="game.js" defer></script>
+                    <script src="players.js" defer></script>
                     <script src="upgrades.js" defer></script>
+                    <script src="enemyUpgrades.js" defer></script>
                     <script src="enemyGuide.js" defer></script>
                     <script src="settings.js" defer></script>
                     <script src="mapObjects.js" defer></script>
@@ -83,12 +85,16 @@
         </div>
         <div id="gamemodeSelectionPage" style="display:none">
             <h1 style="text-align: center; font-size: 67px; position: relative; top: 7px; left: 0; width: 100%; z-index: 1000; margin: 0;">Choose Your Gamemode</h1>
+            <h1 style="position: absolute  ; text-align:center;top: 25%; height:200px; width:100%; z-index: 1000;"id="gamemodeDescriptionText"></h1>
             
-            <button onclick="SelectMode(2)" style="text-align: center; font-size: 67px; position: absolute; top: 30%; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Shrinking Border</button>
-            <button onclick="SelectMode(3)" style="text-align: center; font-size: 67px; position: absolute; top: 45%; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Terrain</button>
-            <button onclick="SelectMode(4)" style="text-align: center; font-size: 67px; position: absolute; top: 60%; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Last Stand</button>
+            <button onclick="SelectMode(2)" style="text-align: center; font-size: 67px; position: absolute; top: 40%; left: 0px; width: 100%; z-index: 1000; margin: 0px;" id="gamemodeSelectionButton">Shrinking Border</button>
+            <button onclick="SelectMode(3)" style="text-align: center; font-size: 67px; position: absolute; top: 55%; left: 0px; width: 100%; z-index: 1000; margin: 0px;" id="gamemodeSelectionButton">Terrain</button>
+            <button onclick="SelectMode(4)" style="text-align: center; font-size: 67px; position: absolute; top: 70%; left: 0px; width: 100%; z-index: 1000; margin: 0px;" id="gamemodeSelectionButton">Last Stand</button>
+            <button onclick="SelectMode(5)" style="text-align: center; font-size: 67px; position: absolute; top: 85%; left: 0px; width: 100%; z-index: 1000; margin: 0px;" id="gamemodeSelectionButton">Pick Your Poison</button>
 
-            <button onclick="ChangePage('IntroPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 10%; left: 80%; width: 20%; z-index: 1000; margin: 0px;">Back</button>
+            <button onclick="ChangePage('IntroPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 0%; left: 80%; width: 20%; z-index: 1000; margin: 0px;">Back</button>
+            <button onclick="ChangePage('difficultyPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 15%; left: 80%; width: 20%; z-index: 1000; margin: 0px;" id="difficultyConfirmationButton"disabled>Continue</button>
+
 
         </div>
         <div id="characterSelectionPage" style="display:none">
@@ -153,6 +159,34 @@
 
             <h1>.</h1>
             
+            <h1>Update 3.3 - </h1>
+            <ul>
+                <li>Added 1 new gamemode</li>
+                <li>Added 1 new tier 2 enemy</li>
+                <li>Added 1 new upgrade</li>
+                <li>Changed the buttons from the default html buttons</li>
+                <li>Renamed "+2 speed" upgrade to "Increase Movement Speed"</li>
+                <li>Changed color of the walls to dark gray</li>
+                <b>Developer's note:</b> This is what happens when you dont have playtesters. Nobody knows what "2 speed" is so I changed the name to make it make sense. Also, the black borders sometimes made the black text hard to see.
+
+                <li>Changed Reddit enemy to Twitter</li>
+                <b>Developer's note:</b> The enemy still works the exact same. I just changed the sprite image since Reddit's circular logo didn't match his square hitbox.
+
+                <li>Balance Changes:</li>
+                <ul>
+                    <li>Increased bomb attack's duration before explosion disappears (0.5s ->0.75s)</li>
+                    <b>Developer's note:</b> So it turns out that last update, when I tried increasing the duration before the bomb's explosion disappeared, I changed the wrong variable and I somehow didn't notice. So here's the actual balance change.
+                    <li>Increased XP bottle's scaling (Old: Gives 0.2x more XP for each level the player has. New: Gives (1+player.level*player.level/5*0.15) times more XP.)</li>
+                    <b>Developer's note:</b> The 1.2x was barely noticable so hopefully now it's better.
+                    <li>Increased amount of upgrade choices for regular upgrades(2 -> 3)</li>
+                    <b>Developer's note:</b> With the amount of upgrades this game has and the fact that the overpowered upgrades were nerfed, changing the amount of upgrades available from 2 to 3 should allow for better focusing on a singular build.
+                    <li>Decreased Enemy health scaling after wave 7 (Wave 8: 1.2x -> 1.2x (unchanged), Wave 9: 1.5x -> 1.4x, Wave 10: 1.9x -> 1.7x, Wave 11: 2.2x -> 2x)</li>
+                    <b>Developer's note:</b> After the damage-increasing upgrades were nerfed, players' damage output unsurprisingly decreased by a lot. This means that the magnifications of enemy health for future waves could get a nerf.
+                    <li>Increased speed of Demonlist boss by 25%</li>
+                    <b>Developer's note:</b> This boss was a little too easy since you could just win by keeping distance from him. This should make it harder to simply run away.
+
+                </ul>
+            </ul>
             <h1>Update 3.2 - July 23, 2026</h1>
             <ul>
                 <li>Added a proper tutorial</li>
@@ -371,6 +405,7 @@
             <button onclick="ShowEnemy(25)" style=" font-size:30px; position:absolute; top: 125%; left: 23%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
             <button onclick="ShowEnemy(26)" style=" font-size:30px; position:absolute; top: 125%; left: 42%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
             <button onclick="ShowEnemy(27)" style=" font-size:30px; position:absolute; top: 65%; left: 70%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(28)" style=" font-size:30px; position:absolute; top: 40%; left: 70%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
    
 
             

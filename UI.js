@@ -28,6 +28,12 @@ class HealthBar {
         else{
             this.image1.src="images/green.webp";
         }
+        if(player.maxHealthHalved==true){
+            this.image2.style.width="200px";
+        }
+        else{
+            this.image2.style.width="400px";
+        }
         if(player.rebirthTimer>0){
             this.image1.src="images/pureWhite.webp"
             this.image1.style.border="2px solid black";
@@ -37,7 +43,12 @@ class HealthBar {
         else{
             this.image1.style.border="";
             this.image1.style.top="60px";
-            this.desiredWidth = Math.ceil(player.health / player.maxHealth * 400);
+            if(player.maxHealthHalved==false){
+                this.desiredWidth = Math.ceil(player.health / player.maxHealth * 400);
+            }
+            else{
+                this.desiredWidth = Math.ceil(player.health / player.maxHealth * 200);
+            }
         }
         if (this.desiredWidth < this.image1.width) {
             requestAnimationFrame(DecreaseHealthBar);
@@ -126,7 +137,9 @@ class LevellingBar {
             }
             //console.log(player.nextLevel+" "+player.level);
             player.currentExp = 0;
-            player.Heal(5);
+            if(player.canHeal==true){
+                player.health=Math.min(player.health+5, player.maxHealth);
+            }
             // console.log(player.currentExp+" "+player.nextLevel);
             //this.image2.style.width=(player.currentExp/player.nextLevel*400)+"px";
             if(currentPage=="gamePage"){
@@ -340,16 +353,28 @@ class BombIcon extends Ability{
     }
 }
 class TimeWarpIcon extends Ability{
+    static version=0;
     constructor(size) {
         super(size);
         this.image.src = 'images/green.webp';
 
 
     }
+    timer(){
+        super.timer();
+        
+        if(TimeWarpIcon.version==0){
+            this.image.src="images/green.webp"
+        }
+        else{
+            this.image.src="images/timeStopIcon.webp"
+        }
+    }
     Activate(){
         if(this.cooldown<=0){
             timeWarpCounter=200;
-            this.cooldown=600;
+            if(TimeWarpIcon.version==0)this.cooldown=600;
+            else this.cooldown=1000;
             this.indicator.Switch();
         }
     }
@@ -597,6 +622,32 @@ class WaveText {
         this.text.style.textAlign="left";
         this.text.id = "waveText";
         this.text.innerHTML = `<b>Wave 1</b>`;
+        document.body.appendChild(this.text);
+
+
+    }
+    Update() {
+        this.text.innerHTML = `<b>Wave ${currentWave}</b>`;
+    }
+}
+class ModifierText {
+    constructor(size) {
+        this.size = size;
+        this.text = document.createElement("div");
+        this.text.style.position = "absolute";
+        this.text.style.left = "210px";
+        this.text.style.top = "170px";
+        this.text.style.zIndex = "2";
+        this.text.style.transform = "translate(-50%, -50%)";
+        this.text.style.pointerEvents = "none";
+        this.text.style.fontSize = "30px";
+        this.text.style.whiteSpace = "nowrap";
+        this.text.style.color = "black";
+        this.text.style.width = "400px";
+        this.text.style.textAlign = "left";
+        this.text.style.fontFamily="Black ops one";
+        this.text.id = "modifierText";
+        this.text.textContent = `Modifier: None`;
         document.body.appendChild(this.text);
 
 

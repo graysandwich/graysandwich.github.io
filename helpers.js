@@ -171,7 +171,8 @@ window.addEventListener("beforeunload", (e)=>{
     localStorage.setItem("ShieldEnemyFound", ShieldEnemy.seen);
     localStorage.setItem("BlackHoleEnemyFound", BlackHoleEnemy.seen);
     localStorage.setItem("MimicEnemyFound", MimicEnemy.seen);
-    localStorage.setItem("SplitterEnemy", SplitterEnemy.seen);
+    localStorage.setItem("SplitterEnemyFound", SplitterEnemy.seen);
+    localStorage.setItem("TeleporterEnemyFound", TeleporterEnemy.seen);
 
     localStorage.setItem("WindupEnemyFound", WindupEnemy.seen);
     localStorage.setItem("BuilderEnemyFound", BuilderEnemy.seen);
@@ -205,6 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
     HomingEnemy.seen=JSON.parse(localStorage.getItem("HomingEnemyFound"));
     ZombieEnemy.seen=JSON.parse(localStorage.getItem("ZombieEnemyFound"));
     TrapperEnemy.seen=JSON.parse(localStorage.getItem("TrapperEnemyFound"));
+    TeleporterEnemy.seen=JSON.parse(localStorage.getItem("TeleporterEnemyFound"));
 
     ChargingEnemy.seen=JSON.parse(localStorage.getItem("ChargingEnemyFound"));
     GhostEnemy.seen=JSON.parse(localStorage.getItem("GhostEnemyFound"));
@@ -212,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ShieldEnemy.seen=JSON.parse(localStorage.getItem("ShieldEnemyFound"));
     BlackHoleEnemy.seen=JSON.parse(localStorage.getItem("BlackHoleEnemyFound"));
     MimicEnemy.seen=JSON.parse(localStorage.getItem("MimicEnemyFound"));
-    SplitterEnemy.seen=JSON.parse(localStorage.getItem("SplitterEnemy"));
+    SplitterEnemy.seen=JSON.parse(localStorage.getItem("SplitterEnemyFound"));
 
     WindupEnemy.seen=JSON.parse(localStorage.getItem("WindupEnemyFound"));
     BuilderEnemy.seen=JSON.parse(localStorage.getItem("BuilderEnemyFound"));
