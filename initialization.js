@@ -64,7 +64,7 @@ let UPGRADES = [
     { onclick: "IncreaseLaserDamage(0.5)",   text: "+0.5 Laser Damage" },
     { onclick: "AddTimeStop()",   text: "Speed Burst -> Time Stop" },
     { onclick: "AddBouncingProjectile(1)",   text: "+1 Bouncing Bullet" },
-    { onclick: "IncreaseProtectorDamage(0.5)",   text: "+0.5 Protector Damage" },
+    { onclick: "IncreaseProtectorDamage(1)",   text: "+1 Protector Damage" },
 
 ];
 let TIER2UPGRADES=[
