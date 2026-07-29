@@ -90,6 +90,7 @@ let ENEMYUPGRADES=[
     { onclick: "IncreaseScale(2)",   text: "Next Wave has 2x More Enemies" },
 ]
 const RESTRICTEDUPGRADES=[17, 18, 19, 20, 22, 23, 24, 25, 27]
+const RESTRICTEDTIER2UPGRADES=[9];
 let timeWarpCounter=0;
 let gambleTimer=0;
 let gambleChoice=0;
@@ -330,6 +331,9 @@ async function Commence(){
     }
     for(let i=0;i<RESTRICTEDUPGRADES.length;i++){
         boughtUpgrades[RESTRICTEDUPGRADES[i]]=1;
+    }
+    for(let i=0;i<RESTRICTEDTIER2UPGRADES.length;i++){
+        boughtTier2Upgrades[RESTRICTEDTIER2UPGRADES[i]]=1;
     }
     //document.querySelectorAll('img').forEach(img => img.remove());
     document.getElementById("loadingPage").style.display="block";

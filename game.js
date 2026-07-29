@@ -1777,7 +1777,7 @@ class EngineerBoss extends Enemy {
         this.width = 150;
         this.height = 150;
 
-        this.shootTimer = 540;
+        this.shootTimer = 480;
         this.shootTimer-=this.shootTimer*(bossMultiplier-1)*0.4
         this.isBoss = true;
         this.value = 500;
@@ -1809,7 +1809,7 @@ class EngineerBoss extends Enemy {
             this.shootTimer--;
         }
         if (this.shootTimer <= 0) {
-            this.shootTimer = 540;
+            this.shootTimer = 480;
             this.shootTimer-=this.shootTimer*(bossMultiplier-1)*0.4;
             let distanceX = player.x - this.x;
             let distanceY = player.y - this.y;
