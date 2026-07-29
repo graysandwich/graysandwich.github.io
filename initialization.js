@@ -25,8 +25,8 @@ let SCALE=0.001;
 let continueFlag=false;
 let speedMultiplier=0;
 let upgradingEnemy=false;
-const NUMUPGRADES=26;
-const NUMTIER2UPGRADES=9;
+const NUMUPGRADES=28;
+const NUMTIER2UPGRADES=10;
 const NUMENEMYUPGRADES=8;
 let boughtUpgrades=new Array(NUMUPGRADES);
 for(let i=0;i<boughtUpgrades.length;i++){
@@ -57,12 +57,14 @@ let UPGRADES = [
     { onclick: "MakeIceBulletsPierce()",  text: "Frost Bullets Pierce Through Enemies" },
     { onclick: "IncreaseFireDamage(0.25)",  text: "+0.25 Fire Damage" },
     { onclick: "PassiveSpawns()",  text: "Passively Spawn Souls" },
-    { onclick: "IncreaseTornadoDamage(0.5)",  text: "+0.5 Tornado Damage" },
+    { onclick: "IncreaseTornadoDamage(1)",  text: "+1 Tornado Damage" },
     { onclick: "AddSpeed(2)",     text: "Increase Movement Speed" },
     { onclick: "IncreaseSlowedDamage(2)",     text: "Slowed Enemies Take 2x Damage" },
     { onclick: "IncreaseBombDamage(4)",     text: "+4 Bomb Damage" },
     { onclick: "IncreaseLaserDamage(0.5)",   text: "+0.5 Laser Damage" },
     { onclick: "AddTimeStop()",   text: "Speed Burst -> Time Stop" },
+    { onclick: "AddBouncingProjectile(1)",   text: "+1 Bouncing Bullet" },
+    { onclick: "IncreaseProtectorDamage(0.5)",   text: "+0.5 Protector Damage" },
 
 ];
 let TIER2UPGRADES=[
@@ -75,18 +77,19 @@ let TIER2UPGRADES=[
     { onclick: "AddShockwave()",   text: "Shockwave Ability" },
     { onclick: "AddRebirth(1)",   text: "Rebirth On Death" },
     { onclick: "AddWindAttack(2)",   text: "+2 Tornado Projectiles" },
+    { onclick: "AddNuke()",   text: "Bomb attack -> Nuke Attack" },
 ]
 let ENEMYUPGRADES=[
     { onclick: "IncreaseEnemyHealth(1.5)",        text: "Healthier Enemies" },
     { onclick: "IncreaseEnemySpeed(1.5)",    text: "Faster Enemies" },
     { onclick: "SpawnBoss()",   text: "Spawn a Random Boss with half HP" },
-    { onclick: "HalveMaxHealth()",   text: "Max Health and Healing Both Get Halved" },
+    { onclick: "HalveMaxHealth()",   text: "Player Healing and Max Health Both Get Halved" },
     { onclick: "SlowPlayer()",   text: "Player is Slowed Until Next Wave" },
     { onclick: "RemoveHealing()",   text: "No Healing" },
     { onclick: "AddConstantDamage()",   text: "Player Takes 1 Damage every 4 Seconds" },
     { onclick: "IncreaseScale(2)",   text: "Next Wave has 2x More Enemies" },
 ]
-const RESTRICTEDUPGRADES=[17, 18, 19, 20, 22, 23, 24, 25]
+const RESTRICTEDUPGRADES=[17, 18, 19, 20, 22, 23, 24, 25, 27]
 let timeWarpCounter=0;
 let gambleTimer=0;
 let gambleChoice=0;

@@ -86,7 +86,7 @@ class WaterTerrain{
             (player.y + player.height / 2-10) > (this.y - this.height / 2) )
         {
             this.color="#1f4153";
-            player.slowCountdown=30;
+            player.slowCountdown=Math.max(player.slowCountdown, 30);
             this.changeColorTimer=30;
         }
     }

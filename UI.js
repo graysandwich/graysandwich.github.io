@@ -327,10 +327,21 @@ class Ability{
     }
 }
 class BombIcon extends Ability{
+    static version=0;
     constructor(size) {
         super(size);
 
 
+    }
+    timer(){
+        super.timer();
+        
+        if(BombIcon.version==0){
+            this.image.src="images/bomb.webp"
+        }
+        else{
+            this.image.src="images/playerNuke.webp"
+        }
     }
     Activate(){
         if(this.cooldown<=0){
@@ -346,8 +357,14 @@ class BombIcon extends Ability{
                 vx=5*Math.cos(angle);
                 vy=5*Math.sin(angle);
             }
-            bullets.push(new PlayerBomb(player.x, player.y, vx, vy))
-            this.cooldown=420;
+            if(BombIcon.version==0){
+                bullets.push(new PlayerBomb(player.x, player.y, vx, vy))
+                this.cooldown=420;
+            }
+            else{
+                bullets.push(new PlayerNuke(player.x, player.y, vx, vy))
+                this.cooldown=1200;
+            }
             this.indicator.Switch();
         }
     }
@@ -494,7 +511,7 @@ class RebirthsIcon {
 }
 class TutorialText {
     static index=-1;
-    static textOrder=["Welcome to Crossover, a game with art assets taken from all kinds of different places. WASD to move.", "As you can see, the player automatically shoots bullets.","Your job is simple: kill all the enemies and survive for as long as possible.", "Killing enemies gives experience points, and getting enough experience points will reward an upgrade.", "Experience bottles and health potions will periodically spawn. Collect them for XP and healing!","Now, let's put your skills to the test!","", "Congratulations on completing the tutorial!"]
+    static textOrder=["Welcome to Crossover, a game with art assets taken from different parts of the internet. WASD to move.", "As you can see, the player automatically shoots bullets.","Your job is simple: kill all the enemies and survive for as long as possible.", "Killing enemies gives experience points, and getting enough experience points will reward an upgrade.", "Experience bottles and health potions will periodically spawn. Collect them for XP and healing!","Now, let's put your skills to the test!","", "Congratulations on completing the tutorial!"]
     static fadeTimer=0;
     static timer=0;
     static canChangeWave=false;

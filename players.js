@@ -54,6 +54,10 @@ class Player {
         this.canHeal=true;
         this.constantDamageAmount=0;
         this.constantDamageTimer=150;
+        this.bouncingProjectiles=0;
+        this.bouncingProjectileCooldown=0;
+        this.bouncingProjectileMaxCooldown = 120;
+        this.protectorDamage=1;
     }
     takeDamage(damage, bullet) {
         if(this.rebirthTimer>0){
@@ -75,7 +79,7 @@ class Player {
         //console.log(this.health);
         floatingObjects.push(new FloatingObject(this.x-this.width/2+Math.random()*this.width,this.y,damage,"red"));
         if (bullet!=null && bullet.frostbite) {
-            this.slowCountdown = 120;
+            this.slowCountdown = Math.max(this.slowCountdown, 120);
         }
         this.redTimer = 10;
         if(this.health<=0 && this.rebirth>0){
@@ -106,37 +110,90 @@ class Player {
                     let vy = 0;
                     if (distanceX == 0) {
                         if (this.y > enemies[closestEnemy].y) {
-                            vy -= this.speed;
+                            vy -= 5;
                         }
                         if (this.y < enemies[closestEnemy].y) {
-                            vy += this.speed;
+                            vy += 5;
                         }
                     }
                     else {
                         let angle = Math.atan(distanceY / distanceX);
                         if (this.x > enemies[closestEnemy].x) {
-                            vx -= this.speed * Math.cos(angle);
+                            vx -= 5 * Math.cos(angle);
                         }
                         if (this.y > enemies[closestEnemy].y) {
-                            vy -= this.speed * Math.sin(angle);
+                            vy -= 5 * Math.sin(angle);
                         }
                         if (this.x < enemies[closestEnemy].x) {
-                            vx += this.speed * Math.cos(angle);
+                            vx += 5 * Math.cos(angle);
                         }
                         if (this.y < enemies[closestEnemy].y) {
-                            vy += this.speed * Math.sin(angle);
+                            vy += 5 * Math.sin(angle);
                         }
                         //console.log(this.x+" "+this.y+" "+Math.sin(angle)+" "+Math.cos(angle)+" "+angle);
                     }
                     bullets[bullets.length] = new FrostBullet(vx, vy, 1);
                 }
                 else {
-                    bullets[bullets.length] = new FrostBullet(10, 0, 1);
+                    bullets[bullets.length] = new FrostBullet(5, 0, 1);
                 }
 
             }
             else {
-                bullets[bullets.length] = new FrostBullet(10, 0, 1);
+                bullets[bullets.length] = new FrostBullet(5, 0, 1);
+            }
+
+        }
+        if (this.bouncingProjectiles > 0 && this.bouncingProjectileCooldown <= 0) {
+            this.bouncingProjectileCooldown = this.bouncingProjectileMaxCooldown;
+            if (enemies.length > 0) {
+                let closestEnemy = -1;
+                let enemyDist = 999999;
+                for (let i = 0; i < enemies.length; i++) {
+                    let newDist = Math.hypot(Math.abs(enemies[i].x - this.x), Math.abs(enemies[i].y - this.y));
+                    if (newDist < enemyDist && enemies[i].ignoreBullets == false) {
+                        enemyDist = newDist;
+                        closestEnemy = i;
+                    }
+                }
+                if (closestEnemy != -1) {
+                    let distanceX = Math.abs(this.x - enemies[closestEnemy].x);
+                    let distanceY = Math.abs(this.y - enemies[closestEnemy].y);
+                    let vx = 0;
+                    let vy = 0;
+                    if (distanceX == 0) {
+                        if (this.y > enemies[closestEnemy].y) {
+                            vy -= 10;
+                        }
+                        if (this.y < enemies[closestEnemy].y) {
+                            vy += 10;
+                        }
+                    }
+                    else {
+                        let angle = Math.atan(distanceY / distanceX);
+                        if (this.x > enemies[closestEnemy].x) {
+                            vx -= 10 * Math.cos(angle);
+                        }
+                        if (this.y > enemies[closestEnemy].y) {
+                            vy -= 10 * Math.sin(angle);
+                        }
+                        if (this.x < enemies[closestEnemy].x) {
+                            vx += 10 * Math.cos(angle);
+                        }
+                        if (this.y < enemies[closestEnemy].y) {
+                            vy += 10 * Math.sin(angle);
+                        }
+                        //console.log(this.x+" "+this.y+" "+Math.sin(angle)+" "+Math.cos(angle)+" "+angle);
+                    }
+                    bullets[bullets.length] = new BouncingBullet(vx, vy, 1);
+                }
+                else {
+                    bullets[bullets.length] = new BouncingBullet(10, 0, 1);
+                }
+
+            }
+            else {
+                bullets[bullets.length] = new BouncingBullet(10, 0, 1);
             }
 
         }
@@ -224,6 +281,7 @@ class Player {
         this.rebirthTimer--;
         this.windProjectileCooldown--;
         this.constantDamageTimer--;
+        this.bouncingProjectileCooldown--;
         this.accelerationX /= 1.05;
         this.accelerationY /= 1.05;
 

@@ -164,6 +164,7 @@ window.addEventListener("beforeunload", (e)=>{
     localStorage.setItem("HomingEnemyFound", HomingEnemy.seen);
     localStorage.setItem("ZombieEnemyFound", ZombieEnemy.seen);
     localStorage.setItem("TrapperEnemyFound", TrapperEnemy.seen);
+    localStorage.setItem("IceEnemyFound", IceEnemy.seen);
 
     localStorage.setItem("ChargingEnemyFound", ChargingEnemy.seen);
     localStorage.setItem("PoisonEnemyFound", PoisonEnemy.seen);
@@ -171,7 +172,6 @@ window.addEventListener("beforeunload", (e)=>{
     localStorage.setItem("ShieldEnemyFound", ShieldEnemy.seen);
     localStorage.setItem("BlackHoleEnemyFound", BlackHoleEnemy.seen);
     localStorage.setItem("MimicEnemyFound", MimicEnemy.seen);
-    localStorage.setItem("SplitterEnemyFound", SplitterEnemy.seen);
     localStorage.setItem("TeleporterEnemyFound", TeleporterEnemy.seen);
 
     localStorage.setItem("WindupEnemyFound", WindupEnemy.seen);
@@ -180,6 +180,7 @@ window.addEventListener("beforeunload", (e)=>{
     localStorage.setItem("SelfDestructEnemyFound", SelfDestructEnemy.seen);
     localStorage.setItem("MachineGunEnemyFound", MachineGunEnemy.seen);
     localStorage.setItem("SmokeBombEnemyFound", SmokeBombEnemy.seen);
+    localStorage.setItem("SplitterEnemyFound", SplitterEnemy.seen);
 
     localStorage.setItem("LaserBossFound", LaserBoss.seen);
     localStorage.setItem("IceBossFound", IceBoss.seen);
@@ -190,6 +191,7 @@ window.addEventListener("beforeunload", (e)=>{
     localStorage.setItem("GambleBossFound", GambleBoss.seen);
     localStorage.setItem("SnakeBossFound", SnakeBoss.seen);
     localStorage.setItem("HealerBossFound", HealerBoss.seen);
+    localStorage.setItem("EngineerBossFound", EngineerBoss.seen);
     
     localStorage.setItem("TankPlayerUnlocked", TankPlayer.unlocked);
     localStorage.setItem("HealerPlayerUnlocked", HealerPlayer.unlocked);
@@ -206,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
     HomingEnemy.seen=JSON.parse(localStorage.getItem("HomingEnemyFound"));
     ZombieEnemy.seen=JSON.parse(localStorage.getItem("ZombieEnemyFound"));
     TrapperEnemy.seen=JSON.parse(localStorage.getItem("TrapperEnemyFound"));
-    TeleporterEnemy.seen=JSON.parse(localStorage.getItem("TeleporterEnemyFound"));
+    IceEnemy.seen=JSON.parse(localStorage.getItem("IceEnemyFound"));
 
     ChargingEnemy.seen=JSON.parse(localStorage.getItem("ChargingEnemyFound"));
     GhostEnemy.seen=JSON.parse(localStorage.getItem("GhostEnemyFound"));
@@ -214,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ShieldEnemy.seen=JSON.parse(localStorage.getItem("ShieldEnemyFound"));
     BlackHoleEnemy.seen=JSON.parse(localStorage.getItem("BlackHoleEnemyFound"));
     MimicEnemy.seen=JSON.parse(localStorage.getItem("MimicEnemyFound"));
-    SplitterEnemy.seen=JSON.parse(localStorage.getItem("SplitterEnemyFound"));
+    TeleporterEnemy.seen=JSON.parse(localStorage.getItem("TeleporterEnemyFound"));
 
     WindupEnemy.seen=JSON.parse(localStorage.getItem("WindupEnemyFound"));
     BuilderEnemy.seen=JSON.parse(localStorage.getItem("BuilderEnemyFound"));
@@ -222,6 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
     SelfDestructEnemy.seen=JSON.parse(localStorage.getItem("SelfDestructEnemyFound"));
     MachineGunEnemy.seen=JSON.parse(localStorage.getItem("MachineGunEnemyFound"));
     SmokeBombEnemy.seen=JSON.parse(localStorage.getItem("SmokeBombEnemyFound"));
+    SplitterEnemy.seen=JSON.parse(localStorage.getItem("SplitterEnemyFound"));
 
     LaserBoss.seen=JSON.parse(localStorage.getItem("LaserBossFound"));
     IceBoss.seen=JSON.parse(localStorage.getItem("IceBossFound"));
@@ -232,6 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
     GambleBoss.seen=JSON.parse(localStorage.getItem("GambleBossFound"));
     SnakeBoss.seen=JSON.parse(localStorage.getItem("SnakeBossFound"));
     HealerBoss.seen=JSON.parse(localStorage.getItem("HealerBossFound"));
+    EngineerBoss.seen=JSON.parse(localStorage.getItem("EngineerBossFound"));
 
     BasicPlayer.unlocked=true;
     if(JSON.parse(localStorage.getItem("TankPlayerUnlocked"))!=null) TankPlayer.unlocked=JSON.parse(localStorage.getItem("TankPlayerUnlocked"));

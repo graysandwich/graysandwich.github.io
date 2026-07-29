@@ -73,7 +73,7 @@ function AddPassiveHealing(amount) {
 function Gamble(numGambles) {
     for (let i = 0; i < numGambles; i++) {
         gambleText = document.createElement("div");
-        gambleTimer = Math.floor(Math.random() * 300) + 300;
+        gambleTimer = Math.floor(Math.random() * 240) + 300;
         gambleText.innerHTML = `<div></div>`;
         document.body.appendChild(gambleText);
         textSpeed = 5;
@@ -90,6 +90,7 @@ function AddProtectorBullet(amount) {
         bullets.push(new ProtectorBullet(1));
     }
     ProtectorBullet.Spacing();
+    boughtUpgrades[27]=false;
     ChangePage('gamePage', false)
 }
 function AddShield(amount) {
@@ -330,8 +331,23 @@ function IncreaseLaserDamage(amount){
     player.laserDamage+=amount;
     ChangePage('gamePage', false)
 }
-function AddTimeStop(amount) {
+function AddTimeStop() {
     TimeWarpIcon.version=1;
     boughtUpgrades[25] = 1;
+    ChangePage('gamePage', false)
+}
+function AddBouncingProjectile(amount){
+    player.bouncingProjectiles+=amount;
+    player.bouncingProjectileMaxCooldown = 240 / player.bouncingProjectiles;
+    ChangePage('gamePage', false)
+}
+function IncreaseProtectorDamage(amount){
+    player.protectorDamage+=amount;
+    ChangePage('gamePage', false)
+}
+function AddNuke() {
+    BombIcon.version=1;
+    boughtTier2Upgrades[9] = 1;
+    UPGRADES[23].text="+8 Bomb Damage";
     ChangePage('gamePage', false)
 }

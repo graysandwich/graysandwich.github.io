@@ -268,6 +268,7 @@ class Enemy {
     takeDamage(bullet) {
         let damage = bullet.damage * player.damageMultiplier;
         if(this.slowCountdown>0) damage*=player.slowedDamageMultiplier
+        if(damage==0)return
         this.health -= damage;
         //console.log(this.health);
         if(bullet.frostbite){
@@ -1113,7 +1114,6 @@ class GambleBoss extends Enemy {
     }
     timer() {
         //console.log(this.attackTimer);
-        this.redTimer--;
         this.gambleTimer--;
         this.laserTimer--;
         this.randomStuffTimer--;
@@ -1251,39 +1251,6 @@ class GambleBoss extends Enemy {
     }
     takeDamage(bullet, index) {
         super.takeDamage(bullet, index);
-    }
-    move() {
-        let distanceX = Math.abs(this.x - player.x);
-        let distanceY = Math.abs(this.y - player.y);
-        if (this.slowCountdown > 0) {
-            this.speed /= 2;
-        }
-        if (distanceX == 0) {
-            if (this.y > player.y) {
-                this.y -= this.speed;
-            }
-            if (this.y < player.y) {
-                this.y += this.speed;
-            }
-        }
-        else {
-            let angle = Math.atan(distanceY / distanceX);
-            if (this.x > player.x) {
-                this.x -= this.speed * Math.cos(angle);
-            }
-            if (this.y > player.y) {
-                this.y -= this.speed * Math.sin(angle);
-            }
-            if (this.x < player.x) {
-                this.x += this.speed * Math.cos(angle);
-            }
-            if (this.y < player.y) {
-                this.y += this.speed * Math.sin(angle);
-            }
-            //console.log(this.x+" "+this.y+" "+Math.sin(angle)+" "+Math.cos(angle)+" "+angle);
-        }
-
-        super.checkForCollisions();
     }
     Gamble(){
         let randomNum=Math.ceil(Math.random()*100);
@@ -1796,72 +1763,440 @@ class HealerBoss extends Enemy {
 
     }
 }
-// class CodingBoss extends Enemy {
-//     /*
-//     Idea: cool bullet patterns
-//     */
-//     constructor(speed, health) {
-//         super(speed, health);
-//         this.maxHealth = health;
-//         this.image.src = 'images/bulletHellBoss.webp';
-//         this.width = 135;
-//         this.height = 135;
+class EngineerBoss extends Enemy {
+    /*
+    Idea: Builds towers (stationary enemies) based on time passed.
+    1. Basic sentry that shoots bullets
+    2. Laser tower that shoots lasers
+    3. Bomb tower that shoots bombs
+    4. Ice tower that slows player
+    */
+    constructor(speed, health) {
+        super(speed, health);
+        this.image.src = 'images/engineerBoss.webp';
+        this.width = 150;
+        this.height = 150;
 
-//         this.shootTimer = 300;
-//         this.isBoss = true;
-//         this.value = 500;
-//         //console.log(this.image.style.transform+" transofrmer");
+        this.shootTimer = 540;
+        this.shootTimer-=this.shootTimer*(bossMultiplier-1)*0.4
+        this.isBoss = true;
+        this.value = 500;
+        //console.log(this.image.style.transform+" transofrmer");
 
-//         this.bossText = document.createElement("div");
-//         this.bossText.style.position = "absolute"
-//         this.bossText.innerHTML = `<div style=" color:red;pointer-events:none; font-size:30px; white-space: nowrap; font-family:'Black Ops One'; text-align:center;" id="bossTitle">McAfee</div>`
-//         this.bossText.style.left = (canvas.width / 2-200) + "px";
-//         this.bossText.style.top = (25 + bossBars.length * 75) + "px";
-//         this.bossText.style.zIndex = 2;
-//         this.bossText.style.transform = "translate(-50%, -50%)";
-//         //console.log(bossText.style.transform+" tradsnf");
 
-//         document.body.appendChild(this.bossText);
-//         //console.log(this.shootTimer);
+        this.bossText = document.createElement("div");
+        this.bossText.style.position = "absolute"
+        this.bossText.innerHTML = `<div style=" color:red;pointer-events:none; font-size:30px; white-space: nowrap; font-family:'Black Ops One'; text-align:center;" id="bossTitle">Paragon</div>`
+        this.bossText.style.left = (canvas.width / 2-200) + "px";
+        this.bossText.style.top = (25 + bossBars.length * 75) + "px";
+        this.bossText.style.zIndex = 2;
+        this.bossText.style.transform = "translate(-50%, -50%)";
+        this.bossText.id="bossText";
+
+        document.body.appendChild(this.bossText);
+        //console.log(this.shootTimer);
+        this.health=Math.ceil(this.health*bossMultiplier);
+        this.maxHealth = this.health;
+        this.bossBar = new BossBar(this);
+        bossBars.push(this.bossBar);
         
-//         this.health=Math.ceil(this.health*bossMultiplier);
-//         this.maxHealth = this.health;
-//         this.bossBar = new BossBar(this);
-//         bossBars.push(this.bossBar);
-//         this.currentAttack=0;
+    }
+    timer() {
+        if (this.slowCountdown > 0) {
+            this.shootTimer -= 0.5;
+        }
+        else {
+            this.shootTimer--;
+        }
+        if (this.shootTimer <= 0) {
+            this.shootTimer = 540;
+            this.shootTimer-=this.shootTimer*(bossMultiplier-1)*0.4;
+            let distanceX = player.x - this.x;
+            let distanceY = player.y - this.y;
+            let distance = distanceX * distanceX + distanceY * distanceY;
+            let vx = 0;
+            let vy = 0;
+
+            if (distance > 0) {
+                let angle = Math.atan2(distanceY, distanceX);
+                vx = 5 * Math.cos(angle);
+                vy = 5 * Math.sin(angle);
+            }
+            let randomNum=Math.random()*10;
+            if(randomNum<4){
+                enemyBullets.push(new EngineerBullet(this.x, this.y, vx, vy, 1));
+            }
+            else if(randomNum<7){
+                enemyBullets.push(new EngineerBullet(this.x, this.y, vx, vy, 2));
+            }
+            else if(randomNum<9){
+                enemyBullets.push(new EngineerBullet(this.x, this.y, vx, vy, 3));
+            }
+            else if(randomNum<10){
+                enemyBullets.push(new EngineerBullet(this.x, this.y, vx, vy, 4));
+            }
+        }
+        //console.log(this.healCooldown)
+    }
+    move(){
+        super.move();
+    }
+    draw() {
+        super.draw();
+        ctx.save();
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = "blue";
+        ctx.strokeRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+        ctx.restore();
+    }
+    takeDamage(bullet, index) {
+        super.takeDamage(bullet, index);
+    }
+    special() {
+        //console.log(this.frostAura.style.left);
+        this.timer();
+
+    }
+}
+class SentryEngineerEnemy extends Enemy {
+    constructor(x, y, health) {
+        super(0, health);
+        this.image.src = 'images/sentryEngineerEnemy.webp';
+        this.value = 0;
+        this.damage=0;
+        this.x = x;
+        this.y = y;
+        this.width = 100;
+        this.height = 100;
+        this.canSiphon = false;
+        this.giveXP=false;
+        this.ignoreKnockback=true;
+        this.ignoreShield=true;
+        this.iFrame=0;
+        this.shootTimer=60;
+        //console.log(this.shootTimer);
+    }
+    special(){
+        this.timer();
+    }
+    timer(){
+        this.redTimer--;
+        this.healTimer--;
+        this.iFrame--;
+        if(this.slowCountdown>0){
+            this.shootTimer-=0.5;
+        }
+        else{
+            this.shootTimer--;
+        }
+        if(this.shootTimer<=0){
+            
+            this.shootTimer = 60;
+            let distanceX = player.x - this.x;
+            let distanceY = player.y - this.y;
+            let distance = distanceX * distanceX + distanceY * distanceY;
+            let vx = 0;
+            let vy = 0;
+
+            if (distance > 0) {
+                let angle = Math.atan2(distanceY, distanceX);
+                vx = 10 * Math.cos(angle);
+                vy = 10 * Math.sin(angle);
+            }
+            let temp=new EnemyBullet(vx, vy, 1, this.x, this.y);
+            temp.height=20;
+            temp.width=20;
+            enemyBullets.push(temp);
+
+        }
+    }
+    draw() {
+        super.draw();
+        ctx.save();
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = "blue";
+        ctx.strokeRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+        ctx.restore();
+    }
+    move() {
+        if (
+            (player.x - player.width / 2) < (this.x + this.width / 2) &&
+            (player.x + player.width / 2) > (this.x - this.width / 2) &&
+            (player.y - player.height / 2) < (this.y + this.height / 2) &&
+            (player.y + player.height / 2) > (this.y - this.height / 2) && this.iFrame <= 0 
+        ) {
+            player.takeDamage(2, this);
+            if (this.x > player.x) {
+                player.AddForce(-10, 0);
+            }
+            if (this.x < player.x) {
+
+                player.AddForce(10, 0);
+            }
+            if (this.y > player.y) {
+
+                player.AddForce(0, -10);
+            }
+            if (this.y < player.y) {
+
+                player.AddForce(0, 10);
+            }
+            this.iFrame = 15;
+        }
+    }
+}
+class LaserEngineerEnemy extends Enemy {
+    constructor(x, y, health) {
+        super(0, health);
+        this.image.src = 'images/laserEngineerEnemy.webp';
+        this.value = 0;
+        this.damage=0;
+        this.x = x;
+        this.y = y;
+        this.width = 100;
+        this.height = 100;
+        this.canSiphon = false;
+        this.giveXP=false;
+        this.ignoreKnockback=true;
+        this.ignoreShield=true;
+        this.shootTimer=60;
+        this.laser=null;
+        this.iFrame=0;
+        //console.log(this.shootTimer);
+    }
+    special(){
+        this.timer();
+    }
+    timer(){
+        this.redTimer--;
+        this.healTimer--;
+        this.iFrame--;
+        if(this.slowCountdown>0){
+            this.shootTimer-=0.5;
+        }
+        else{
+            this.shootTimer--;
+        }
+        if(this.shootTimer<=0 && this.laser==null){
+            
+            let distanceX = player.x - (this.x);
+            let distanceY = player.y - (this.y);
+
+            this.angle = Math.atan2(distanceY, distanceX);
+            this.stage = 1;
+            this.laser=new PermanentLaser(this.angle, this.x, this.y);
+            enemyBullets.push(this.laser);
+
+        }
+    }
+    takeDamage(a, b){
+        super.takeDamage(a, b);
+        if(this.dead && this.laser){
+            this.laser.dead=true;
+        }
+    }
+    draw() {
+        super.draw();
+        ctx.save();
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = "blue";
+        ctx.strokeRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+        ctx.restore();
+    }
+    move() {
+        if (
+            (player.x - player.width / 2) < (this.x + this.width / 2) &&
+            (player.x + player.width / 2) > (this.x - this.width / 2) &&
+            (player.y - player.height / 2) < (this.y + this.height / 2) &&
+            (player.y + player.height / 2) > (this.y - this.height / 2) && this.iFrame <= 0 
+        ) {
+            player.takeDamage(2, this);
+            if (this.x > player.x) {
+                player.AddForce(-10, 0);
+            }
+            if (this.x < player.x) {
+
+                player.AddForce(10, 0);
+            }
+            if (this.y > player.y) {
+
+                player.AddForce(0, -10);
+            }
+            if (this.y < player.y) {
+
+                player.AddForce(0, 10);
+            }
+            this.iFrame = 15;
+        }
+    }
+}
+class BombEngineerEnemy extends Enemy {
+    constructor(x, y, health) {
+        super(0, health);
+        this.image.src = 'images/bombEngineerEnemy.webp';
+        this.value = 0;
+        this.damage=0;
+        this.x = x;
+        this.y = y;
+        this.width = 100;
+        this.height = 100;
+        this.canSiphon = false;
+        this.giveXP=false;
+        this.ignoreKnockback=true;
+        this.ignoreShield=true;
+        this.iFrame=0;
+        this.shootTimer=60;
+        //console.log(this.shootTimer);
+    }
+    special(){
+        this.timer();
+    }
+    timer(){
+        this.redTimer--;
+        this.healTimer--;
+        this.iFrame--;
+        if(this.slowCountdown>0){
+            this.shootTimer-=0.5;
+        }
+        else{
+            this.shootTimer--;
+        }
+        if(this.shootTimer<=0){
+            
+            this.shootTimer = 240;
+            let distanceX = player.x - this.x;
+            let distanceY = player.y - this.y;
+            let distance = distanceX * distanceX + distanceY * distanceY;
+            let vx = 0;
+            let vy = 0;
+
+            if (distance > 0) {
+                let angle = Math.atan2(distanceY, distanceX);
+                vx = 5 * Math.cos(angle);
+                vy = 5 * Math.sin(angle);
+            }
+            let temp=new EnemyBomb(this.x, this.y, vx, vy, Math.sqrt(distance)/5);
+            temp.height=40;
+            temp.width=40;
+            enemyBullets.push(temp);
+
+        }
+    }
+    draw() {
+        super.draw();
+        ctx.save();
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = "blue";
+        ctx.strokeRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+        ctx.restore();
+    }
+    move() {
+        if (
+            (player.x - player.width / 2) < (this.x + this.width / 2) &&
+            (player.x + player.width / 2) > (this.x - this.width / 2) &&
+            (player.y - player.height / 2) < (this.y + this.height / 2) &&
+            (player.y + player.height / 2) > (this.y - this.height / 2) && this.iFrame <= 0 
+        ) {
+            player.takeDamage(2, this);
+            if (this.x > player.x) {
+                player.AddForce(-10, 0);
+            }
+            if (this.x < player.x) {
+
+                player.AddForce(10, 0);
+            }
+            if (this.y > player.y) {
+
+                player.AddForce(0, -10);
+            }
+            if (this.y < player.y) {
+
+                player.AddForce(0, 10);
+            }
+            this.iFrame = 15;
+        }
+    }
+}
+class IceEngineerEnemy extends Enemy {
+    constructor(x, y, health) {
+        super(0, health);
+        this.image.src = 'images/iceEngineerEnemy.webp';
+        this.value = 0;
+        this.damage=0;
+        this.x = x;
+        this.y = y;
+        this.width = 100;
+        this.height = 100;
+        this.canSiphon = false;
+        this.giveXP=false;
+        this.ignoreKnockback=true;
+        this.ignoreShield=true;
+        this.iFrame=0;
+        this.frostAura = new Image();
+        this.frostAura.src = "images/frostAura.webp";
+        this.frostAuraWidth = 500;
+        this.frostAuraHeight = 500;
+        //console.log(this.shootTimer);
+    }
+    special(){
+        this.timer();
         
-//     }
-//     timer() {
-//         //console.log(this.attackTimer);
-//         this.redTimer--;
-//         if (this.slowCountdown > 0) {
-//             this.shootTimer-=0.5;
-//         }
-//         else {
-//             this.shootTimer--;
-//         }
-//         if(this.shootTimer<=0){
-//             this.shootTimer=300;
-//             this.currentAttack=Math.ceil(Math.random()*1);
-//         }
-//         switch(this.currentAttack){
-//             case 1:
+    }
+    timer(){
+        this.redTimer--;
+        this.healTimer--;
+        this.iFrame--;
+        
+        if (RectCircleColliding(this, player, 250, this.x, this.y)) {
+            player.slowCountdown = Math.max(player.slowCountdown, 30);
+        }
+        for(let i=0;i<bullets.length;i++){
+            if(RectCircleColliding(this, bullets[i], 250, this.x, this.y)){
+                bullets[i].slowCountdown=30;
+            }
+        }
+        if (this.dead) {
+            player.slowed = false;
+        }
+    }
+    draw() {
+        ctx.globalAlpha=0.4;
+        ctx.drawImage(this.frostAura, this.x - this.frostAuraWidth / 2, this.y - this.frostAuraHeight / 2, this.frostAuraWidth, this.frostAuraHeight);
+        ctx.globalAlpha=1; 
+        super.draw();
+        ctx.save();
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = "blue";
+        ctx.strokeRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+        ctx.restore();
+    }
+    move() {
+        if (
+            (player.x - player.width / 2) < (this.x + this.width / 2) &&
+            (player.x + player.width / 2) > (this.x - this.width / 2) &&
+            (player.y - player.height / 2) < (this.y + this.height / 2) &&
+            (player.y + player.height / 2) > (this.y - this.height / 2) && this.iFrame <= 0 
+        ) {
+            player.takeDamage(2, this);
+            if (this.x > player.x) {
+                player.AddForce(-10, 0);
+            }
+            if (this.x < player.x) {
 
-//                 break;
-//         }
+                player.AddForce(10, 0);
+            }
+            if (this.y > player.y) {
 
-//     }
-//     takeDamage(bullet, index) {
-//         super.takeDamage(bullet, index);
-//     }
-//     move() {
-//         super.move();
-//     }
-//     special() {
-//         //console.log(this.frostAura.style.left);
-//         this.timer();
-//     }
-// }
+                player.AddForce(0, -10);
+            }
+            if (this.y < player.y) {
+
+                player.AddForce(0, 10);
+            }
+            this.iFrame = 15;
+        }
+    }
+}
 
 class ShooterEnemy extends Enemy {
     constructor(speed, health) {
@@ -1902,7 +2237,6 @@ class ChargingEnemy extends Enemy {
         super(speed, health);
         this.image.src = 'images/chargingEnemy.webp';
         this.shootTimer = 100;
-        this.order = 1;
         this.width = 50;
         this.height = 50;
         this.value = 80;
@@ -1994,7 +2328,6 @@ class AimingEnemy extends Enemy {
         this.image.src = 'images/aimingEnemy.webp';
         this.shootTimer = 45;
         this.value = 30;
-        this.order = 1;
         //console.log(this.shootTimer);
     }
     special() {
@@ -2069,7 +2402,6 @@ class HomingEnemy extends Enemy {
         this.image.src = 'images/homingEnemy.webp';
         this.shootTimer = 60;
         this.value = 30;
-        this.order = 1;
         //console.log(this.shootTimer);
     }
     special() {
@@ -2105,7 +2437,6 @@ class ShieldEnemy extends Enemy {
     constructor(speed, health) {
         super(speed, health);
         this.image.src = 'images/shieldEnemy.webp';
-        this.order = 1;
         this.value = 80;
         this.width = 100;
         this.height = 100;
@@ -2133,7 +2464,6 @@ class EnemyShield extends Enemy {
         super(speed, health);
         this.image.src = 'images/shield.webp';
         this.shootTimer = 30;
-        this.order = 1;
         this.value = 30;
         this.damage=0;
         this.owner = owner;
@@ -2186,7 +2516,6 @@ class TrapperEnemy extends Enemy {
         super(speed, health);
         this.image.src = 'images/trapperEnemy.webp';
         this.shootTimer = 30;
-        this.order = 1;
         this.value = 30;
         this.constructor.baseTimer=400;
         this.constructor.randomTimer=400;
@@ -2216,7 +2545,6 @@ class ZombieEnemy extends Enemy {
         super(speed, health);
         this.image.src = 'images/zombieEnemy.webp';
         this.shootTimer = 30;
-        this.order = 1;
         this.value = 30;
         this.deathCount = 0;
         this.deathTimer = 0;
@@ -2246,6 +2574,7 @@ class ZombieEnemy extends Enemy {
     takeDamage(bullet, index) {
         let damage = bullet.damage * player.damageMultiplier;
         if(this.slowCountdown>0) damage*=player.slowedDamageMultiplier
+        if(damage==0)return
         this.health -= damage;
         //console.log(this.health);
         
@@ -2304,7 +2633,6 @@ class GhostEnemy extends Enemy {
         super(speed, health);
         this.image.src = 'images/ghostEnemy.webp';
         this.shootTimer = 0;
-        this.order = 1;
         this.value = 80;
         this.ghostTimer = 0;
         //console.log(this.shootTimer);
@@ -2379,7 +2707,6 @@ class PoisonEnemy extends Enemy {
         super(speed, health);
         this.image.src = 'images/poisonEnemy.webp';
         this.shootTimer = 120;
-        this.order = 1;
         this.value = 80;
         //console.log(this.shootTimer);
     }
@@ -2416,7 +2743,6 @@ class BlackHoleEnemy extends Enemy {
         super(speed, health);
         this.image.src = 'images/blackHoleEnemy.webp';
         this.shootTimer = 120;
-        this.order = 1;
         this.value = 80;
         //console.log(this.shootTimer);
     }
@@ -2452,7 +2778,6 @@ class BuilderEnemy extends Enemy {
         super(speed, health);
         this.image.src = 'images/builderEnemy.webp';
         this.shootTimer = 120;
-        this.order = 1;
         this.width = 75;
         this.height = 75;
         this.value = 150;
@@ -2490,7 +2815,6 @@ class EnemyWall extends Enemy {
     constructor(x, y, health) {
         super(0, health);
         this.image.src = 'images/enemyWall.webp';
-        this.order = 1;
         this.value = 0;
         this.damage=0;
         this.x = x;
@@ -2510,6 +2834,7 @@ class EnemyWall extends Enemy {
     }
     timer(){
         this.redTimer--;
+        this.healTimer--;
     }
     move() {
         if (
@@ -2539,7 +2864,6 @@ class WindupEnemy extends Enemy {
         this.image.src = 'images/windupEnemy.webp';
         this.shootTimer = 200;
         this.chargeTimer = -1;
-        this.order = 1;
         this.width = 50;
         this.height = 50;
         this.value = 150;
@@ -2567,7 +2891,7 @@ class WindupEnemy extends Enemy {
         else {
             this.shootTimer--;
         }
-        if (this.shootTimer <= 0 && this.chargeTimer < 0) {
+        if (this.shootTimer <= 0 && this.chargeTimer < 0 && this.accelerationX<0.1 && this.accelerationY<0.1) {
             this.shootTimer = 800;
             let distanceX = player.x - this.x;
             let distanceY = player.y - this.y;
@@ -2584,6 +2908,10 @@ class WindupEnemy extends Enemy {
             enemyBullets.push(this.orb)
         }
     }
+    AddForce(a, b){
+        super.AddForce(a,b);
+        if(this.orb && this.shootTimer > 200)this.orb.dead=true;
+    }
     special() {
         this.timer();
     }
@@ -2599,7 +2927,6 @@ class SpawnerEnemy extends Enemy {
         super(speed, health);
         this.image.src = 'images/spawnerEnemy.webp';
         this.shootTimer = 400;
-        this.order = 1;
         this.width = 100;
         this.height = 100;
         this.value = 150;
@@ -2774,7 +3101,6 @@ class MimicEnemy extends Enemy {
         super(speed, health);
         this.image.src = 'images/xpBag.webp';
         this.shootTimer = 120;
-        this.order = 1;
         this.width = 50;
         this.height = 50;
         this.value = 80;
@@ -2935,6 +3261,11 @@ class SelfDestructEnemy extends Enemy {
         this.timer();
         this.speed=6.5-(this.health/this.maxHealth)*15/4;
     }
+    draw(){
+        if(this.exploding) ctx.filter = 'hue-rotate(90deg)';
+        super.draw();
+        ctx.filter="none"
+    }
     takeDamage(a, b){
         super.takeDamage(a, b);
         if(this.dead){
@@ -2988,7 +3319,6 @@ class MachineGunEnemy extends Enemy {
         super(speed, health);
         this.image.src = 'images/machineGunEnemy.webp';
         this.shootTimer = 30;
-        this.order = 1;
         this.value = 150;
         this.width=100;
         this.height=100;    
@@ -3238,7 +3568,6 @@ class SplitterEnemy extends Enemy {
         super(speed, health);
         this.image.src = 'images/splitterEnemy.webp';
         this.shootTimer = 60;
-        this.order = 1;
         this.value = 150;
         this.width=100;
         this.height=100;    
@@ -3307,7 +3636,51 @@ class TeleporterEnemy extends Enemy {
         
     
 }
-const ENEMYTYPES=[BasicEnemy,ShooterEnemy,AimingEnemy,HomingEnemy,TrapperEnemy,ZombieEnemy,ShieldEnemy,ChargingEnemy,GhostEnemy,PoisonEnemy,BlackHoleEnemy,MimicEnemy,BuilderEnemy,WindupEnemy,SpawnerEnemy,SelfDestructEnemy,MachineGunEnemy,SmokeBombEnemy,SplitterEnemy,TeleporterEnemy];
+class IceEnemy extends Enemy {
+    constructor(speed, health) {
+        super(speed, health);
+        this.image.src = 'images/iceEnemy.webp';
+        this.shootTimer = 60;
+        this.value = 30;
+        this.width=50;
+        this.height=50;    
+        //console.log(this.shootTimer);
+    }
+    timer() {
+        if (this.slowCountdown > 0) {
+            this.shootTimer -= 0.5;
+        }
+        else {
+            this.shootTimer--;
+        }
+        if (this.shootTimer <= 0) {
+            this.shootTimer = 240;
+            let distanceX = player.x - this.x;
+            let distanceY = player.y - this.y;
+            let distance = distanceX * distanceX + distanceY * distanceY;
+            let vx = 0;
+            let vy = 0;
+
+            if (distance > 0) {
+                let angle = Math.atan2(distanceY, distanceX);
+                vx = 5 * Math.cos(angle);
+                vy = 5 * Math.sin(angle);
+            }
+            let temp=new EnemyBullet(vx, vy, 1, this.x, this.y);
+            temp.width = 20;
+            temp.height = 20;
+            temp.image.src = "images/iceEnemyProjectile.webp";
+            temp.frostbite = true;
+            enemyBullets.push(temp)
+        }
+    }
+    special() {
+        this.timer();
+    }
+        
+    
+}
+const ENEMYTYPES=[BasicEnemy,ShooterEnemy,AimingEnemy,HomingEnemy,TrapperEnemy,ZombieEnemy,ShieldEnemy,ChargingEnemy,GhostEnemy,PoisonEnemy,BlackHoleEnemy,MimicEnemy,BuilderEnemy,WindupEnemy,SpawnerEnemy,SelfDestructEnemy,MachineGunEnemy,SmokeBombEnemy,SplitterEnemy,TeleporterEnemy, IceEnemy];
 
 /*
 ^ ENEMIES
@@ -3333,9 +3706,11 @@ class Bullet {
         // console.log(this.width)
         this.frostbite = false;
         this.slowed = false;
+        this.slowCountdown=0;
     }
     move() {
-        if (this.slowed) {
+        this.slowCountdown--;
+        if (this.slowed || this.slowCountdown>0) {
             this.x += this.speedX / 3;
             this.y += this.speedY / 3;
         }
@@ -3356,7 +3731,7 @@ class Bullet {
                 this.dead = true;
             }
         }
-        if (this.x < leftBorder-100 || this.y < topBorder-100 || this.x > rightBorder + 100 || this.y >= bottomBorder + 100) {
+        if (this.x < leftBorder-20 || this.y < topBorder-20 || this.x > rightBorder + 20 || this.y >= bottomBorder + 20) {
             this.dead = true;
         }
     }
@@ -3381,7 +3756,9 @@ class PiercingBullet extends Bullet{
         this.hitEnemies = new Set();
     }
     move(){
-        if (this.slowed) {
+        
+        this.slowCountdown--;
+        if (this.slowed || this.slowCountdown>0) {
             this.x += this.speedX / 3;
             this.y += this.speedY / 3;
         }
@@ -3403,7 +3780,7 @@ class PiercingBullet extends Bullet{
                 }
             }
         }
-        if (this.x < leftBorder-100 || this.y < topBorder-100 || this.x > rightBorder+ 100 || this.y >= bottomBorder+ 100) {
+        if (this.x < leftBorder-20 || this.y < topBorder-20 || this.x > rightBorder+ 20 || this.y >= bottomBorder+ 20) {
             this.dead = true;
         }
     }
@@ -3415,6 +3792,69 @@ class PiercingBullet extends Bullet{
         
 
         ctx.restore();
+    }
+}
+class BouncingBullet extends Bullet{
+    constructor(speedX, speedY, damage) {
+        super(speedX, speedY, damage);
+        this.width = 40;
+        this.height = 40;
+        this.width*=player.projectileSizeMultiplier;
+        this.height*=player.projectileSizeMultiplier;
+        this.timer=900;
+        this.image.src="images/bouncingBullet.webp";
+        this.hitEnemies = new Set();
+    }
+    move(){
+        this.timer--;
+        
+        this.slowCountdown--;
+        if (this.slowed || this.slowCountdown>0) {
+            this.x += this.speedX / 3;
+            this.y += this.speedY / 3;
+        }
+        else {
+            this.x += this.speedX;
+            this.y += this.speedY;
+        }
+        
+        if (this.x < (this.width - 50) / 2+leftBorder) {
+            this.x = (this.width - 50) / 2+leftBorder;
+            this.speedX *= -1;
+            this.hitEnemies=new Set();
+        }
+        if (this.y < (this.width - 50) / 2+topBorder) {
+            this.y = (this.width - 50) / 2+topBorder;
+            this.speedY *= -1;
+            this.hitEnemies=new Set();
+        }
+        if (this.x > rightBorder - (this.width - 50) / 2) {
+            this.x =rightBorder - (this.width - 50) / 2;
+            this.speedX *= -1;
+            this.hitEnemies=new Set();
+        }
+        if (this.y > bottomBorder - (this.width - 50) / 2) {
+            this.y = bottomBorder - (this.width - 50) / 2;
+            this.speedY *= -1;
+            this.hitEnemies=new Set();
+        }
+        for (let i = enemies.length - 1; i >= 0; i--) {
+
+            if (
+                (enemies[i].x - enemies[i].width / 2) < (this.x + this.width / 2) &&
+                (enemies[i].x + enemies[i].width / 2) > (this.x - this.width / 2) &&
+                (enemies[i].y - enemies[i].height / 2) < (this.y + this.height / 2) &&
+                (enemies[i].y + enemies[i].height / 2) > (this.y - this.height / 2) && enemies[i].ignoreBullets == false 
+            ) {
+                if(!this.hitEnemies.has(enemies[i])){
+                    enemies[i].takeDamage(this);
+                    this.hitEnemies.add(enemies[i]);
+                }
+            }
+        }
+        if(this.timer<=0){
+            this.dead=true;
+        }
     }
 }
 class FrostBullet extends Bullet {
@@ -3429,7 +3869,9 @@ class FrostBullet extends Bullet {
         this.hitEnemies = new Set();
     }
     move(){
-        if (this.slowed) {
+        
+        this.slowCountdown--;
+        if (this.slowed || this.slowCountdown>0) {
             this.x += this.speedX / 3;
             this.y += this.speedY / 3;
         }
@@ -3513,6 +3955,8 @@ class PlayerBomb extends Bullet {
         this.scale = 25;
         this.damage = player.bombDamage;
         this.hitEnemies = new Set();
+        this.maxExplodeTimer=45;
+        this.knockback=false;
     }
     move() {
         if (this.explodeTimer <= 0) {
@@ -3528,7 +3972,7 @@ class PlayerBomb extends Bullet {
         if (this.shootTimer > 0) {
             for (let i = 0; i < enemies.length; i++) {
                 if (enemies[i].ignoreBullets == false && RectCircleColliding(this, enemies[i], this.width / 2, this.x, this.y)) {
-                    this.explodeTimer = 45;
+                    this.explodeTimer = this.maxExplodeTimer;
                     this.shootTimer = 0;
                     this.image.src = "images/explosion.webp";
                 }
@@ -3546,11 +3990,29 @@ class PlayerBomb extends Bullet {
             for (let i = 0; i < enemies.length; i++) {
                 if (!this.hitEnemies.has(enemies[i]) && enemies[i].ignoreBullets == false && RectCircleColliding(this, enemies[i], this.width / 2, this.x, this.y)) {
                     enemies[i].takeDamage(this);
+                    if(this.knockback){
+                        let angle=Math.atan2((enemies[i].y-player.y),(enemies[i].x-player.x));
+                        enemies[i].AddForce(25*Math.cos(angle), 25*Math.sin(angle));
+                    }
                     this.hitEnemies.add(enemies[i]);
                 }
             }
         }
 
+    }
+}
+class PlayerNuke extends PlayerBomb {
+    constructor(x, y, speedX, speedY) {
+        super(x, y, speedX/2, speedY/2);
+        this.image.src = "images/playerNuke.webp";
+        this.maxExplodeTimer=120;
+        this.damage=player.bombDamage*2;
+        this.shootTimer=240;
+        this.knockback=true;
+    }
+    move(){
+        super.move();
+        
     }
 }
 class ExpandingCircle extends Bullet {
@@ -3619,6 +4081,7 @@ class ProtectorBullet extends Bullet {
         protectorBullets.push(this);
     }
     move() {
+        this.damage=player.protectorDamage;
         this.width=40*player.projectileSizeMultiplier;
         this.height=40*player.projectileSizeMultiplier;
         if(ProtectorBullet.slowed==true){
@@ -3760,7 +4223,9 @@ class WindBullet extends Bullet {
         this.hitEnemies = new Set();
     }
     move(){
-        if (this.slowed) {
+        
+        this.slowCountdown--;
+        if (this.slowed || this.slowCountdown>0) {
             this.x += this.speedX / 3;
             this.y += this.speedY / 3;
         }
@@ -3922,8 +4387,6 @@ class PoisonBomb extends EnemyBullet {
         this.speedX = speedX;
         this.speedY = speedY;
         this.image.src = "images/poisonBomb.webp";
-        this.image.style.left = (x) + "px";  // center horizontally on x
-        this.image.style.top = y + "px";
         this.image.zIndex = 1;
         this.scale = 25;
         this.iFrame = 0;
@@ -3962,6 +4425,68 @@ class PoisonBomb extends EnemyBullet {
             this.dead = true;
         }
 
+    }
+}
+class EnemyBomb extends EnemyBullet {
+    constructor(x, y, speedX, speedY, timer) {
+        super(speedX, speedY, 1, x, y);
+        this.shootTimer = Math.round(timer/2)*2;
+        this.maxTimer=Math.round(timer/2)*2;
+        this.explodeTimer = 0;
+        this.height = 50;
+        this.width = 50;
+        this.damage=4;
+        this.x=x;
+        this.y=y;
+        this.speedX = speedX;
+        this.speedY = speedY;
+        this.image.src = "images/enemyBomb.webp";
+        this.image.zIndex = 1;
+        this.scale = 50;
+        this.iFrame = 0;
+        this.ignoreShield=true;
+        console.log(this.x+" "+this.y+" "+this.speedX+" "+this.speedY)
+    }
+    move() {
+
+        if (this.explodeTimer <= 0) {
+            this.x += this.speedX;
+            this.y += this.speedY;
+        }
+        if (this.explodeTimer > 0 && this.iFrame <= 0 && RectCircleColliding(this, player, this.width / 2-20, this.x, this.y)) {
+            player.takeDamage(this.damage, this);
+            this.iFrame = 61;
+
+        }
+    }
+    special() {
+        this.shootTimer--;
+        this.explodeTimer--;
+        this.iFrame--;
+        if (this.shootTimer == 0 && this.explodeTimer < 0) {
+            this.image.src = "images/explosion.webp";
+            this.explodeTimer = 30;
+        }
+        if (this.explodeTimer >0) {
+            this.scale += 10;
+        }
+        if (this.shootTimer > this.maxTimer/2) {
+            this.scale += 1;
+        }
+        else if (this.shootTimer > 0) {
+            this.scale -= 1;
+        }
+        this.width = this.scale;
+        this.height = this.scale;
+        if (this.explodeTimer == 0) {
+            this.dead = true;
+        }
+
+    }
+    draw(){
+        if(this.exploding) ctx.filter = 'hue-rotate(90deg)';
+        super.draw();
+        ctx.filter="none"
     }
 }
 
@@ -4280,6 +4805,12 @@ class Laser extends EnemyBullet {
         ctx.restore();
     }
 }
+class PermanentLaser extends Laser {
+    constructor(angle, x, y) {
+        super(angle, x, y);
+        this.despawnTimer=9999999;
+    }
+}
 class Fire extends EnemyBullet {
     constructor(damage, x, y, vx, vy) {
         super(vx, vy, damage, x, y);
@@ -4323,7 +4854,7 @@ class Water extends EnemyBullet {
         const distance = Math.sqrt(dx * dx + dy * dy);
         if (distance < (player.width/2-10) + this.width / 2 && this.hit == false) {
             player.AddForce(-dx / 3.5, -dy / 3.5);
-            player.slowCountdown = 120;
+            player.slowCountdown = Math.max(player.slowCountdown, 120);
             this.hit = true;
         }
         if (this.x < -500 || this.y < -500 || this.x > canvas.width + 500 || this.y >= canvas.height + 500) {
@@ -4434,7 +4965,7 @@ class ChargingOrb extends EnemyBullet {
 class SpinningBullet extends EnemyBullet {
     constructor(speedX, speedY, damage, x, y) {
         super(speedX, speedY, damage, x, y);
-        this.image.src = 'images/blue.webp';
+        this.image.src = 'images/purple.webp';
         this.width = 20;
         this.height = 20;
         this.centerX = this.x;
@@ -4498,6 +5029,51 @@ class SplitterBullet extends EnemyBullet {
         }
     }
 
+}
+class EngineerBullet extends EnemyBullet {
+    constructor(x, y, speedX, speedY, type) {
+        super(speedX, speedY, 1, x, y);
+        this.shootTimer = Math.random()*120+60;
+        this.height = 50;
+        this.width = 50;
+        this.x=x;
+        this.y=y;
+        this.speedX = speedX;
+        this.speedY = speedY;
+        this.image.src = "images/engineerBullet.webp";
+        this.type=type;
+        this.ignoreShield=true;
+    }
+    move() {
+
+        this.x += this.speedX;
+        this.y += this.speedY;
+    }
+    special() {
+        this.shootTimer--;
+        if (this.shootTimer <= 0 || this.x < leftBorder-20 || this.y < topBorder-20 || this.x > rightBorder + 20 || this.y >= bottomBorder + 20) {
+            this.dead=true;
+            this.x=Math.min(rightBorder+20, this.x);
+            this.x=Math.max(leftBorder-20, this.x);
+            this.y=Math.max(topBorder-20, this.y);
+            this.y=Math.min(bottomBorder+20, this.y);
+            switch(this.type){
+                case 1:
+                    enemies.push(new SentryEngineerEnemy(this.x, this.y, 10));
+                    break;
+                case 2:
+                    enemies.push(new LaserEngineerEnemy(this.x, this.y, 15));
+                    break;
+                case 3:
+                    enemies.push(new BombEngineerEnemy(this.x, this.y, 15));
+                    break;
+                case 4:
+                    enemies.push(new IceEngineerEnemy(this.x, this.y, 25));
+                    break;
+            }
+        }
+
+    }
 }
 
 /*
@@ -4613,11 +5189,11 @@ const worldDiv = document.getElementById("world");
 
 function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Boss) {
     bossesLeft = numTier1Boss+numTier2Boss;
-    let tier1 = [1, 2, 3, 4, 5, 6];
+    let tier1 = [1, 2, 3, 4, 5, 6, 7];
     let tier2 = [1, 2, 3, 4, 5, 6, 7];
     let tier3 = [1, 2, 3, 4, 5, 6, 7];
     let tier1Bosses = [1, 2, 3, 4, 5];
-    let tier2Bosses = [1, 2, 3];
+    let tier2Bosses = [1, 2, 3, 4];
     tier1 = shuffle(tier1);
     tier2 = shuffle(tier2);
     tier3 = shuffle(tier3);
@@ -4671,6 +5247,14 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 if (!ZombieEnemy.seen) {
                     ZombieEnemy.seen = true;
                     newEnemyQueue.push("images/zombieEnemy.webp");
+                    isPlayerUnlocked.push(false);
+                }
+                break;
+            case 7:
+                IceEnemy.isActive = true;
+                if (!IceEnemy.seen) {
+                    IceEnemy.seen = true;
+                    newEnemyQueue.push("images/iceEnemy.webp");
                     isPlayerUnlocked.push(false);
                 }
                 break;
@@ -4867,11 +5451,20 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 }
                 break;
             case 3:
-                boss = new HealerBoss(1.5,150);
+                boss = new HealerBoss(1.5,175);
                 enemies[enemies.length] = boss;
                 if (!HealerBoss.seen) {
                     HealerBoss.seen = true;
                     newEnemyQueue.push("images/healingBoss.webp");
+                    isPlayerUnlocked.push(false);
+                }
+                break;
+            case 4:
+                boss = new EngineerBoss(1,175);
+                enemies[enemies.length] = boss;
+                if (!EngineerBoss.seen) {
+                    EngineerBoss.seen = true;
+                    newEnemyQueue.push("images/engineerBoss.webp");
                     isPlayerUnlocked.push(false);
                 }
                 break;
@@ -4880,26 +5473,9 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
 
 }
 function DisableAllEnemies(){
-
-    BasicEnemy.isActive = false;
-    ShooterEnemy.isActive = false;
-    AimingEnemy.isActive = false;
-    HomingEnemy.isActive = false;
-    ChargingEnemy.isActive = false;
-    ShieldEnemy.isActive = false;
-    TrapperEnemy.isActive = false;
-    ZombieEnemy.isActive = false;
-    GhostEnemy.isActive = false;
-    PoisonEnemy.isActive = false;
-    BlackHoleEnemy.isActive = false;
-    BuilderEnemy.isActive = false;
-    WindupEnemy.isActive = false;
-    SpawnerEnemy.isActive = false;
-    MimicEnemy.isActive=false;
-    SelfDestructEnemy.isActive=false;
-    MachineGunEnemy.isActive=false;
-    SmokeBombEnemy.isActive=false;
-    SplitterEnemy.isActive=false;
+    for(let i=0;i<ENEMYTYPES.length;i++){
+        ENEMYTYPES[i].isActive=false;
+    }
 }
 function InitializeStats(){
     BasicEnemy.baseTimer=200;
@@ -4931,12 +5507,6 @@ function InitializeStats(){
     HomingEnemy.index=3;
     HomingEnemy.health=2;
     HomingEnemy.speed=1;
-    
-    TeleporterEnemy.baseTimer=800;
-    TeleporterEnemy.randomTimer=500;
-    TeleporterEnemy.index=19;
-    TeleporterEnemy.health=9;
-    TeleporterEnemy.speed=2;
 
     ShieldEnemy.baseTimer=900;
     ShieldEnemy.randomTimer=750;
@@ -5021,6 +5591,18 @@ function InitializeStats(){
     SplitterEnemy.index=18;
     SplitterEnemy.health=15;
     SplitterEnemy.speed=1.5;
+    
+    TeleporterEnemy.baseTimer=800;
+    TeleporterEnemy.randomTimer=500;
+    TeleporterEnemy.index=19;
+    TeleporterEnemy.health=9;
+    TeleporterEnemy.speed=2;
+    
+    IceEnemy.baseTimer=300;
+    IceEnemy.randomTimer=300;
+    IceEnemy.index=20;
+    IceEnemy.health=3;
+    IceEnemy.speed=1.5;
     
 }
 
@@ -5390,6 +5972,14 @@ function ChangePage(id, reset) {
     }
     //console.log(id)
     if(id=="characterSelectionPage"){
+        chosenCharacter=0;
+        let descriptionText=document.getElementById("descriptionText");
+        descriptionText.innerText="";
+        list = document.querySelectorAll('[id$="Player"]');
+        for (let i = 0; i < list.length; i++) {
+            list[i].style.border = "";
+        }
+        document.getElementById("startButton").disabled = true; 
         let tankPlayerButton=document.getElementById("tankPlayer");
         let tankPlayerImage=document.getElementById("tankPlayerImage");
         let tankPlayerText=document.getElementById("tankPlayerText");
@@ -5477,6 +6067,16 @@ function ChangePage(id, reset) {
             pheonixPlayerText.style.fontSize="30px";
             pheonixPlayerText.style.top="225px";
         }
+    }
+    if(id=="gamemodeSelectionPage"){
+    
+        let gamemodeDescriptionText=document.getElementById("gamemodeDescriptionText");
+        gamemodeDescriptionText.innerText="";
+        list = document.querySelectorAll('[id$="gamemodeSelectionButton"]');
+        for (let i = 0; i < list.length; i++) {
+            list[i].style.border = "";
+        }
+        document.getElementById("difficultyConfirmationButton").disabled=true;
     }
     if(id=="settingsPage"){
         let temp=""
@@ -5608,6 +6208,14 @@ function ChangePage(id, reset) {
         if(TeleporterEnemy.seen){
             images[27].src="images/teleporterEnemy.webp";
             images[27].style.pointerEvents="auto";
+        }
+        if(IceEnemy.seen){
+            images[28].src="images/iceEnemy.webp";
+            images[28].style.pointerEvents="auto";
+        }
+        if(EngineerBoss.seen){
+            images[29].src="images/engineerBoss.webp";
+            images[29].style.pointerEvents="auto";
         }
     }
     if (id == "gamePage") {
@@ -5751,21 +6359,6 @@ async function EndGame(win) {
         shieldBar.image2.remove();
     }
     
-    chosenCharacter=0;
-    let descriptionText=document.getElementById("descriptionText");
-    descriptionText.innerText="";
-    let gamemodeDescriptionText=document.getElementById("gamemodeDescriptionText");
-    gamemodeDescriptionText.innerText="";
-    list = document.querySelectorAll('[id$="Player"]');
-    for (let i = 0; i < list.length; i++) {
-        list[i].style.border = "";
-    }
-    list = document.querySelectorAll('[id$="gamemodeSelectionButton"]');
-    for (let i = 0; i < list.length; i++) {
-        list[i].style.border = "";
-    }
-    document.getElementById("startButton").disabled = true; 
-    document.getElementById("difficultyConfirmationButton").disabled=true;
 
     if(win==true){
         ChangePage("winPage",true);
