@@ -4948,8 +4948,6 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 break;
         }
     }
-                boss = new FarmerBoss(2,75);
-                enemies[enemies.length] = boss;
 
 }
 function DisableAllEnemies(){
