@@ -1,5 +1,6 @@
 function increaseDamage(amount) {
     player.damage += amount;
+    console.log(boughtUpgrades[0]);
     boughtUpgrades[0]+=0.5;
     boughtTier2Upgrades[0]+=0.5;
     
@@ -57,6 +58,7 @@ function addBomb(amount) {
     new BombIcon(50);
     boughtUpgrades[8] = 1;
     boughtUpgrades[23]=0;
+    boughtTier2Upgrades[9]=0;
     ChangePage('gamePage', false)
 }
 function addTimeWarp(amount) {
@@ -144,7 +146,7 @@ function Roll() {
                 gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:black; font-size:75px;background-color:gray;" id="upgrade">Heal 10</div>`
                 break;
             case 4:
-                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:black; font-size:75px;background-color:gray;" id="upgrade">Increase Speed</div>`
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:green; font-size:75px;background-color:gray;" id="upgrade">Increase Speed</div>`
                 break;
             case 5:
                 gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:green; font-size:75px;background-color:gray;" id="upgrade">+0.5 Damage</div>`
@@ -319,7 +321,7 @@ function AddSpeed(amount) {
     ChangePage('gamePage', false)
 }
 function IncreaseSlowedDamage(amount){
-    player.slowedDamageMultiplier=1.5;
+    player.slowedDamageMultiplier=amount;
     boughtUpgrades[22]=1;
     ChangePage('gamePage', false)
 }
@@ -339,6 +341,7 @@ function AddTimeStop() {
 function AddBouncingProjectile(amount){
     player.bouncingProjectiles+=amount;
     player.bouncingProjectileMaxCooldown = 240 / player.bouncingProjectiles;
+    boughtUpgrades[28]=0;
     ChangePage('gamePage', false)
 }
 function IncreaseProtectorDamage(amount){
@@ -349,5 +352,9 @@ function AddNuke() {
     BombIcon.version=1;
     boughtTier2Upgrades[9] = 1;
     UPGRADES[23].text="+8 Bomb Damage";
+    ChangePage('gamePage', false)
+}
+function IncreaseBouncingBulletDamage(amount){
+    player.bouncingBulletDamage+=amount;
     ChangePage('gamePage', false)
 }

@@ -45,42 +45,42 @@ document.addEventListener("mousemove", (e)=>{
 document.addEventListener("keydown", (e)=>{ 
     if(page=="gamePage"){
         let key=e.key.toLowerCase();
-        if(key==='w'){
+        if(key==controls["up"]){
             movingUp=true;
         }
-        if(key==='a'){
+        if(key==controls["left"]){
             movingLeft=true;
         }
-        if(key==='d'){
+        if(key==controls["right"]){
             movingRight=true;
         }
-        if(key==='s'){
+        if(key==controls["down"]){
             movingDown=true;
         }
-        if(key=="c"){
-            player.currentExp+=10000;
+        if(key==controls["levelUp"]){
+            player.currentExp+=1000000;
         }
-        if(key=="p"){
-            ChangeWave(); 
+        if(key==controls["skipWave"]){
+            ChangeWave();
         }
-        if(key=="o"){
+        if(key==controls["dealDamage"]){
             for(let i=0;i<enemies.length;i++){
-                enemies[i].takeDamage(new Bullet(1,1,20), i);
+                enemies[i].takeDamage(new Bullet(1,1,2000), i);
             }
         }
-        if(key=="q" && playerAbilities.length>0){
+        if(key==controls["ability1"] && playerAbilities.length>0){
             playerAbilities[0].Activate();
         }
-        if(key=="e" && playerAbilities.length>1){
+        if(key==controls["ability2"] && playerAbilities.length>1){
             playerAbilities[1].Activate();
         }
-        if(key=="r" && playerAbilities.length>2){
+        if(key==controls["ability3"] && playerAbilities.length>2){
             playerAbilities[2].Activate();
         }
-        if(key=="f" && playerAbilities.length>3){
+        if(key==controls["ability4"] && playerAbilities.length>3){
             playerAbilities[3].Activate();
         }
-        if(key=="t" && playerAbilities.length>4){
+        if(key==controls["ability5"] && playerAbilities.length>4){
             playerAbilities[4].Activate();
         }
         if(e.key=="Escape" && gamemode==0){
@@ -89,6 +89,21 @@ document.addEventListener("keydown", (e)=>{
         if (['w', 'a', 's', 'd'].includes(key)) {
             e.preventDefault();
         }
+    }
+    if(controlBeingToggled!=""){
+        //console.log(e.key.toLowerCase()+" "+Object.values(controls)+" "+(e.key.toLowerCase() in Object.values(controls)))
+        if(Object.values(controls).includes(e.key.toLowerCase()) && controls[controlBeingToggled]!=e.key.toLowerCase()){
+            document.getElementById(controlBeingToggled+"ControlButton").innerText="Key already used"
+        }
+        else if(e.key.toLowerCase()=="escape"){
+            controls[controlBeingToggled]="N/A";
+            document.getElementById(controlBeingToggled+"ControlButton").innerText="N/A";
+        }
+        else{
+            controls[controlBeingToggled]=e.key.toLowerCase();
+            document.getElementById(controlBeingToggled+"ControlButton").innerText=e.key.toUpperCase();
+        }
+        controlBeingToggled="";
     }
         
 })
@@ -142,16 +157,16 @@ async function EndTutorial(){
 }
 document.addEventListener("keyup", (e)=>{
     let key=e.key.toLowerCase();
-    if(key==='w'){
+    if(key==controls["up"]){
         movingUp=false;
     }
-    else if(key==='a'){
+    else if(key==controls["left"]){
         movingLeft=false;
     }
-    else if(key==='d'){
+    else if(key==controls["right"]){
         movingRight=false;
     }
-    else if(key==='s'){
+    else if(key==controls["down"]){
         movingDown=false;
     }
     
@@ -192,6 +207,7 @@ window.addEventListener("beforeunload", (e)=>{
     localStorage.setItem("SnakeBossFound", SnakeBoss.seen);
     localStorage.setItem("HealerBossFound", HealerBoss.seen);
     localStorage.setItem("EngineerBossFound", EngineerBoss.seen);
+    localStorage.setItem("FarmerBossFound", FarmerBoss.seen);
     
     localStorage.setItem("TankPlayerUnlocked", TankPlayer.unlocked);
     localStorage.setItem("HealerPlayerUnlocked", HealerPlayer.unlocked);
@@ -200,6 +216,18 @@ window.addEventListener("beforeunload", (e)=>{
     localStorage.setItem("PheonixPlayerUnlocked", PheonixPlayer.unlocked);
     
     localStorage.setItem("ShowHealthbarSetting", showHealthBars);
+    localStorage.setItem("leftControl", controls["left"]);
+    localStorage.setItem("rightControl", controls["right"]);
+    localStorage.setItem("upControl", controls["up"]);
+    localStorage.setItem("downControl", controls["down"]);
+    localStorage.setItem("ability1Control", controls["ability1"]);
+    localStorage.setItem("ability2Control", controls["ability2"]);
+    localStorage.setItem("ability3Control", controls["ability3"]);
+    localStorage.setItem("ability4Control", controls["ability4"]);
+    localStorage.setItem("ability5Control", controls["ability5"]);
+    localStorage.setItem("levelUpControl", controls["levelUp"]);
+    localStorage.setItem("skipWaveControl", controls["skipWave"]);
+    localStorage.setItem("dealDamageControl", controls["dealDamage"]);
 });
 document.addEventListener('DOMContentLoaded', () => {
     BasicEnemy.seen=JSON.parse(localStorage.getItem("BasicEnemyFound"));
@@ -236,6 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
     SnakeBoss.seen=JSON.parse(localStorage.getItem("SnakeBossFound"));
     HealerBoss.seen=JSON.parse(localStorage.getItem("HealerBossFound"));
     EngineerBoss.seen=JSON.parse(localStorage.getItem("EngineerBossFound"));
+    FarmerBoss.seen=JSON.parse(localStorage.getItem("FarmerBossFound"));
 
     BasicPlayer.unlocked=true;
     if(JSON.parse(localStorage.getItem("TankPlayerUnlocked"))!=null) TankPlayer.unlocked=JSON.parse(localStorage.getItem("TankPlayerUnlocked"));
@@ -247,6 +276,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     if(JSON.parse(localStorage.getItem("ShowHealthbarSetting"))!=null) showHealthBars=JSON.parse(localStorage.getItem("ShowHealthbarSetting"));
-
+    if(localStorage.getItem("leftControl")!=null) controls["left"]=localStorage.getItem("leftControl");
+    if(localStorage.getItem("rightControl")!=null) controls["right"]=localStorage.getItem("rightControl");
+    if(localStorage.getItem("upControl")!=null) controls["up"]=localStorage.getItem("upControl");
+    if(localStorage.getItem("downControl")!=null) controls["down"]=localStorage.getItem("downControl");
+    if(localStorage.getItem("ability1Control")!=null) controls["ability1"]=localStorage.getItem("ability1Control");
+    if(localStorage.getItem("ability2Control")!=null) controls["ability2"]=localStorage.getItem("ability2Control");
+    if(localStorage.getItem("ability3Control")!=null) controls["ability3"]=localStorage.getItem("ability3Control");
+    if(localStorage.getItem("ability4Control")!=null) controls["ability4"]=localStorage.getItem("ability4Control");
+    if(localStorage.getItem("ability5Control")!=null) controls["ability5"]=localStorage.getItem("ability5Control");
+    if(localStorage.getItem("levelUpControl")!=null) controls["levelUp"]=localStorage.getItem("levelUpControl");
+    if(localStorage.getItem("skipWaveControl")!=null) controls["skipWave"]=localStorage.getItem("skipWaveControl");
+    if(localStorage.getItem("dealDamageControl")!=null) controls["dealDamage"]=localStorage.getItem("dealDamageControl");
 
 });

@@ -25,7 +25,9 @@ let SCALE=0.001;
 let continueFlag=false;
 let speedMultiplier=0;
 let upgradingEnemy=false;
-const NUMUPGRADES=28;
+let controls={left:"a", up:"w", right:"d", down:"s", ability1:"q", ability2:"e", ability3:"r", ability4:"f", ability5:"t", levelUp:"N/A", skipWave:"N/A", dealDamage:"N/A"};
+let controlBeingToggled="";
+const NUMUPGRADES=29;
 const NUMTIER2UPGRADES=10;
 const NUMENEMYUPGRADES=8;
 let boughtUpgrades=new Array(NUMUPGRADES);
@@ -59,12 +61,13 @@ let UPGRADES = [
     { onclick: "PassiveSpawns()",  text: "Passively Spawn Souls" },
     { onclick: "IncreaseTornadoDamage(1)",  text: "+1 Tornado Damage" },
     { onclick: "AddSpeed(2)",     text: "Increase Movement Speed" },
-    { onclick: "IncreaseSlowedDamage(2)",     text: "Slowed Enemies Take 2x Damage" },
+    { onclick: "IncreaseSlowedDamage(1.5)",     text: "Slowed Enemies Take 1.5x Damage" },
     { onclick: "IncreaseBombDamage(4)",     text: "+4 Bomb Damage" },
     { onclick: "IncreaseLaserDamage(0.5)",   text: "+0.5 Laser Damage" },
     { onclick: "AddTimeStop()",   text: "Speed Burst -> Time Stop" },
     { onclick: "AddBouncingProjectile(1)",   text: "+1 Bouncing Bullet" },
     { onclick: "IncreaseProtectorDamage(1)",   text: "+1 Protector Damage" },
+    { onclick: "IncreaseBouncingBulletDamage(1)",   text: "+1 Bouncing Bullet Damage" },
 
 ];
 let TIER2UPGRADES=[
@@ -89,7 +92,7 @@ let ENEMYUPGRADES=[
     { onclick: "AddConstantDamage()",   text: "Player Takes 1 Damage every 4 Seconds" },
     { onclick: "IncreaseScale(2)",   text: "Next Wave has 2x More Enemies" },
 ]
-const RESTRICTEDUPGRADES=[17, 18, 19, 20, 22, 23, 24, 25, 27]
+const RESTRICTEDUPGRADES=[17, 18, 19, 20, 22, 23, 24, 25, 27, 28]
 const RESTRICTEDTIER2UPGRADES=[9];
 let timeWarpCounter=0;
 let gambleTimer=0;
@@ -299,6 +302,9 @@ function SelectMode(mode){
             case 5:
                 document.getElementById("gamemodeDescriptionText").innerText="Every wave, pick between two negative effects. The player's max health is doubled."
                 break;
+            case 6:
+                document.getElementById("gamemodeDescriptionText").innerText="Waves consist of only bosses. If you don't kill them fast enough, the next wave will spawn."
+                break;
         }
         gamemodes[mode-2].style.border="5px solid red";
         document.getElementById("difficultyConfirmationButton").disabled=false;
@@ -384,7 +390,8 @@ function Start(){
     killedBoss=false;
     enableShrinking=false;
     page="gamePage";
-    
+    BombIcon.version=0;
+    TimeWarpIcon.version=0;
     
     background=new Image();
     background.src='images/background.webp';
@@ -463,6 +470,7 @@ function Start(){
             boughtUpgrades[6]=1;
             boughtUpgrades[7]=1;
             boughtUpgrades[10]=1;
+            boughtUpgrades[11]=1;
             boughtTier2Upgrades[4]=1;
             boughtTier2Upgrades[5]=1;   
             break;
@@ -471,6 +479,11 @@ function Start(){
             player.health*=2;
             player.maxHealth*=2;
             new ModifierText();
+            break;
+        case 6:
+            mapType=1;
+            waveTimer=3000;
+            boughtUpgrades[7]=1;
             break;
     }
     if(mapType==1){
@@ -506,6 +519,9 @@ function Start(){
     }
     else if(gamemode==4){
         ChangeWave();
+    }
+    else if(gamemode==6){
+        RandomizeEnemies(0,0,0,1,0);
     }
     else{
         RandomizeEnemies(2, 0, 0,0,0);

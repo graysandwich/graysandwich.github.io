@@ -58,6 +58,7 @@ class Player {
         this.bouncingProjectileCooldown=0;
         this.bouncingProjectileMaxCooldown = 120;
         this.protectorDamage=1;
+        this.bouncingBulletDamage=1;
     }
     takeDamage(damage, bullet) {
         if(this.rebirthTimer>0){
@@ -193,7 +194,7 @@ class Player {
 
             }
             else {
-                bullets[bullets.length] = new BouncingBullet(10, 0, 1);
+                bullets[bullets.length] = new BouncingBullet(10, 0, this.bouncingBulletDamage);
             }
 
         }
@@ -332,7 +333,7 @@ class Player {
 
     }
     GainXP(amount){
-        if(gamemode==4)return;
+        if(gamemode==4 || gamemode==6)return;
         this.currentExp+=amount*this.xpMultiplier;
     }
 }

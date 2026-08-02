@@ -426,7 +426,7 @@ class ChangeModeIcon extends Ability{
                 player.mode=1;
             }
             if(player.mode==1){
-                player.attackSpeed=5;
+                player.attackSpeed=7;
                 this.image.src="images/playerFire.webp";
             }
             else if(player.mode==2){
@@ -434,7 +434,7 @@ class ChangeModeIcon extends Ability{
                 this.image.src="images/playerIceBullet.webp";
             }
             else{
-                player.attackSpeed=50;
+                player.attackSpeed=30;
                 this.image.src="images/playerWind.webp";
             }
         }

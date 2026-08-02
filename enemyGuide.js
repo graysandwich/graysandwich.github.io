@@ -146,7 +146,7 @@ function ShowEnemy(enemy){
         case 24:
             sourceImage.src="images/gambleBoss.webp";
             sourceText.innerText="Source: Lowkey's MCSR Random Seed Glitchess world record thumbnail"
-            abilityText.innerText="Ability: Each attack has a chance of being one of five outcomes. Attacks are chosen at random, but each possible attack as a rarity that differs depending on difficulty.\n\n Common: Shoots basic bullets in a circle. \nUncommon: Shoots homing bullets and black holes. \nRare: Spawns a Roblox enemy, a File Explorer enemy, and a Filibuster enemy. \nEpic: Shoots lasers in a circle around him. \nLegendary: Shoots a barrage of random projectiles at the player.";
+            abilityText.innerText="Ability: Each attack has a chance of being one of five outcomes. Attacks are chosen at random, but each possible attack has a rarity that differs depending on difficulty.\n\n Common: Shoots basic bullets in a circle. \nUncommon: Shoots homing bullets and black holes. \nRare: Spawns a Roblox enemy, a File Explorer enemy, and a Filibuster enemy. \nEpic: Shoots lasers in a circle around him. \nLegendary: Shoots a barrage of random projectiles at the player.";
             descriptionText.innerText="For some reason, he seemed to really want to gamble. I guess that's what RSG does to someone.";
             break;
         case 25:
@@ -184,6 +184,12 @@ function ShowEnemy(enemy){
             sourceText.innerText="Source: Engineer Paragon from BTD6"
             abilityText.innerText="Ability: Can build 1 of 4 different towers. The tower it builds is chosen at random.\n\n 40%: Sentry Tower \n 30%: Laser Cannon \n 20%: Bomb Tower \n 10%: Ice Tower"
             descriptionText.innerText="You might be asking: How is this a paragon if its ability is solely based on the top crosspath? Well, ";
+            break;
+        case 31:
+            sourceImage.src="images/farmerBoss.webp";
+            sourceText.innerText="Source: Farmer from Luck Be A Landlord. Cow image is the profile picture of the goat BenQ in Codeforces. If you understand this enemy's reference then you are cool."
+            abilityText.innerText="Ability: Shoots grass bullets that bounce off walls and never disappear. When he dies, he spawns Bessie the cow in his place. Bessie will shoot bullets and eat the grass that Farmer John shoots. For each grass block Bessie eats, she will increase in both movement speed and attack speed."
+            descriptionText.innerText="Farmer John scoffs at people in math problems. Bob has 594+125 apples? Amateur. He has 10^5 different farms, with each farm having up to 10^9 cows. Find the shortest path between them. Or else.";
             break;
     }
 }
