@@ -1,6 +1,9 @@
 
 
-const SERVER_URL = location.hostname === "localhost" ? "http://localhost:3000" : "https://your-app.onrender.com";
+const SERVER_URL =
+  location.hostname === "localhost" || location.hostname === "127.0.0.1"
+    ? "http://localhost:8080"
+    : "https://ewow-score-checker-698852688376.us-central1.run.app";
 let serverState = { code: "", players: {}, bullets: [], enemies: [], floatingObjects: [], enemyBullets: [], abilityIcons: [], mapObjects: [], sharedXP: 0, nextLevel: 0, currentPage: "", readyCount: 0, waveText: null, deadPlayers:{}};
 
 const backgroundImage = new Image();

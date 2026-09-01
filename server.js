@@ -24,8 +24,8 @@ function makeCode() {
     }
     return code;
 }
-const PORT = process.env.PORT || 3000;
-httpServer.listen(PORT, () => console.log('listening on', PORT));
+
+
 const io = new Server(server, {
     cors: {
         origin: (origin, callback) => {
@@ -268,4 +268,5 @@ setInterval(() => {
     
 }, 1000 / 67);
 
-server.listen(3000, () => console.log("TESTING TESTING 123"));
+const PORT = process.env.PORT || 8080;
+server.listen(PORT, () => console.log("TESTING TESTING 123"));
