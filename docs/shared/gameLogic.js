@@ -7192,7 +7192,7 @@ function ChangePage(id, reset, player) {
             buttons[i].style.pointerEvents = "none";
         }
         if (BasicEnemy.seen) {
-            images[0].src = "images/Enemy.webp";
+            images[0].src = "images/enemy.webp";
             images[0].style.pointerEvents = "auto";
         }
         if (ShooterEnemy.seen) {
