@@ -87,7 +87,7 @@ let enemyBulletImages = enemyBulletPaths.map(src => {
 });
 
 const collectablePaths = [
-    "images/XPBag.webp",
+    "images/xpBag.webp",
     "images/healthPotion.webp",
 ];
 let collectableImages = collectablePaths.map(src => {
