@@ -1,5 +1,5 @@
-const { Bullet, Enemy, Player, BasicPlayer, FloatingObject, ENEMYTYPES, InitializeStats, currentPage, RandomizeEnemies, ChangeWave, WaveText, Wall, EnemyShield, XPBag, HealthPotion, ProtectorBullet, TankPlayer, HealerPlayer, MagePlayer, PheonixPlayer, NecromancerPlayer } = require('./public/shared/gameLogic.js')
-const { controls } = require('./public/initialization.js')
+const { Bullet, Enemy, Player, BasicPlayer, FloatingObject, ENEMYTYPES, InitializeStats, currentPage, RandomizeEnemies, ChangeWave, WaveText, Wall, EnemyShield, XPBag, HealthPotion, ProtectorBullet, TankPlayer, HealerPlayer, MagePlayer, PheonixPlayer, NecromancerPlayer } = require('./docs/shared/gameLogic.js')
+const { controls } = require('./docs/initialization.js')
 function createGameState() {
     return {
         code: "",
