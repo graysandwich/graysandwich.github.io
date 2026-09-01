@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <style>
+            body{
+                overflow:hidden;
+                width:100vw;
+                height:100vh;
+                margin:0;
+                background-color: lightblue;
+                /* background-image: url('introBackground.png');
+                background-repeat: no-repeat;
+                background-attachment: fixed; */
+            }
+            h1 {
+                font-family: Black ops one;
+                pointer-events:none;
+            }
+            button{
+                cursor: pointer;
+            }
+            ::-webkit-scrollbar {
+                width: 10px;
+            }
+
+            ::-webkit-scrollbar-track {
+                box-shadow: inset 0 0 5px grey;
+                border-radius: 10px;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: teal;
+                border-radius: 10px;
+            }
+            .scrollable-box {
+                height: 200px;
+                overflow-y: auto;
+            }
+                        
+        </style>
+        <title>A COMPLETELY ORIGINAL GAME</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+        
+        <canvas id="myCanvas" width=2000 height=1100 style="position:absolute; z-index: 0"></canvas>
+        <div id="gamePage" style="display:none">
+                <div id="world" style="position: relative;left: 0;right: 0;">
+                    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+                    <script src="shared/gameLogic.js" defer></script>
+                    <script src="initialization.js" defer></script>
+                    <script src="helpers.js" defer></script>
+                    <script src="players.js" defer></script>
+                    <script src="enemyBullets.js" defer></script>
+                    <script src="upgrades.js" defer></script>
+                    <script src="enemyUpgrades.js" defer></script>
+                    <script src="enemyGuide.js" defer></script>
+                    <script src="settings.js" defer></script>
+                    <script src="mapObjects.js" defer></script>
+                    <script src="game.js" defer></script>
+                    <script src="multiplayerStuff.js" defer></script>
+                    
+                </div>
+        </div>
+        <div id="losePage" style="display:none">            
+            <h1 style="text-align: center; font-size: 67px; position: absolute; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0;">You Lost</h1>
+            <button onclick="if(gamemode==100)ChangePage('coopPage', false); else ChangePage('characterSelectionPage', false)" style="text-align: center; font-size: 67px; position: relative; top: 230px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Restart</button>
+
+        </div>
+        <div id="winPage" style="display:none">            
+            <h1 style="text-align: center; font-size: 67px; position: absolute; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0;">You Win!</h1>
+            <button onclick="if(gamemode==100)ChangePage('coopPage', false); else ChangePage('characterSelectionPage', false)" style="text-align: center; font-size: 67px; position: relative; top: 230px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Play Again</button>
+
+        </div>
+        <div id="loadingPage" style="display:none">            
+            <h1 style="text-align: center; font-size: 67px; position: absolute; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0;"><span style="background-color: black; color: white">Loading...</span></h1>
+
+        </div>
+        <div id="upgradePage" style="display:none">
+            <h1 style="text-align: center; font-size: 67px; position: absolute; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0;"><span style="background-color: black; color: white" id="upgradeText">Choose Your Upgrade</span></h1>
+        </div>
+        <div id="IntroPage">
+            <h1 style="text-align: center; font-size: 67px; position: relative; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0; "><u>Crossover</u></h1>
+            <h1 style="text-align: center; font-size: 47px; position: relative; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0; font-family: Black ops one;">A very cool Roguelike Game by graysandwich</h1>
+            <h1 style="text-align: center; font-size: 20px; position: relative; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0; font-family: Black ops one;">I promise if you ignore the graphics this game is actually fun</h1>
+            
+            <button onclick="ChangePage('coopPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 40%; left: 0px; width: 50%; z-index: 1000; margin: 0px;">Co-op</button>
+            <button onclick="SelectMode(1)" style="text-align: center; font-size: 67px; position: absolute; top: 25%; left: 0px; width: 50%; z-index: 1000; margin: 0px;">PLAY</button>
+            <button onclick="ChangePage('gamemodeSelectionPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 25%; left: 50%; width: 50%; z-index: 1000; margin: 0px;">Other Modes</button>
+
+            <button onclick="SelectMode(0)" style="text-align: center; font-size: 67px; position: absolute; top: 40%; left: 50%; width: 50%; z-index: 1000; margin: 0;">Tutorial</button>
+            <button onclick="ChangePage('devlogPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 55%; left: 0; width: 100%; z-index: 1000; margin: 0;">Update Log</button>
+            <button onclick="ChangePage('settingsPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 70%; left: 0; width: 100%; z-index: 1000; margin: 0;">Settings</button>
+            <button onclick="ChangePage('enemyDescriptionSelectionPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 85%; left: 0; width: 100%; z-index: 1000; margin: 0;">Enemy Guide</button>
+
+
+        </div>
+        <div id="coopPage" style="display:none">
+            <input style="text-transform: uppercase;text-align: center; font-size: 67px; position: absolute; top: 5%; left: 25%; height:10%; width: 50%; z-index: 1000; margin: 0px;" type="text" placeholder="Room Code" maxlength="6" id="roomCode">
+            <button onclick="checkRoom()" style="text-align: center; font-size: 67px; position: absolute; top: 20%; left: 20%; height:15%; width: 60%; z-index: 1000; margin: 0px;" type="button" id="roomCodeButton">Join</button>
+            <button onclick="SelectMode(100)" style="text-align: center; font-size: 67px; position: absolute; top: 40%; left: 20%; height:15%; width: 60%; z-index: 1000; margin: 0px;" type="button">Create Room</button>
+            <h1 style="text-align: center; font-size: 67px; position: absolute; top: 60%; left: 0; width: 100%;z-index: 1000; margin: 0;" id="output"></h1>
+            <button onclick="ChangePage('IntroPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 80%; left: 20%; height:15%; width: 60%; z-index: 1000; margin: 0px;" type="button">Back</button>
+
+
+        </div>
+        <div id="coopWaitingPage" style="display:none">
+            <h1 style="text-align: center; font-size: 67px; position: relative; top: 7px; left: 0; width: 100%; z-index: 1000; margin: 0;">Waiting</h1>
+            <button onclick="startMultiplayer();" style="text-align: center; font-size: 67px; position: absolute; top: 55%; left: 20%; height:15%; width: 60%; z-index: 1000; margin: 0px;" type="button" id="coopStartButton">START</button>
+            <h1 style="text-align: center; font-size: 67px; position: absolute; top: 25%; left: 0; width: 100%;z-index: 1000; margin: 0;" id="coopCodeText"></h1>
+            <h1 style="text-align: center; font-size: 67px; position: absolute; top: 40%; left: 0; width: 100%;z-index: 1000; margin: 0;" id="coopPlayerText"></h1>
+            <button onclick="ChangePage('coopPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 80%; left: 25%; width: 50%; z-index: 1000; margin: 0;">Back</button>
+
+        </div>
+        <script>
+            
+        </script>
+        <div id="difficultyPage" style="display:none">
+            <h1 style="text-align: center; font-size: 67px; position: relative; top: 7px; left: 0; width: 100%; z-index: 1000; margin: 0;">Choose Your Difficulty</h1>
+            
+            <button onclick="SetDifficulty(1)" style="text-align: center; font-size: 67px; position: relative; top: 130px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Easy</button>
+            <button onclick="SetDifficulty(2)" style="text-align: center; font-size: 67px; position: relative; top: 150px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Normal</button>
+            <button onclick="SetDifficulty(3)" style="text-align: center; font-size: 67px; position: relative; top: 170px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Hard</button>
+            <button onclick="SetDifficulty(4)" style="text-align: center; font-size: 67px; position: relative; top: 190px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Extreme Demon</button>
+            <button onclick="if(gamemode==1)ChangePage('IntroPage', false); else if(gamemode==100)ChangePage('coopPage', false); else ChangePage('gamemodeSelectionPage', false);" style="text-align: center; font-size: 67px; position: relative; top: -410px; left: 1300px; width: 15%; z-index: 1000; margin: 0px;">Back</button>
+
+        </div>
+        <div id="gamemodeSelectionPage" style="display:none; position:relative; overflow:auto;height:100vh;">
+            <h1 style="text-align: center; font-size: 67px; position: relative; top: 7px; left: 0; width: 100%;z-index: 1000; margin: 0;">Choose Your Gamemode</h1>
+            <h1 style="position: absolute  ; text-align:center;top: 25%; height:200px; width:100%; z-index: 1000;"id="gamemodeDescriptionText"></h1>
+            <div class="scrollable-box" style="position: absolute; top: 40%; left: 0px; width: 100%; height: 60%; z-index: 1000; margin: 0px;">
+                
+                <button onclick="SelectMode(2)" style="text-align: center; font-size: 67px; position: absolute; top: 0%; left: 0px; height:20%; width: 100%; z-index: 1000; margin: 0px;" id="gamemodeSelectionButton">Shrinking Border</button>
+                <button onclick="SelectMode(3)" style="text-align: center; font-size: 67px; position: absolute; top: 25%; left: 0px; height:20%; width: 100%; z-index: 1000; margin: 0px;" id="gamemodeSelectionButton">Terrain</button>
+                <button onclick="SelectMode(4)" style="text-align: center; font-size: 67px; position: absolute; top: 50%; left: 0px; height:20%; width: 100%; z-index: 1000; margin: 0px;" id="gamemodeSelectionButton">Last Stand</button>
+                <button onclick="SelectMode(5)" style="text-align: center; font-size: 67px; position: absolute; top: 75%; left: 0px; height:20%; width: 100%; z-index: 1000; margin: 0px;" id="gamemodeSelectionButton">Pick Your Poison</button>
+                <button onclick="SelectMode(6)" style="text-align: center; font-size: 67px; position: absolute; top: 100%; left: 0px; height:20%; width: 100%; z-index: 1000; margin: 0px;" id="gamemodeSelectionButton">Boss Rush</button>
+
+            </div>
+            <button onclick="ChangePage('IntroPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 0%; left: 80%; width: 20%; z-index: 1000; margin: 0px;">Back</button>
+            <button onclick="ChangePage('difficultyPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 15%; left: 80%; width: 20%; z-index: 1000; margin: 0px;" id="difficultyConfirmationButton"disabled>Continue</button>
+
+
+        </div>
+        <div id="characterSelectionPage" style="display:none">
+            <h1 style="text-align: center; font-size: 67px; position: relative; top: 7px; left: 0; width: 100%; z-index: 1000; margin: 0;">Choose Your Character</h1>
+            
+            <button onclick="SelectCharacter(1)" style=" font-size:30px; position:absolute; top: 300px; left: 100px; width: 200px; height:200px; z-index: 1000;padding:0px" id="basicPlayer"><img src="images/player.webp" style="height:100%;width: 100%; "></img></button>
+            <h1 style="position: absolute  ; text-align:center;top: 225px; left: 100px; width: 200px; height:200px; z-index: 1000;">Basic</h1>
+            <button onclick="SelectCharacter(2)" style=" font-size:30px;position: absolute; top: 300px; left: 500px; width: 200px; height:200px; z-index: 1000;padding:0px" id="tankPlayer"><img src="images/tankPlayer.webp" style="height:100%;width: 100%; "id="tankPlayerImage"></img></button>
+            <h1 style="position: absolute  ; text-align:center;top: 225px; left: 500px; width: 200px; height:200px; z-index: 1000;"id="tankPlayerText">Tank</h1>
+            <button onclick="SelectCharacter(3)" style=" font-size:30px;position: absolute; top: 300px; left: 900px; width: 200px; height:200px; z-index: 1000;padding:0px" id="healerPlayer"><img src="images/healerPlayer.webp" style="height:100%;width: 100%; "id="healerPlayerImage"></img></button>
+            <h1 style="position: absolute  ; text-align:center;top: 225px; left: 900px; width: 200px; height:200px; z-index: 1000;"id="healerPlayerText">Healer</h1>
+            <button onclick="SelectCharacter(4)" style=" font-size:30px;position: absolute; top: 300px; left: 1300px; width: 200px; height:200px; z-index: 1000;padding:0px" id="magePlayer"><img src="images/magePlayer.webp" style="height:100%;width: 100%; "id="magePlayerImage"></img></button>
+            <h1 style="position: absolute  ; text-align:center;top: 225px; left: 1300px; width: 200px; height:200px; z-index: 1000;"id="magePlayerText">Mage</h1>
+            
+            <h1 style="position: absolute  ; text-align:center;top: 500px; height:200px; z-index: 1000;"id="descriptionText"></h1>
+            
+            <button onclick="ChangePage('characterSelection2Page', false)" style="text-align: center; font-size: 67px; position: absolute; top: 88%; left: 80%; width: 5%; z-index: 1001; margin: 0px;">></button>
+
+            
+            <!-- <button onclick="Commence(3)" style="text-align: center; font-size: 67px; position: relative; top: 170px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Hard</button>
+            <button onclick="Commence(4)" style="text-align: center; font-size: 67px; position: relative; top: 190px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Extreme Demon</button> -->
+            <button onclick="ChangePage('difficultyPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 10px; left: 80%; width: 15%; z-index: 1001; margin: 0px;">Back</button>
+            <button onclick="Commence()" style="text-align: center; font-size: 67px; position: absolute; top: 110px; left: 80%; width: 15%; z-index: 1001; margin: 0px;" id="startButton" disabled>Start</button>
+
+        </div>
+        <div id="characterSelection2Page" style="display:none">
+            <h1 style="text-align: center; font-size: 67px; position: relative; top: 7px; left: 0; width: 100%; z-index: 1000; margin: 0;">Choose Your Character</h1>
+            
+            <button onclick="SelectCharacter(5)" style=" font-size:30px; position:absolute; top: 300px; left: 100px; width: 200px; height:200px; z-index: 1000;padding:0px" id="necromancerPlayer"><img src="images/player.webp" style="height:100%;width: 100%; " id="necromancerPlayerImage"></img></button>
+            <h1 style="position: absolute  ; text-align:center;top: 225px; left: 90px; width: 200px; height:200px; z-index: 1000;" id="necromancerPlayerText">Necromancer</h1>
+            <button onclick="SelectCharacter(6)" style=" font-size:30px; position:absolute; top: 300px; left: 500px; width: 200px; height:200px; z-index: 1000;padding:0px" id="pheonixPlayer"><img src="images/player.webp" style="height:100%;width: 100%; " id="pheonixPlayerImage"></img></button>
+            <h1 style="position: absolute  ; text-align:center;top: 225px; left: 500px; width: 200px; height:200px; z-index: 1000;" id="pheonixPlayerText">Pheonix</h1>
+  
+            <h1 style="position: absolute  ; text-align:center;top: 500px; height:200px; z-index: 1000;"id="descriptionText2"></h1>
+
+            <button onclick="ChangePage('characterSelectionPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 88%; left: 20%; width: 5%; z-index: 1001; margin: 0px;"><</button>
+
+            <!-- <button onclick="Commence(3)" style="text-align: center; font-size: 67px; position: relative; top: 170px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Hard</button>
+            <button onclick="Commence(4)" style="text-align: center; font-size: 67px; position: relative; top: 190px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Extreme Demon</button> -->
+            <button onclick="ChangePage('difficultyPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 10px; left: 80%; width: 15%; z-index: 1001; margin: 0px;">Back</button>
+            <button onclick="Commence()" style="text-align: center; font-size: 67px; position: absolute; top: 110px; left: 80%; width: 15%; z-index: 1001; margin: 0px;" id="startButton2" disabled>Start</button>
+
+        </div>
+        
+        <div id="helpPage" style="display:none">
+            <h1 style="text-align: center; font-size: 67px; position: relative; top: 0px; left: 0; width: 100%; z-index: 1000; margin: 0px; font-family: 'Times New Roman';"><span style="background-color: black; color: white">A Very Cool Game</span></h1>
+            <h1 style="text-align: center; font-size: 67px; position: relative; top: 50px; left: 0; width: 100%; z-index: 1000; margin: 0px;font-family: 'Times New Roman';"><span style="color: black">WASD to move</span></h1>
+            <h1 style="text-align: center; font-size: 67px; position: relative; top: 50px; left: 0; width: 100%; z-index: 1000; margin: 0px;font-family: 'Times New Roman';"><span style="color: black">Player automatically shoots bullets. Shoot enemies to gain XP!</span></h1>
+            <h1 style="text-align: center; font-size: 67px; position: relative; top: 50px; left: 0; width: 100%; z-index: 1000; margin: 0px;font-family: 'Times New Roman';"><span style="color: black">Fullscreen recommended and keyboard required</span></h1>
+
+            <button onclick="ChangePage('IntroPage', false)" style="text-align: center; font-size: 67px; position: relative; top: 50px; left: 0; width: 100%; z-index: 1000; margin: 0;">Back</button>
+
+        </div>
+        <div id="settingsPage" style="display:none; background-color: lightgray;height:100vh">
+            <button onclick="ToggleHealthBars()" style="text-align: center; font-size: 67px; position: absolute; top: 20%; left: 0; width: 100%; z-index: 1000; margin: 0;" id="healthBarSetting">Back</button>
+
+            <button onclick="ChangePage('IntroPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 5%; left: 0; width: 100%; z-index: 1000; margin: 0;">Back</button>
+            <button onclick="ChangePage('controlsPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 35%; left: 0; width: 100%; z-index: 1000; margin: 0;">Controls</button>
+
+        </div>
+        <div id="controlsPage" style="position:relative; display:none; overflow:auto;height:100vh; display:none; background-color: lightgray;height:100vh">
+
+            <button onclick="ChangePage('settingsPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 5%; left: 0; width: 100%; z-index: 1000; margin: 0;">Back</button>
+            <div style="text-align: center; font-size: 67px; position: absolute; top: 20%; left: 0; z-index: 1000; margin: 0; font-family: 'black ops one';">Move Left:</div>
+            <div style="text-align: center; font-size: 67px; position: absolute; top: 35%; left: 0; z-index: 1000; margin: 0; font-family: 'black ops one';">Move Right:</div>
+            <div style="text-align: center; font-size: 67px; position: absolute; top: 50%; left: 0; z-index: 1000; margin: 0; font-family: 'black ops one';">Move Up:</div>
+            <div style="text-align: center; font-size: 67px; position: absolute; top: 65%; left: 0; z-index: 1000; margin: 0; font-family: 'black ops one';">Move Down:</div>
+            <div style="text-align: center; font-size: 67px; position: absolute; top: 80%; left: 0; z-index: 1000; margin: 0; font-family: 'black ops one';">Ability 1:</div>
+            <div style="text-align: center; font-size: 67px; position: absolute; top: 95%; left: 0; z-index: 1000; margin: 0; font-family: 'black ops one';">Ability 2:</div>
+            <div style="text-align: center; font-size: 67px; position: absolute; top: 110%; left: 0; z-index: 1000; margin: 0; font-family: 'black ops one';">Ability 3:</div>
+            <div style="text-align: center; font-size: 67px; position: absolute; top: 125%; left: 0; z-index: 1000; margin: 0; font-family: 'black ops one';">Ability 4:</div>
+            <div style="text-align: center; font-size: 67px; position: absolute; top: 140%; left: 0; z-index: 1000; margin: 0; font-family: 'black ops one';">Ability 5:</div>
+            <button onclick="ToggleControls('left')" style="text-align: center; font-size: 67px; position: absolute; top: 20%; left: 40%; width: 60%; z-index: 1000; margin: 0;" id="leftControlButton">A</button>
+            <button onclick="ToggleControls('right')" style="text-align: center; font-size: 67px; position: absolute; top: 35%; left: 40%; width: 60%; z-index: 1000; margin: 0;" id="rightControlButton">D</button>
+            <button onclick="ToggleControls('up')" style="text-align: center; font-size: 67px; position: absolute; top: 50%; left: 40%; width: 60%; z-index: 1000; margin: 0;" id="upControlButton">W</button>
+            <button onclick="ToggleControls('down')" style="text-align: center; font-size: 67px; position: absolute; top: 65%; left: 40%; width: 60%; z-index: 1000; margin: 0;" id="downControlButton">S</button>
+            <button onclick="ToggleControls('ability1')" style="text-align: center; font-size: 67px; position: absolute; top: 80%; left: 40%; width: 60%; z-index: 1000; margin: 0;" id="ability1ControlButton">Q</button>
+            <button onclick="ToggleControls('ability2')" style="text-align: center; font-size: 67px; position: absolute; top: 95%; left: 40%; width: 60%; z-index: 1000; margin: 0;" id="ability2ControlButton">E</button>
+            <button onclick="ToggleControls('ability3')" style="text-align: center; font-size: 67px; position: absolute; top: 110%; left: 40%; width: 60%; z-index: 1000; margin: 0;" id="ability3ControlButton">R</button>
+            <button onclick="ToggleControls('ability4')" style="text-align: center; font-size: 67px; position: absolute; top: 125%; left: 40%; width: 60%; z-index: 1000; margin: 0;" id="ability4ControlButton">F</button>
+            <button onclick="ToggleControls('ability5')" style="text-align: center; font-size: 67px; position: absolute; top: 140%; left: 40%; width: 60%; z-index: 1000; margin: 0;" id="ability5ControlButton">T</button>
+
+            <div style="text-align: center; font-size: 67px; position: absolute; top: 155%; left: 0; z-index: 1000; margin: 0; width: 100%; font-family: 'black ops one'; text-align:center">Cheats</div>
+            <div style="text-align: center; font-size: 67px; position: absolute; top: 170%; left: 0; z-index: 1000; margin: 0; font-family: 'black ops one';">Level Up:</div>
+            <div style="text-align: center; font-size: 67px; position: absolute; top: 185%; left: 0; z-index: 1000; margin: 0; font-family: 'black ops one';">Skip Wave:</div>
+            <div style="text-align: center; font-size: 67px; position: absolute; top: 200%; left: 0; z-index: 1000; margin: 0; font-family: 'black ops one';">Kill all enemies:</div>
+            <button onclick="ToggleControls('levelUp')" style="text-align: center; font-size: 67px; position: absolute; top: 170%; left: 40%; width: 60%; z-index: 1000; margin: 0;" id="levelUpControlButton">N/A</button>
+            <button onclick="ToggleControls('skipWave')" style="text-align: center; font-size: 67px; position: absolute; top: 185%; left: 40%; width: 60%; z-index: 1000; margin: 0;" id="skipWaveControlButton">N/A</button>
+            <button onclick="ToggleControls('dealDamage')" style="text-align: center; font-size: 67px; position: absolute; top: 200%; left: 40%; width: 60%; z-index: 1000; margin: 0;" id="dealDamageControlButton">N/A</button>
+
+        </div>
+        <div id="newEnemyPage" style="display:none">
+            <h1 style="text-align: center; font-size: 67px; position: absolute; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0px;" id="introText"><span style="background-color: black; color: white">New Enemy Discovered!</span></h1>
+        </div>
+        <div id="enemyDescriptionSelectionPage" style="position:relative; display:none; overflow:auto;height:100vh; background-color: lightgreen;">
+            <h1 style="text-align: center; font-size: 67px; position: relative; top: 7px; left: 0; width: 100%; z-index: 1000; margin: 0;">Enemy Guide</h1>
+            
+            <button onclick="ShowEnemy(1)" style=" font-size:30px; position:absolute; top: 15%; left: 4%; width: 150px; height:150px; z-index: 1000;padding:0px" id="basicEnemyGuideButton"><img src="images/enemy.webp" style="height:100%;width: 100%;" id="basicEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(2)" style=" font-size:30px; position:absolute; top: 15%; left: 15%; width: 150px; height:150px; z-index: 1000;padding:0px" id="shooterEnemyGuideButton"><img src="images/shooterEnemy.webp" style="height:100%;width: 100%;" id="shooterEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(3)" style=" font-size:30px; position:absolute; top: 15%; left: 26%; width: 150px; height:150px; z-index: 1000;padding:0px" id="aimingEnemyGuideButton"><img src="images/aimingEnemy.webp" style="height:100%;width: 100%;" id="aimingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(4)" style=" font-size:30px; position:absolute; top: 15%; left: 37%; width: 150px; height:150px; z-index: 1000;padding:0px" id="homingEnemyGuideButton"><img src="images/homingEnemy.webp" style="height:100%;width: 100%;" id="homingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(5)" style=" font-size:30px; position:absolute; top: 15%; left: 48%; width: 150px; height:150px; z-index: 1000;padding:0px" id="trapperEnemyGuideButton"><img src="images/trapperEnemy.webp" style="height:100%;width: 100%;" id="trapperEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(6)" style=" font-size:30px; position:absolute; top: 15%; left: 59%; width: 150px; height:150px; z-index: 1000;padding:0px" id="zombieEnemyGuideButton"><img src="images/zombieEnemy.webp" style="height:100%;width: 100%;" id="zombieEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(7)" style=" font-size:30px; position:absolute; top: 40%; left: 4%; width: 150px; height:150px; z-index: 1000;padding:0px" id="shieldEnemyGuideButton"><img src="images/shieldEnemy.webp" style="height:100%;width: 100%;" id="shieldEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(8)" style=" font-size:30px; position:absolute; top: 40%; left: 15%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(9)" style=" font-size:30px; position:absolute; top: 40%; left: 26%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(10)" style=" font-size:30px; position:absolute; top: 40%; left: 37%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(11)" style=" font-size:30px; position:absolute; top: 40%; left: 48%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(12)" style=" font-size:30px; position:absolute; top: 40%; left: 59%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(13)" style=" font-size:30px; position:absolute; top: 65%; left: 4%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(14)" style=" font-size:30px; position:absolute; top: 65%; left: 15%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(15)" style=" font-size:30px; position:absolute; top: 65%; left: 26%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(16)" style=" font-size:30px; position:absolute; top: 65%; left: 37%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(17)" style=" font-size:30px; position:absolute; top: 65%; left: 48%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(18)" style=" font-size:30px; position:absolute; top: 65%; left: 59%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(19)" style=" font-size:30px; position:absolute; top: 90%; left: 4%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(20)" style=" font-size:30px; position:absolute; top: 90%; left: 23%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(21)" style=" font-size:30px; position:absolute; top: 90%; left: 42%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(22)" style=" font-size:30px; position:absolute; top: 90%; left: 61%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(23)" style=" font-size:30px; position:absolute; top: 90%; left: 79%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(24)" style=" font-size:30px; position:absolute; top: 125%; left: 4%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(25)" style=" font-size:30px; position:absolute; top: 125%; left: 23%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(26)" style=" font-size:30px; position:absolute; top: 125%; left: 42%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(27)" style=" font-size:30px; position:absolute; top: 65%; left: 70%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(28)" style=" font-size:30px; position:absolute; top: 40%; left: 70%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(29)" style=" font-size:30px; position:absolute; top: 15%; left: 70%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(30)" style=" font-size:30px; position:absolute; top: 125%; left: 61%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(31)" style=" font-size:30px; position:absolute; top: 125%; left: 79%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+   
+
+            
+            <!-- <button onclick="Commence(3)" style="text-align: center; font-size: 67px; position: relative; top: 170px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Hard</button>
+            <button onclick="Commence(4)" style="text-align: center; font-size: 67px; position: relative; top: 190px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Extreme Demon</button> -->
+            <button onclick="ChangePage('IntroPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 10px; left: 80%; width: 15%; z-index: 1001; margin: 0px;">Back</button>
+
+        </div>
+        <div id="enemyDescriptionPage" style="display:none; overflow: auto; height:100%; font-size: 18px; top: 10px; left: 0; width: 100%; z-index: 1000; margin: 0px;">
+            <h1 style="text-align: center; font-size: 67px; position: relative; top: 7px; left: 0; width: 100%; z-index: 1000; margin: 0;">Enemy Guide</h1>
+            
+            <div style="text-align: center;font-family: Black ops one;">
+            <img src="images/enemy.webp" style="position:relative; height:200px; width: 200px; top:100px;display: block;margin:0 auto" id="enemyShowcaseImage"></img>
+            <div style="font-size:30px;position: relative; top:125px;display: block" id="enemySourceText">testing</div>
+            <div style="font-size:30px;position: relative; top:150px;display: block" id="enemyAbilityText">testing</div>
+            <div style="font-size:30px;position: relative; top:175px;display: block" id="enemyDescriptionText">testing</div>
+            </div>
+
+
+            
+            <!-- <button onclick="Commence(3)" style="text-align: center; font-size: 67px; position: relative; top: 170px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Hard</button>
+            <button onclick="Commence(4)" style="text-align: center; font-size: 67px; position: relative; top: 190px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Extreme Demon</button> -->
+            <button onclick="ChangePage('enemyDescriptionSelectionPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 10px; left: 80%; width: 15%; z-index: 1001; margin: 0px;">Back</button>
+
+
+        </div>
+        <div id="devlogPage" style="display:none; overflow: auto; height:100%; font-size: 18px; top: 10px; left: 0; width: 100%; z-index: 1000; margin: 0px;">
+            <button onclick="ChangePage('IntroPage', false)" style="position:absolute;text-align: center; font-size: 67px; top: 0px; left: 0; width: 100%; z-index: 1000; margin: 0;">Back</button>
+
+            <div class="scrollable-box" style="position: absolute; top: 12%; left: 0px; width: 100%; height: 88%; z-index: 1000; margin: 0px;">
+
+            <h1>Update 4.0 - September 1, 2026</h1>
+            <ul>
+                <li>Added Co-op mode</li>
+                <b>Developer's note:</b> Let me tell you a story. On August 2nd, 2026, I had a random thought. "Wouldn't it be cool to have a multiplayer mode for my game?" Surely it wouldn't be that difficult considering the game works pretty well in singleplayer, right? WRONG. I had to REWRITE almost EVERY LINE OF CODE. i am in constant pain and suffering now but we got there. nobody is going to play this game and use coop mode anyways why did i even do this my peak player count is like 2 people and one of them was me
+
+
+
+                <li>Balance Changes:</li>
+                <ul>
+                    <li>The balance changes that I made are left as an exercise for the players. (there were so many minor changes that I had to make in order for the logic to work for multiplayer mode so i stopped keeping track)</li>
+                </ul>
+            </ul>
+
+            <h1>Update 3.5 - August 1, 2026</h1>
+            <ul>
+                <li>Added 1 new gamemode: Boss Rush</li>
+                <li>Added 1 new tier 2 boss</li>
+                <b>Developer's note:</b> Ok this boss has to be my favourite boss in terms of design. Approximately 0.53% of people are going to understand the reference but its ok.
+                <li>Added option to change controls</li>
+
+
+                <li>Balance Changes:</li>
+                <ul>
+                    <li>Decreased Paragon's time between attacks (8s -> 6.5s)</li>
+                    <li>Increased health of all of Paragon's towers (Sentry 10 -> 12, Laser 15 -> 20, Bomb 15 -> 20, Ice 25 -> 30)</li>
+                    <b>Developer's note:</b> Since the towers are the only threat that Paragon has, it should not be as easy as it currently is for the player to constantly be destroying the towers whenever they spawn.
+                    <li>Increased time between attacks for the Mage character's fire mode (0.08s -> 0.14s)</li>
+                    <li>Decreased time between attacks for the Mage character's wind mode (0.83s -> 0.5s)</li>
+                    <b>Developer's note:</b> Mage was too reliant on its fire form, so this change should hopefully incentivize switching forms more.
+                    <li>Increased health of Thwomp's minions (3 -> 4)</li>
+                    <b>Developer's note:</b> Thwomp's minions barely did anything and could just be ignored. Now they might actually do something.
+                    <li>Made Database's attacks heal her for 5 health if it damages the player</li>
+                    <b>Developer's note:</b> Considering Database's entire thing is about healing, it's weird that her attack only heals allies and not herself. Database also still didn't have enough survivability so this should help.
+
+                </ul>
+            </ul>
+
+            <h1>Update 3.4 - July 29, 2026</h1>
+            <ul>
+                <li>Added 1 new tier 1 enemy</li>
+                <li>Added 1 new tier 2 boss</li>
+                <li>Added 1 new tier 2 upgrade</li>
+                <li>Changed snow pea enemy's sprite to the Collatz Conjecture</li>
+                <b>Developer's note:</b> I think it's the first time in human history that sentence has ever been said. The ability of the new enemy is more in line with snow pea's design so I changed up what sprite is used for the enemy with snow pea's old ability. Similar to the Reddit -> Twitter change, the functionality of the enemy is still the same. The only change is what the enemy looks like.
+                
+
+                <li>Balance Changes:</li>
+                <ul>
+                    <li>Made Filibuster's attack disappear if Filibuster gets knocked back when he's charging his attack.</li>
+                    <li>Made Nvidia, Job Application, Demonlist, Random Seed Glitchless, and Database bosses take half knockback instead of no knockback</li>
+                    <b>Developer's note:</b> They were all already like this (except for Random Seed Glitchless due to a bug) even though I stated in an earlier update that all bosses became immune. Bosses can get knocked back by the player, just less than regular enemies. However, they cannot get pushed by other enemies.
+                    <li>Increased Database's health (150 in hard mode -> 175)</li>
+                    <b>Developer's note:</b> Database had the lowest health of all the tier 2 bosses, which doesn't make sense considering its entire gimmick is healing.
+                </ul>
+            </ul>
+            <h1>Update 3.3 - July 27, 2026</h1>
+            <ul>
+                <li>Added 1 new gamemode</li>
+                <li>Added 1 new tier 2 enemy</li>
+                <li>Added 1 new upgrade</li>
+                <li>Changed the buttons from the default html buttons</li>
+                <li>Renamed "+2 speed" upgrade to "Increase Movement Speed"</li>
+                <li>Changed color of the walls to dark gray</li>
+                <b>Developer's note:</b> This is what happens when you dont have playtesters. Nobody knows what "2 speed" is so I changed the name to make it make sense. Also, the black borders sometimes made the black text hard to see.
+
+                <li>Changed Reddit enemy to Twitter</li>
+                <b>Developer's note:</b> The enemy still works the exact same. I just changed the sprite image since Reddit's circular logo didn't match his square hitbox.
+
+                <li>Balance Changes:</li>
+                <ul>
+                    <li>Increased bomb attack's duration before explosion disappears (0.5s ->0.75s)</li>
+                    <b>Developer's note:</b> So it turns out that last update, when I tried increasing the duration before the bomb's explosion disappeared, I changed the wrong variable and I somehow didn't notice. So here's the actual balance change.
+                    <li>Increased XP bottle's scaling (Old: Gives 0.2x more XP for each level the player has. New: Gives (1+player.level*player.level/5*0.15) times more XP.)</li>
+                    <b>Developer's note:</b> The 1.2x was barely noticable so hopefully now it's better.
+                    <li>Increased amount of upgrade choices for regular upgrades(2 -> 3)</li>
+                    <b>Developer's note:</b> With the amount of upgrades this game has and the fact that the overpowered upgrades were nerfed, changing the amount of upgrades available from 2 to 3 should allow for better focusing on a singular build.
+                    <li>Decreased Enemy health scaling after wave 7 (Wave 8: 1.2x -> 1.2x (unchanged), Wave 9: 1.5x -> 1.4x, Wave 10: 1.9x -> 1.7x, Wave 11: 2.2x -> 2x)</li>
+                    <b>Developer's note:</b> After the damage-increasing upgrades were nerfed, players' damage output unsurprisingly decreased by a lot. This means that the magnifications of enemy health for future waves could get a nerf.
+                    <li>Increased speed of Demonlist boss by 25%</li>
+                    <b>Developer's note:</b> This boss was a little too easy since you could just win by keeping distance from him. This should make it harder to simply run away.
+
+                </ul>
+            </ul>
+            <h1>Update 3.2 - July 23, 2026</h1>
+            <ul>
+                <li>Added a proper tutorial</li>
+                <li>Added 1 new upgrade</li>
+                <b>Developer's note:</b> I need upgrade ideas help
+                <li>Added 3 new upgrades. These upgrades can be unlocked after a previous upgrade has already been obtained (e.g. +0.5 laser damage can only be obtained after Add Laser has been chosen)</li>
+                <b>Developer's note:</b> nvm i got some ideas but i still need more
+                <li>Balance Changes:</li>
+                <ul>
+                    <li>Increased the time it takes for Database's projectile to stop homing on the player (2s -> 4s)</li>
+                    <li>Decreased Database's time between attacks (2.67s -> 6s at hard difficulty)</li>
+                    <li>Added four projectiles to Database's attacks. These extra projectiles will fire in the four cardinal directions.</li>
+                    <b>Developer's note:</b> Database's attacks were too easy to dodge.
+                    <li>Increased Splitty's time between attacks (3s -> 3.5s)</li>
+                    <b>Developer's note:</b> Splitty's attacks were difficult to dodge (which is intended) so a nerf to attack speed should make it less oppressive.
+                    <li>Increased rate of healing for Passive Healing upgrade (8s -> 5s)</li>
+                    <b>Developer's note:</b> Would you rather: Get +1 health every 8 seconds (+1 passive healing) or kill 4 enemies every 8 seconds (+0.25 siphon). Yeah passive healing was useless especially in the lategame hopefully this makes it less useless
+                    <li>Increased bomb attack's duration before explosion dissappears (1s ->1.25s)</li>
+                    <li>Increased bomb attack's damage(3 -> 4)</li>
+                    <b>Developer's note:</b> Bomb attack was also pretty useless since it barely did anything after wave 3. It just didnt hit enough enemies and didn't do enough damage.
+                    <li>Increased the amount of times +0.25 Fire Damage could be obtained (1 -> 2)</li>
+                    <li>Decreased the damage increase of the +1 damage upgrade (+1 damage -> +0.5 damage). The upgrade has also been renamed to match the damage boost it new gives.</li>
+                    <li>Decreased the damage increase of the +2 damage special upgrade (+2 damage -> +1 damage). The upgrade has also been renamed to match the damage boost it new gives.</li>
+                    <li>Increased the amount of times +0.5 Damage could be obtained (1 -> 2)</li>
+                    <li>Allowed (the new) +1 damage to be obtained even if the player already has a +0.5 damage upgrade</li>
+                    <li>Allowed +4 projectiles to be obtained even if the player already has a +2 projectiles upgrade</li>
+                    <b>Developer's note:</b> Ever since it was added to the game (it was the first upgrade I ever added), +1 damage has always been the best upgrade and an instant pick if it was available. Because of this, upgrades that synergized with it (such as +2 projectiles and Increase Attack Speed) were also instant picks. By decreasing the damage buff it gets, it becomes less overpowered and upgrades such as Increase Projectiles can now be changed more freely. Hopefully this nerf, along with the other balance changes, will make choosing between which upgrade to get more challenging.
+                    <li>Buffed Mystery Box's chances of getting a good upgrade</li>
+                    <li>Moved +2 speed from Common to Uncommon rarity in Mystery Boxes</li>
+                    <li>Halved every damage boost in Mystery Boxes</li>
+                    <b>Developer's note:</b> Mystery box used to have a 60% chance of being either useless or bad. Now it has a 47% chance. +2 speed also never fit in the common tier so it was moved up. The damage boost nerf is just to match the nerf to the original upgrade.
+                    <li>Made bosses immune to knockback</li>
+                    
+
+                </ul>
+            </ul>
+            <h1>Update 3.1 - July 20, 2026</h1>
+            <ul>
+                <li>Added 1 new character</li>
+                <li>Added 1 new enemy</li>
+                <li>Added 1 new special upgrade</li>
+                <li>Balance Changes:</li>
+                <ul>
+                    <li>Reworked healing from Database's main attack (Original: +1 health to all enemies in range of heal aura, including herself. Updated: Full heals all enemies in range of heal aura, excluding herself)</li>
+                    <b>Developer's note:</b> Database felt too weak all around. The healing from the main attack was barely noticable since the attack didn't hit very often, so now there is a big consequence if it hits. The healing form also didn't heal fast enough to outpace the damaging, so that is fixed as well.
+
+                    <li>Decreased Enemy health scaling after wave 7 (Wave 8: 1.3x -> 1.3x (unchanged), Wave 9: 1.7x -> 1.6x, Wave 10: 2.1x -> 1.9x, Wave 11: 2.5x -> 2.2x)</li>
+                    <li>Decreased scaling of required XP to level up after the player reaches level 12 (1.3x -> 1.2x)</li>
+                    <b>Developer's note:</b> All the changes in the last update made later waves too difficult, so the later waves are getting somewhat of a nerf.
+
+                </ul>
+            </ul>
+            <h1>Update 3.0 - July 17, 2026</h1>
+            <ul>
+                <li>Added "Shrinking Border" gamemode</li>
+                <li>Added "Terrain" gamemode</li>
+                <li>Added "Last Stand" gamemode</li>
+                <b>Developer's note:</b> R E P L A Y A B I L I T Y
+                <li>Made enemies push each other on contact</li>
+                <b>Developer's note:</b> This was done because sometimes enemies would stack up on a single spot if the player kept running away from them. This also has the side effect of faster enemies pushing slower enemies into the player, but that's not a bug, that's a feature.
+                <li>Added 1 new special upgrade</li>
+                <li>Added 1 new wave</li>
+                <b>Developer's note:</b> This wave was actually always in the code but a bug that I somehow did not notice for months made it never appear in-game.
+                <li>Balance Changes:</li>
+                <ul>
+                    <li>Decreased amount of times "Increase Attack Speed" upgrade can be obtained (Infinite -> 4)</li>
+                    <li>Buffed enemy spawn rate in wave 6</li>
+                    <b>Developer's note:</b> Wave 6 was still way too easy.
+                    <li>Made enemies' healths increase every wave, starting from wave 8. (Wave 8: 1.3x, Wave 9: 1.7x, Wave 10: 2.1x, Wave 11: 2.5x)</li>
+                    <li>Made the special upgrades only appear after defeating waves 3, 5, and 7. (orignally they appeared after every wave with a boss)</li>
+                    <li>Increased scaling of required XP to level up after the player reaches level 10 (1.2x -> 1.3x)</li>
+                    <b>Developer's note:</b> Once the player got past the first five waves, the enemies all had too little health and the later stages ended up having little to no challenge. This should fix the issue.
+
+                </ul>
+            </ul>
+            <h1>Update 2.2 - July 14, 2026</h1>
+            <ul>
+                <li>Added 6 new upgrades. These upgrades can only be obtained after defeating a boss.</li>
+                <li>Added 3 new class-specific upgrades, two for Mage and one for Necromancer</li>
+                <li>Added 1 new character</li>
+                
+                <li>Balance Changes:</li>
+                <ul>
+                    <li>Increased enemy density in wave 6</li>
+                    <b>Developer's note:</b> Wave 6 was meant to introduce the player to fighting multiple tier 3 enemies at once, but it did not have enough enemies to be threatening.
+                    <li>Halved the speed at which McAfee's blue bullets spin</li>
+                    <li>Decreased the attack speed for all of McAfee's attacks by 20%</li>
+                    <b>Developer's note:</b> McAfee was way too difficult on every difficulty.
+                    <li>Decreased enemy lasers' damaging speed (6 dps -> 4 dps)</li>
+                    <b>Developer's note:</b> The two hardest bosses are Nvidia and McAfee, so this should make them more manageable.
+
+                </ul>
+            </ul>
+            <h1>Update 2.1 - July 9, 2026</h1>
+            <ul>
+                <li>Added 1 new upgrade</li>
+                <li>Added 1 new tier 2 boss</li>
+                <li>Added healthbars on all enemies (can be toggled in the new Settings page)</li>
+                <li>Added enemy guide</li>
+                <b>Developer's note:</b> I'm semi-proud of some of the jokes I wrote there please laugh at them
+                <li>Balance Changes:</li>
+                <ul>
+                    <li>Made XP bottles' and health potions' spawn rate scale with amount of time since the last wave's arrival</li>
+                    <b>Developer's note:</b> The spawning of these collectables now scales the same way as enemies do (though they scale a lot slower).
+
+                </ul>
+            </ul>
+            
+            <h1>Update 2.0 - July 6, 2026</h1>
+            <ul>
+                <li>Added new feature: Unlockable characters! These are chosen before the start of the game and can be unlocked though progression. Currently, there are three new characters: Tank, Healer, and Mage. Each character has their own unique strengths and weaknesses.</li>
+                <li>Added 1 new tier 3 enemy</li>
+                <li>Balance Changes:</li>
+                <ul>
+                    <li>Increased time between attacks of arena closer (0.33s -> 0.5s)</li>
+                    <b>Developer's note:</b> Arena closer was too good at its job.
+                    <li>Increased health of slither.io boss (240 -> 300)</li>
+                    <b>Developer's note:</b> slither.io could be burst down too easily, especially for a tier 2 boss.
+                    <li>Increased starting health hultiplier for easy and medium difficulties (1.5x -> 1.8x for easy, 1.2x -> 1.4x for medium)</li>
+                    <li>Decreased enemy spawn rate for easy and medium difficulties.</li>
+                    <b>Developer's note:</b> Since there are now multiple characters with different amounts of starting health, it has become a multiplier instead of a flat increase. Easy and medium mode were still too difficult so they get nerfed yet again.
+                    <li>Made every boss enemy deal knockback to the player instead of instantly killing them on contact</li>
+                    <b>Developer's note:</b> Instakilling the player on contact caused a lot of runs to suddenly die out, and it's always really frustrating when that happens. Now every boss deals knockback and a little bit of damage instead. All the bosses currently in the game either already deal knockback or rely on their projectiles for damage, so this shouldn't be too big of a nerf.
+                    <li>Made health potions survive longer before disappearing (10s -> 16.67s)</li>
+
+
+                </ul>
+            </ul>
+
+            <h1>Update 1.5 - July 3, 2026</h1>
+            <ul>
+                <li>Added 1 new tier 3 enemy</li>
+                <li>Added 1 new upgrade</li>
+                <li>Made intro screen look slightly better</li>
+                <li>Added background color</li>
+                <li>Balance Changes:</li>
+                <ul>
+                    <li>Increased health of furnace zombie (15 -> 20)</li>
+                    <li>Reworked speed scaling for furnace zombie (Before: 6-health/3. After: 6.5-health/4)</li>
+                    <b>Developer's note:</b> Furnace zombie felt way too underpowered for a tier 3 enemy.
+                    <li>Increased the rate at which health potions spawn (16.67s on average -> 10s)</li>
+                    <li>Increased the range of healing amounts that health potions can give (1-4 -> 2-5)</li>
+                    <b>Developer's note:</b> Health potions felt too rare and not useful enough, leading to players being forced to pick healing-related upgrades in order to stay alive.
+                    <li>Decreased amount of times the 2x Exp Gain upgrade could be obtained (2 -> 1)</li>
+                    <li>Nerfed wave 9 (2 tier 3 enemies -> 1 tier 3 enemy)</li>
+                    <li>Nerfed wave 10 (3 tier 3 enemies -> 2 tier 3 enemies)</li>
+                    <b>Developer's note:</b> Waves 9 and 10 were still too difficult even on easy difficulty.
+                </ul>
+            </ul>
+
+            <h1>Update 1.4 - June 30, 2026</h1>
+            <ul>
+                <li>Added 1 new tier 2 boss</li>
+                <li>Added 1 new upgrade</li>
+                <li>Added Update Log</li>
+                <li>Balance Changes:</li>
+                <ul>
+                    <li>Decreased damaging speed of poison from Reddit enemy (0.5s/damage tick -> 0.75s/damage tick)</li>
+                    <li>Increased starting health for easy and medium difficulties (15 for easy, 12 for medium, originally 10 for both)</li>
+                    <li>Decreased rates at which enemies spawn for easy, medium, and hard mode</li>
+                    <li>Decreased boss difficulty for easy, medium, and hard mode</li>
+                    <b>Developer's note:</b> Got feedback that the player died way too quickly even in easy difficulty.
+                </ul>
+            </ul>
+
+            <h1>Update 1.3</h1>
+            <ul>
+                <li>Added 1 new tier 3 enemy</li>
+                <li>Added difficulty selection screen &lpar;Easy, Medium, Hard, Extreme Demon&rpar;</li>
+                <li>Added winscreen</li>
+            </ul>
+
+            <h1>Update 1.2</h1>
+
+            <ul>
+                <li>Added 1 new tier 2 enemy</li>
+                <li>Added 1 new boss. This boss is part of a new group of tier 2 bosses, which can be first encountered on wave 7.</li>
+                <li>Improved Performance &lpar;Switched to using Canvas instead of directly moving the images during gameplay&rpar;</li>
+            </ul>
+
+            <h1>Update 1.1</h1>
+            <ul>
+                <li>Added How to Play button</li>
+            </ul>
+            </div>
+        </div>
+    </head>
+</html>
