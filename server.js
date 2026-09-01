@@ -42,7 +42,7 @@ const io = new Server(server, {
     }
 });
 
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "docs")));
 
 io.on("connection", (socket) => {
     console.log(`Player connected: ${socket.id}`);
