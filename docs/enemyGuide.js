@@ -135,7 +135,7 @@ function ShowEnemy(enemy){
             sourceImage.src="images/mageFireMode.webp";
             sourceText.innerText="Source: All 3 forms are levels from Geometry Dash. Tidal wave is taken from the level itself while the others are taken from the video thumbnails of the level's completion"
             abilityText.innerText="Ability: Cycles between three forms. Fire form shoots fast, close range bullets. Water form shoots waves of water bullets that deal knockback. Rock form shoots giant golems that split into smaller rocks.";
-            descriptionText.innerText="If this game was created a five years ago then all three forms would have been based off of Hell-themed levels...";
+            descriptionText.innerText="If this game was created five years ago then all three forms would have been based off of Hell-themed levels...";
             break;
         case 23:
             sourceImage.src="images/bulletHellBoss.webp";
@@ -187,9 +187,63 @@ function ShowEnemy(enemy){
             break;
         case 31:
             sourceImage.src="images/farmerBoss.webp";
-            sourceText.innerText="Source: Farmer from Luck Be A Landlord. Cow image is the profile picture of the goat BenQ in Codeforces. If you understand this enemy's reference then you are cool."
-            abilityText.innerText="Ability: Shoots grass bullets that bounce off walls and never disappear. When he dies, he spawns Bessie the cow in his place. Bessie will shoot bullets and eat the grass that Farmer John shoots. For each grass block Bessie eats, she will increase in both movement speed and attack speed."
+            sourceText.innerText="Source: Farmer from Luck Be A Landlord."
+            abilityText.innerText="Ability: Shoots grass bullets that bounce off walls and never disappear. When he dies, he spawns Bessie the cow in his place."
             descriptionText.innerText="Farmer John scoffs at people in math problems. Bob has 594+125 apples? Amateur. He has 10^5 different farms, with each farm having up to 10^9 cows. Find the shortest path between them. Or else.";
+            break;
+        case 32:
+            sourceImage.src="images/weakenBoss.webp";
+            sourceText.innerText="Source: The boss blind \"The Flint\" from Balatro"
+            abilityText.innerText="Ability: Dashes before shooting bullets that weaken the player's damage to 50%."
+            descriptionText.innerText="Started his villain arc after going to a casino a while back. The poker table didn't want to give him his $4.384e17 payout...";
+            break;
+        case 33:
+            sourceImage.src="images/distractionEnemy.webp";
+            sourceText.innerText="Source: Minion laughing Twitch emote"
+            abilityText.innerText="Ability: Has infinite health but does zero damage"
+            descriptionText.innerText="Always puts in the minimum amount of effort possible in group projects. Still doesn't understand why he's chosen to be the meatshield.";
+            break;
+        case 1000:
+            sourceImage.src="images/farmerBossCow.webp";
+            sourceText.innerText="Source: The profile picture of BenQ in Codeforces"
+            abilityText.innerText="Ability: Spawns from the boss Farmer John. Bessie will shoot bullets and eat the grass that Farmer John shoots. For each grass block Bessie eats, she will increase in both movement speed and attack speed."
+            descriptionText.innerText="According to USACO, Bessie can lift up to 10^10^5 stones at once. this puts her at the Universal tier for powerscaling. Thank you for coming to my TED Talk.";
+            break;
+        case 1001:
+            sourceImage.src="images/enemyWall.webp";
+            sourceText.innerText="Source: Stud wall from Roblox"
+            abilityText.innerText="Ability: Spawns from Roblox enemy. Prevents player from moving through it and tanks attacks."
+            descriptionText.innerText="“ ” - The Wall's most famous quote";
+            break;
+        case 1002:
+            sourceImage.src="images/bouncyMinion.webp";
+            sourceText.innerText="Source: Troll face"
+            abilityText.innerText="Ability: Spawns from Legally Distinct Thwomp boss. Bounces off walls and knocks back player on contact."
+            descriptionText.innerText="Unsurprisingly, he's an internet troll as well. Also works part-time as a bridge troll during summers.";
+            break;
+        case 1004:
+            sourceImage.src="images/sentryEngineerEnemy.webp";
+            sourceText.innerText="Source: Engineer Sentry from BTD6"
+            abilityText.innerText="Ability: Spawns from The Paragon boss. Shoots basic bullets at the player."
+            descriptionText.innerText="sentences.";
+            break;
+        case 1005:
+            sourceImage.src="images/laserEngineerEnemy.webp";
+            sourceText.innerText="Source: Plasma Accelerator from BTD6"
+            abilityText.innerText="Ability: Spawns from The Paragon boss. Shoots a laser that only dissappears after it dies."
+            descriptionText.innerText="Cross the Streams monkey knowledge so useless that they didn't even bother unlocking it";
+            break;
+        case 1006:
+            sourceImage.src="images/bombEngineerEnemy.webp";
+            sourceText.innerText="Source: Recursive Cluster from BTD6"
+            abilityText.innerText="Ability: Spawns from The Paragon boss. Shoots exploding bombs that deal high damage."
+            descriptionText.innerText="Bomb Tower's secretly an anti-conservationist. Wants any and all zebras killed for no particular reason.";
+            break;
+        case 1007:
+            sourceImage.src="images/iceEngineerEnemy.webp";
+            sourceText.innerText="Source: Ice Monkey from BTD6"
+            abilityText.innerText="Ability: Spawns from The Paragon boss. Slows the player if they enter its range."
+            descriptionText.innerText="Is secretly best friends with Sentry tower. They're so in sync, they finish each others'";
             break;
     }
 }

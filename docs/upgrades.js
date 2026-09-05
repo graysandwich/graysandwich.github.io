@@ -489,13 +489,13 @@ function IncreaseLaserDamage(amount, player){
         socket.emit("buyUpgrade", {type: "stat", stat:"laserDamage", amount:amount});
     }
     else{
-        player.laserDamage+=4;
+        player.laserDamage+=amount;
     }
     ChangePage('gamePage', false)
 }
 function AddTimeStop(player){
     if(gamemode==100){
-        socket.emit("buyUpgrade", {type: "abilityUpgrade", stat:"laserDamage", amount:amount});
+        
     }
     else{
         TimeWarpIcon.version=1;
@@ -540,5 +540,15 @@ function IncreaseBouncingBulletDamage(amount, player){
         player.bouncingBulletDamage+=amount;
     }
     
+    ChangePage('gamePage', false)
+}
+function AddStrengthPotions(amount, player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "other", stat:"spawnStrengthPotions", amount:amount});
+    }
+    else{
+        gameState.strengthPotionSpawnRate+=amount;
+    }
+    player.boughtUpgrades[29] = 1;
     ChangePage('gamePage', false)
 }

@@ -65,7 +65,8 @@ let UPGRADES = [
     { onclick: (player) => AddTimeStop(player), text: "Speed Burst -> Time Stop" },
     { onclick: (player) => AddBouncingProjectile(1, player), text: "+1 Bouncing Bullet" },
     { onclick: (player) => IncreaseProtectorDamage(1, player), text: "+1 Protector Damage" },
-    { onclick: (player) => IncreaseBouncingBulletDamage(1, player), text: "+1 Bouncing Bullet Damage" },
+    { onclick: (player) => IncreaseBouncingBulletDamage(1, player), text: "+0.5 Bouncing Bullet Damage" },
+    { onclick: (player) => AddStrengthPotions(0.25, player), text: "Health potions sometimes become Strength potions" },
 
 ];
 const NUMUPGRADES = UPGRADES.length;
@@ -278,6 +279,11 @@ async function Commence() {
     if (gamemode != 100) loop();
 }
 function Start() {
+    const scale = Math.min(window.innerWidth / 1536, window.innerHeight / 695);
+    canvas.style.width = `${1536 * scale}px`;
+    canvas.style.height = `${695 * scale}px`;
+    canvas.width = 1536;
+    canvas.height = 695; 
     if (gamemode == 100) {
         ChangePage("coopWaitingPage", false);
         if (createdRoom) createRoom();
@@ -315,6 +321,7 @@ function Start() {
         scaleMultiplier: 1,
         bossMultiplier: 1,
         waveTimer: 2000,
+        strengthPotionSpawnRate:0
     };
 
     healthPotionSpawnTimer = Math.random() * 600 + 700;
@@ -478,7 +485,7 @@ function Start() {
         RandomizeEnemies(0, 0, 0, 1, 0, gameState.enemies, gameState.bossBars, gameState.bossMultiplier);
     }
     else {
-        RandomizeEnemies(2, 0, 0, 0, 0);
+        RandomizeEnemies(2, 0, 0, 0, 0, gameState.enemies, gameState.bossBars, gameState.bossMultiplier);
     }
     ctx.clearRect(0, 0, 2000, 1100);
     currentPage = "gamePage";
@@ -688,80 +695,6 @@ function CheckTile(x, y, counts, value) {
     }
     return counts;
 }
-function InitializeTiles(x, y) {
-    visited[x][y] = 1;
-    let weights = [1, 1, 1];
-    let counts = [0, 0, 0];
-    for (let i = -1; i <= 1; i++) {
-        for (let j = -1; j <= 1; j++) {
-            if (Math.abs(1) <= 1 && Math.abs(j) <= 1) {
-                counts = CheckTile(x + i, y + j, counts, 1);
-            }
-            else {
-                counts = CheckTile(x + i, y + j, counts, 0.25);
-            }
-        }
-    }
-    // if(x>0 && visited[x-1][y]==1){
-    //     counts[tiles[x-1][y]]++;
-    // }
-    // if(x<tiles.length-1 && visited[x+1][y]==1){
-    //     counts[tiles[x+1][y]]++;
-    // }
-    // if(y>0 && visited[x][y-1]==1){
-    //     counts[tiles[x][y-1]]++;
-    // }
-    // if(y<tiles[0].length-1 && visited[x][y+1]==1){
-    //     counts[tiles[x][y+1]]++;
-    // }
-    // if(x>0 && y>0 && visited[x-1][y-1]==1){
-    //     counts[tiles[x-1][y-1]]++;
-    // }
-    // if(x<tiles.length-1 && y>0 && visited[x+1][y-1]==1){
-    //     counts[tiles[x+1][y-1]]++;
-    // }
-    // if(x>0 && y<tiles[0].length-1 && visited[x-1][y+1]==1){
-    //     counts[tiles[x-1][y+1]]++;
-    // }
-    // if(x<tiles.length-1 && y<tiles[0].length-1 && visited[x+1][y+1]==1){
-    //     counts[tiles[x+1][y+1]]++;
-    // }
-    //console.log(weights)
-    weights[0] += counts[0] * counts[0] * 2.5;
-    weights[1] += counts[1] * counts[1];
-    weights[2] += counts[2] * counts[2] * 0.5;
-    if (counts[1] > 0) {
-        weights[2] = 0;
-    }
-    if (counts[2] > 0) {
-        weights[1] = 0;
-    }
-    let totalWeight = 0;
-    for (let i = 0; i < weights.length; i++) {
-        totalWeight += weights[i];
-    }
-    let value = Math.random() * totalWeight;
-    let index = 0;
-    value -= weights[index]
-    while (value > 0) {
-        index++;
-        value -= weights[index];
-    }
-    tiles[x][y] = index;
-
-    if (x > 0 && visited[x - 1][y] == 0) {
-        InitializeTiles(x - 1, y)
-    }
-    if (x < tiles.length - 1 && visited[x + 1][y] == 0) {
-        InitializeTiles(x + 1, y)
-    }
-    if (y > 0 && visited[x][y - 1] == 0) {
-        InitializeTiles(x, y - 1)
-    }
-    if (y < tiles.length - 1 && visited[x][y + 1] == 0) {
-        InitializeTiles(x, y + 1)
-    }
-}
 if (typeof window !== "undefined") {
     window.addEventListener("beforeunload", (e) => {
         localStorage.setItem("leftControl", controls["left"]);
@@ -786,6 +719,7 @@ if (typeof window !== "undefined") {
         localStorage.setItem("BouncyBossFound", BouncyBoss.seen);
         localStorage.setItem("MageBossFound", MageBoss.seen);
         localStorage.setItem("BulletHellBossFound", BulletHellBoss.seen);
+        localStorage.setItem("WeakenBossFound", WeakenBoss.seen);
 
         localStorage.setItem("GambleBossFound", GambleBoss.seen);
         localStorage.setItem("SnakeBossFound", SnakeBoss.seen);
@@ -827,6 +761,7 @@ if (typeof window !== "undefined") {
         BouncyBoss.seen = JSON.parse(localStorage.getItem("BouncyBossFound"));
         MageBoss.seen = JSON.parse(localStorage.getItem("MageBossFound"));
         BulletHellBoss.seen = JSON.parse(localStorage.getItem("BulletHellBossFound"));
+        WeakenBoss.seen=JSON.parse(localStorage.getItem("WeakenBossFound"));
 
         GambleBoss.seen = JSON.parse(localStorage.getItem("GambleBossFound"));
         SnakeBoss.seen = JSON.parse(localStorage.getItem("SnakeBossFound"));

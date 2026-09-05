@@ -79,6 +79,7 @@ const enemyBulletPaths = [
     "images/enemyBomb.webp",
     "images/farmerBullet.webp",
     "images/farmerBossCowBullet.webp",
+    "images/weakenBullet.webp",
 ];
 let enemyBulletImages = enemyBulletPaths.map(src => {
     let img = new Image();
@@ -128,10 +129,26 @@ const otherImagePaths = {
     pheonixPlayerIcon: "images/pheonixPlayer.webp",
     timeStopIcon: "images/timeStopIcon.webp",
     nukeIcon: "images/playerNuke.webp",
+    strengthPotion:"images/strengthPotion.webp",
 };
 
 let otherImages = Object.fromEntries(
     Object.entries(otherImagePaths).map(([key, src]) => {
+        const img = new Image();
+        img.src = src;
+        return [key, img];
+    })
+);
+const statusEffectPaths = {
+    slow: "images/slowed.webp",
+    weaken: "images/weakened.webp",
+    strength: "images/strength.webp",
+    invincibility: "images/invincibility.webp",
+    speed: "images/speed.webp",
+};
+
+let statusEffectImages = Object.fromEntries(
+    Object.entries(statusEffectPaths).map(([key, src]) => {
         const img = new Image();
         img.src = src;
         return [key, img];
@@ -159,6 +176,7 @@ const bossPaths = [
     "images/healingBoss.webp",
     "images/engineerBoss.webp",
     "images/farmerBoss.webp",
+    "images/weakenBoss.webp",
 ];
 let bossImages = bossPaths.map(src => {
     let img = new Image();
@@ -238,7 +256,7 @@ function multiplayerDraw() {
         canvas.style.filter ="none";
     }
     ctx.translate(cameraX, cameraY);
-    if (serverState.players[socket.id] && serverState.players[socket.id].timeWarpCounter > 0) {
+    if (serverState.players[socket.id] && serverState.players[socket.id].statusEffects.speed > 0) {
         ctx.drawImage(timeWarpBackground, -50, -50, 2000 + 100, 1100 + 100);
     }
     else ctx.drawImage(backgroundImage, -50, -50, 2000 + 100, 1100 + 100);
@@ -248,163 +266,9 @@ function multiplayerDraw() {
         drawCollectable(collectables[i], collectableImages[collectables[i].index]);
     }
     let bullets = serverState.bullets || [];
-    for (let i = 0; i < bullets.length; i++) {
-        switch (bullets[i].index) {
-            case 0:
-                drawBullet(bullets[i], bulletImages[bullets[i].index]);
-                break;
-            case 1:
-                drawBullet(bullets[i], bulletImages[bullets[i].index]);
-                break;
-            case 2:
-                if(!bullets[i].owner.dead) drawPlayerLaser(bullets[i], bulletImages[bullets[i].index]);
-                break;
-            case 3:
-                if (bullets[i].shootTimer > 0) {
-                    drawBullet(bullets[i], bulletImages[bullets[i].index]);
-                }
-                else {
-                    drawBullet(bullets[i], otherImages.playerBombExploded);
-                }
-                break;
-            case 4:
-                if(!bullets[i].owner.dead) drawBullet(bullets[i], bulletImages[bullets[i].index]);
-                break;
-            case 5:
-                drawBullet(bullets[i], bulletImages[bullets[i].index]);
-                break;
-            case 6:
-                drawBullet(bullets[i], bulletImages[bullets[i].index]);
-                break;
-            case 7:
-                drawBullet(bullets[i], bulletImages[bullets[i].index]);
-                break;
-            case 8:
-                drawBullet(bullets[i], bulletImages[bullets[i].index]);
-                break;
-            case 9:
-                drawBullet(bullets[i], bulletImages[bullets[i].index]);
-                break;
-            case 10:
-                drawBullet(bullets[i], bulletImages[bullets[i].index]);
-                break;
-            case 11:
-                ctx.save();
-                ctx.filter = "brightness(500%)"
-                drawBullet(bullets[i], bulletImages[bullets[i].index]);
-                ctx.restore();
-                break;
-            case 12:
-                console.log(bullets[i])
-                drawBullet(bullets[i], bulletImages[bullets[i].index]);
-                break;
-            case 13:
-                ctx.save();
-                ctx.filter = "grayscale(100%)";
-                drawBullet(bullets[i], enemyImages[bullets[i].imageIndex]);
-                ctx.restore();
-                break;
-            case 14:
-                if (bullets[i].shootTimer > 0) {
-                    drawBullet(bullets[i], bulletImages[bullets[i].index]);
-                }
-                else {
-                    drawBullet(bullets[i], otherImages.playerBombExploded);
-                }
-                break;
-        }
-    }
+    drawBullets(bullets);
     let enemyBullets = serverState.enemyBullets || [];
-    for (let i = enemyBullets.length - 1; i >= 0; i--) {
-        switch (enemyBullets[i].index) {
-            case 0:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 1:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 2:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 3:
-                if (enemyBullets[i].explodeTimer > 0) {
-                    drawEnemy(enemyBullets[i], otherImages.poisonBombExploded);
-                }
-                else {
-                    drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                }
-                break;
-            case 4:
-                drawBlackHole(enemyBullets[i], enemyBulletImages[enemyBullets[i].index], otherImages.blackHoleBackground);
-                break;
-            case 5:
-                drawLaser(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 6:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 7:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 8:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 9:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 10:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 11:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 12:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 13:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 14:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 15:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 16:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 17:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 18:
-                ctx.save();
-                ctx.filter = "brightness(200%)";
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                ctx.restore();
-                break;
-            case 19:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 20:
-                ctx.save();
-                if (enemyBullets[i].explodeTimer > 0) {
-                    ctx.filter = "hue-rotate(90deg)";
-                    drawBullet(enemyBullets[i], otherImages.playerBombExploded);
-                }
-                else {
-                    drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                }
-                ctx.restore();
-                break;
-            case 21:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 22:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-        }
-
-    }
+    drawEnemyBullets(enemyBullets)
     for (let id in serverState.players) {
         let currentPlayer = serverState.players[id];
         if (currentPlayer.index == 1 && currentPlayer.inputs.right) {
@@ -415,273 +279,7 @@ function multiplayerDraw() {
         }
     }
     let enemies = serverState.enemies || [];
-    for (let i = enemies.length - 1; i >= 0; i--) {
-        if (enemies[i].isBoss) {
-            switch (enemies[i].index) {
-                case 0:
-                    drawOutline(enemies[i]);
-                    drawEnemy(enemies[i], bossImages[enemies[i].index]);
-                    break;
-                case 1:
-                    ctx.save();
-                    drawOutline(enemies[i]);
-                    ctx.globalAlpha = 0.4;
-                    ctx.drawImage(otherImages.frostAura, enemies[i].x - enemies[i].frostAuraWidth / 2, enemies[i].y - enemies[i].frostAuraHeight / 2, enemies[i].frostAuraWidth, enemies[i].frostAuraHeight);
-                    ctx.restore();
-                    drawEnemy(enemies[i], bossImages[enemies[i].index]);
-                    break;
-                case 2:
-                    drawOutline(enemies[i]);
-                    drawEnemy(enemies[i], bossImages[enemies[i].index]);
-                    break;
-                case 3:
-                    drawOutline(enemies[i]);
-                    if (enemies[i].cycle == 0) {
-
-                        drawEnemy(enemies[i], bossImages[enemies[i].index]);
-                    }
-                    else if (enemies[i].cycle == 1) {
-
-                        drawEnemy(enemies[i], otherImages.mageWaterMode);
-                    }
-                    else {
-                        drawEnemy(enemies[i], otherImages.mageRockMode);
-                    }
-                    break;
-                case 4:
-                    drawOutline(enemies[i]);
-                    if (enemies[i].health <= enemies[i].maxHealth / 3) {
-
-                        drawEnemy(enemies[i], otherImages.bulletHellBossEnraged);
-                    }
-                    else {
-
-                        drawEnemy(enemies[i], bossImages[enemies[i].index]);
-                    }
-                    break;
-                case 5:
-                    drawOutline(enemies[i]);
-                    drawEnemy(enemies[i], bossImages[enemies[i].index]);
-                    if (enemies[i].gambleTimer > -60) {
-                        switch (enemies[i].currentGamble) {
-                            case 1:
-                                ctx.fillStyle = "white";
-                                break;
-                            case 2:
-                                ctx.fillStyle = "green";
-                                break;
-                            case 3:
-                                ctx.fillStyle = "blue";
-                                break;
-                            case 4:
-                                ctx.fillStyle = "purple";
-                                break;
-                            case 5:
-                                ctx.fillStyle = "yellow";
-                                break;
-                        }
-                        ctx.fillRect(enemies[i].x - 20, enemies[i].y - 20, 40, 40);
-                    }
-                    break;
-                case 6:
-                    drawSnakeBoss(enemies[i], bossImages[enemies[i].index]);
-                    break;
-                case 7:
-
-                    ctx.save();
-                    drawOutline(enemies[i]);
-                    ctx.globalAlpha = 0.4;
-                    if (enemies[i].healAuraTimer > 0) {
-                        ctx.drawImage(otherImages.healAura, enemies[i].x - enemies[i].healAuraHeight / 2, enemies[i].y - enemies[i].healAuraHeight / 2, enemies[i].healAuraWidth, enemies[i].healAuraHeight);
-                    }
-                    ctx.drawImage(otherImages.healAura, enemies[i].x - enemies[i].healAuraWidth / 2, enemies[i].y - enemies[i].healAuraHeight / 2, enemies[i].healAuraWidth, enemies[i].healAuraHeight);
-                    ctx.restore();
-                    if (enemies[i].isHealing) {
-
-                        drawEnemy(enemies[i], otherImages.healerBossHealing);
-                    }
-                    else {
-                        drawEnemy(enemies[i], bossImages[enemies[i].index]);
-                    }
-                    break;
-                case 8:
-                    drawOutline(enemies[i]);
-                    drawEnemy(enemies[i], bossImages[enemies[i].index]);
-                    break;
-                case 9:
-                    drawOutline(enemies[i]);
-                    drawEnemy(enemies[i], bossImages[enemies[i].index]);
-                    break;
-                case 1000:
-                    drawOutline(enemies[i]);
-                    drawEnemy(enemies[i], otherImages.farmerBossCow);
-                    break;
-            }
-            continue;
-        }
-        switch (enemies[i].index) {
-            case 0:
-                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
-            case 1:
-                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
-            case 2:
-                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
-            case 3:
-                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
-            case 4:
-                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
-            case 5:
-                if (enemies[i].deathTimer >= 0) {
-                    //console.log(otherImages.zombieEnemyDead);
-                    drawEnemy(enemies[i], otherImages.zombieEnemyDead);
-                }
-                else {
-                    drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                }
-                break;
-            case 6:
-                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
-            case 7:
-                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
-            case 8:
-                drawGhostEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
-            case 9:
-                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
-            case 10:
-                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
-            case 11:
-                if (enemies[i].trollTimer > 0) {
-                    drawEnemy(enemies[i], otherImages.mimicEnemyDead, showHealthBars);
-                }
-                else {
-                    drawEnemy(enemies[i], enemyImages[enemies[i].index], enemies[i].showHealthBar);
-                }
-                break;
-            case 12:
-                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
-            case 13:
-                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
-            case 14:
-                if (enemies[i].releasing == true) {
-
-                    drawEnemy(enemies[i], otherImages.spawnPortal, showHealthBars);
-                }
-                else if (enemies[i].speed == 0) {
-                    ctx.lineWidth = 5;
-                    ctx.strokeStyle = "black";
-                    ctx.strokeRect(enemies[i].x - enemies[i].width / 2, enemies[i].y - enemies[i].height / 2, enemies[i].width, enemies[i].height);
-
-                    drawEnemy(enemies[i], otherImages.spawner, showHealthBars);
-                }
-                else {
-                    drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                }
-
-                break;
-            case 15:
-                if (enemies[i].exploding) {
-                    ctx.save();
-                    ctx.filter = 'hue-rotate(90deg)';
-                    drawEnemy(enemies[i], otherImages.playerBombExploded, showHealthBars);
-                    ctx.restore();
-                }
-                else drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
-            case 16:
-                drawMachineGunEnemy(enemies[i], enemyImages[enemies[i].index], enemies[i].angle, showHealthBars);
-                break;
-            case 17:
-                ctx.lineWidth = 5;
-                ctx.strokeStyle = "blue";
-                //ctx.globalAlpha=0.4;
-                if (!enemies[i].moving) ctx.drawImage(otherImages.smoke, enemies[i].x - enemies[i].smokeWidth / 2, enemies[i].y - enemies[i].smokeHeight / 2, enemies[i].smokeWidth, enemies[i].smokeHeight);
-                ctx.strokeRect(enemies[i].x - enemies[i].width / 2, enemies[i].y - enemies[i].height / 2, enemies[i].width, enemies[i].height);
-                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
-            case 18:
-                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
-            case 19:
-                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
-            case 20:
-                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
-            case 1000:
-                if (enemies[i].offsetX == 0) {
-                    //console.log(otherImages.zombieEnemyDead);
-                    drawEnemy(enemies[i], otherImages.rotatedShield);
-                }
-                else {
-                    drawEnemy(enemies[i], otherImages.enemyShield);
-                }
-                break;
-            case 1001:
-                ctx.save();
-                ctx.lineWidth = 5;
-                ctx.strokeStyle = "black";
-                ctx.strokeRect(enemies[i].x - enemies[i].width / 2, enemies[i].y - enemies[i].height / 2, enemies[i].width, enemies[i].height);
-                drawEnemy(enemies[i], otherImages.enemyWall, showHealthBars);
-                ctx.restore();
-                break;
-            case 1002:
-                ctx.save();
-                drawOutline(enemies[i]);
-                drawEnemy(enemies[i], otherImages.bouncyMinion, showHealthBars);
-                ctx.restore();
-                break;
-            case 1003:
-
-                if (enemies[i].width <= 0) break;
-                ctx.save();
-                ctx.strokeStyle = "blue";
-                ctx.lineWidth = 5;
-                ctx.beginPath();
-                ctx.arc(enemies[i].x, enemies[i].y, enemies[i].width / 2, 0, Math.PI * 2);
-                ctx.stroke();
-                drawEnemy(enemies[i], otherImages.snakeBossSegment);
-                ctx.restore();
-                break;
-            case 1004:
-                ctx.save();
-                drawOutline(enemies[i]);
-                drawEnemy(enemies[i], otherImages.sentryEngineerEnemy, showHealthBars);
-                ctx.restore();
-                break;
-            case 1005:
-                ctx.save();
-                drawOutline(enemies[i]);
-                drawEnemy(enemies[i], otherImages.laserEngineerEnemy, showHealthBars);
-                ctx.restore();
-                break;
-            case 1006:
-                ctx.save();
-                drawOutline(enemies[i]);
-                drawEnemy(enemies[i], otherImages.bombEngineerEnemy, showHealthBars);
-                ctx.restore();
-                break;
-            case 1007:
-                ctx.save();
-                drawOutline(enemies[i]);
-                ctx.globalAlpha = 0.4;
-                ctx.drawImage(otherImages.frostAura, enemies[i].x - enemies[i].frostAuraWidth / 2, enemies[i].y - enemies[i].frostAuraHeight / 2, enemies[i].frostAuraWidth, enemies[i].frostAuraHeight);
-                drawEnemy(enemies[i], otherImages.iceEngineerEnemy, showHealthBars);
-                ctx.restore();
-                break;
-        }
-    }
+    drawEnemies(enemies)
     let floatingObjects = serverState.floatingObjects || [];
     for (let i = floatingObjects.length - 1; i >= 0; i--) {
         ctx.save();
@@ -744,43 +342,7 @@ function multiplayerDraw() {
         }
     }
     if (serverState.players[socket.id]) {
-        for (let i = serverState.players[socket.id].abilities.length - 1; i >= 0; i--) {
-            let ability = serverState.players[socket.id].abilities[i];
-            switch (ability.index) {
-                case 0:
-                    drawIcon(ability, abilityIconImages[ability.index]);
-                    break;
-                case 1:
-                    drawIcon(ability, abilityIconImages[ability.index]);
-                    break;
-                case 2:
-                    drawIcon(ability, abilityIconImages[ability.index]);
-                    break;
-                case 3:
-                    if (ability.mode == 1) {
-                        drawIcon(ability, abilityIconImages[ability.index]);
-                    }
-                    else if (ability.mode == 2) {
-                        drawIcon(ability, otherImages.mageIceMode);
-                    }
-                    else {
-                        drawIcon(ability, otherImages.mageWindMode);
-                    }
-                    break;
-                case 4:
-                    drawIcon(ability, abilityIconImages[ability.index]);
-                    ctx.font = "50px Black Ops One";
-                    ctx.fillStyle = "black";
-                    console.log(ability.counterTextY);
-                    ctx.fillText(ability.counterText, ability.counterTextX, ability.counterTextY);
-                    break;
-            }
-
-
-        }
-        if (serverState.players[socket.id].index == 5) {
-            drawPheonixIcon(serverState.players[socket.id].icon, otherImages.pheonixPlayerIcon);
-        }
+        drawPlayerInfo(serverState.players[socket.id]);
     }
     if(serverState.deadPlayers[socket.id]){
         ctx.fillStyle = "black";
@@ -808,12 +370,12 @@ function multiplayerDraw() {
         if (player.rebirth > 0) ctx.fillStyle = "purple";
         else ctx.fillStyle = "green"
         ctx.fillRect(10, 60, healthBarCurrentLength, 30);
-        if (player.rebirthTimer > 0) {
+        if (player.statusEffects.invincibility > 0) {
             ctx.fillStyle = "white";
             ctx.strokeStyle = "black";
             ctx.lineWidth = 2;
-            ctx.fillRect(10, 60, player.rebirthTimer / 300 * 400, 30);
-            ctx.strokeRect(10, 60, player.rebirthTimer / 300 * 400, 30);
+            ctx.fillRect(10, 60, player.statusEffects.invincibility / 300 * 400, 30);
+            ctx.strokeRect(10, 60, player.statusEffects.invincibility / 300 * 400, 30);
         }
 
         levelBarDesiredLength = (serverState.sharedXP / serverState.nextLevel) * 400

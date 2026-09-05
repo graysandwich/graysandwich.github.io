@@ -122,7 +122,7 @@
             <button onclick="SetDifficulty(2)" style="text-align: center; font-size: 67px; position: relative; top: 150px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Normal</button>
             <button onclick="SetDifficulty(3)" style="text-align: center; font-size: 67px; position: relative; top: 170px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Hard</button>
             <button onclick="SetDifficulty(4)" style="text-align: center; font-size: 67px; position: relative; top: 190px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Extreme Demon</button>
-            <button onclick="if(gamemode==1)ChangePage('IntroPage', false); else if(gamemode==100)ChangePage('coopPage', false); else ChangePage('gamemodeSelectionPage', false);" style="text-align: center; font-size: 67px; position: relative; top: -410px; left: 1300px; width: 15%; z-index: 1000; margin: 0px;">Back</button>
+            <button onclick="if(gamemode==1)ChangePage('IntroPage', false); else if(gamemode==100)ChangePage('coopPage', false); else ChangePage('gamemodeSelectionPage', false);" style="text-align: center; font-size: 67px; position: relative; top: -410px; left: 80%; width: 15%; z-index: 1000; margin: 0px;">Back</button>
 
         </div>
         <div id="gamemodeSelectionPage" style="display:none; position:relative; overflow:auto;height:100vh;">
@@ -145,16 +145,16 @@
         <div id="characterSelectionPage" style="display:none">
             <h1 style="text-align: center; font-size: 67px; position: relative; top: 7px; left: 0; width: 100%; z-index: 1000; margin: 0;">Choose Your Character</h1>
             
-            <button onclick="SelectCharacter(1)" style=" font-size:30px; position:absolute; top: 300px; left: 100px; width: 200px; height:200px; z-index: 1000;padding:0px" id="basicPlayer"><img src="images/player.webp" style="height:100%;width: 100%; "></img></button>
-            <h1 style="position: absolute  ; text-align:center;top: 225px; left: 100px; width: 200px; height:200px; z-index: 1000;">Basic</h1>
-            <button onclick="SelectCharacter(2)" style=" font-size:30px;position: absolute; top: 300px; left: 500px; width: 200px; height:200px; z-index: 1000;padding:0px" id="tankPlayer"><img src="images/tankPlayer.webp" style="height:100%;width: 100%; "id="tankPlayerImage"></img></button>
-            <h1 style="position: absolute  ; text-align:center;top: 225px; left: 500px; width: 200px; height:200px; z-index: 1000;"id="tankPlayerText">Tank</h1>
-            <button onclick="SelectCharacter(3)" style=" font-size:30px;position: absolute; top: 300px; left: 900px; width: 200px; height:200px; z-index: 1000;padding:0px" id="healerPlayer"><img src="images/healerPlayer.webp" style="height:100%;width: 100%; "id="healerPlayerImage"></img></button>
-            <h1 style="position: absolute  ; text-align:center;top: 225px; left: 900px; width: 200px; height:200px; z-index: 1000;"id="healerPlayerText">Healer</h1>
-            <button onclick="SelectCharacter(4)" style=" font-size:30px;position: absolute; top: 300px; left: 1300px; width: 200px; height:200px; z-index: 1000;padding:0px" id="magePlayer"><img src="images/magePlayer.webp" style="height:100%;width: 100%; "id="magePlayerImage"></img></button>
-            <h1 style="position: absolute  ; text-align:center;top: 225px; left: 1300px; width: 200px; height:200px; z-index: 1000;"id="magePlayerText">Mage</h1>
+            <button onclick="SelectCharacter(1)" style=" font-size:30px; position:absolute; top: 42%; left: 8%; width: 13%; height:28.8%; z-index: 1000;padding:0px" id="basicPlayer"><img src="images/player.webp" style="height:100%;width: 100%; "></img></button>
+            <h1 style="position: absolute  ; text-align:center;top: 32%; left: 8%; width: 13%; height:28.8%; z-index: 1000;">Basic</h1>
+            <button onclick="SelectCharacter(2)" style=" font-size:30px;position: absolute; top: 42%; left: 32%; width: 13%; height:28.8%; z-index: 1000;padding:0px" id="tankPlayer"><img src="images/tankPlayer.webp" style="height:100%;width: 100%; "id="tankPlayerImage"></img></button>
+            <h1 style="position: absolute  ; text-align:center;top: 42%; left: 32%; width: 13%; height:28.8%; z-index: 1000;"id="tankPlayerText">Tank</h1>
+            <button onclick="SelectCharacter(3)" style=" font-size:30px;position: absolute; top: 42%; left: 56%; width: 13%; height:28.8%; z-index: 1000;padding:0px" id="healerPlayer"><img src="images/healerPlayer.webp" style="height:100%;width: 100%; "id="healerPlayerImage"></img></button>
+            <h1 style="position: absolute  ; text-align:center;top: 42%; left: 56%; width: 13%; height:28.8%; z-index: 1000;"id="healerPlayerText">Healer</h1>
+            <button onclick="SelectCharacter(4)" style=" font-size:30px;position: absolute; top: 42%; left: 80%; width: 13%; height:28.8%; z-index: 1000;padding:0px" id="magePlayer"><img src="images/magePlayer.webp" style="height:100%;width: 100%; "id="magePlayerImage"></img></button>
+            <h1 style="position: absolute  ; text-align:center;top: 42%; left: 80%; width: 13%; height:28.8%; z-index: 1000;"id="magePlayerText">Mage</h1>
             
-            <h1 style="position: absolute  ; text-align:center;top: 500px; height:200px; z-index: 1000;"id="descriptionText"></h1>
+            <h1 style="position: absolute  ; text-align:center;top: 70%; height:200px; z-index: 1000;"id="descriptionText"></h1>
             
             <button onclick="ChangePage('characterSelection2Page', false)" style="text-align: center; font-size: 67px; position: absolute; top: 88%; left: 80%; width: 5%; z-index: 1001; margin: 0px;">></button>
 
@@ -168,12 +168,12 @@
         <div id="characterSelection2Page" style="display:none">
             <h1 style="text-align: center; font-size: 67px; position: relative; top: 7px; left: 0; width: 100%; z-index: 1000; margin: 0;">Choose Your Character</h1>
             
-            <button onclick="SelectCharacter(5)" style=" font-size:30px; position:absolute; top: 300px; left: 100px; width: 200px; height:200px; z-index: 1000;padding:0px" id="necromancerPlayer"><img src="images/player.webp" style="height:100%;width: 100%; " id="necromancerPlayerImage"></img></button>
-            <h1 style="position: absolute  ; text-align:center;top: 225px; left: 90px; width: 200px; height:200px; z-index: 1000;" id="necromancerPlayerText">Necromancer</h1>
-            <button onclick="SelectCharacter(6)" style=" font-size:30px; position:absolute; top: 300px; left: 500px; width: 200px; height:200px; z-index: 1000;padding:0px" id="pheonixPlayer"><img src="images/player.webp" style="height:100%;width: 100%; " id="pheonixPlayerImage"></img></button>
-            <h1 style="position: absolute  ; text-align:center;top: 225px; left: 500px; width: 200px; height:200px; z-index: 1000;" id="pheonixPlayerText">Pheonix</h1>
+            <button onclick="SelectCharacter(5)" style=" font-size:30px; position:absolute; top: 42%; left: 8%; width: 13%; height:28.8%; z-index: 1000;padding:0px" id="necromancerPlayer"><img src="images/player.webp" style="height:100%;width: 100%; " id="necromancerPlayerImage"></img></button>
+            <h1 style="position: absolute  ; text-align:center;top: 32%; left: 7%; width: 15%; height:28.8%; z-index: 1000;" id="necromancerPlayerText">Necromancer</h1>
+            <button onclick="SelectCharacter(6)" style=" font-size:30px; position:absolute; top: 42%; left: 32%; width: 13%; height:28.8%; z-index: 1000;padding:0px" id="pheonixPlayer"><img src="images/player.webp" style="height:100%;width: 100%; " id="pheonixPlayerImage"></img></button>
+            <h1 style="position: absolute  ; text-align:center;top: 42%; left: 32%; width: 13%; height:28.8%; z-index: 1000;" id="pheonixPlayerText">Pheonix</h1>
   
-            <h1 style="position: absolute  ; text-align:center;top: 500px; height:200px; z-index: 1000;"id="descriptionText2"></h1>
+            <h1 style="position: absolute  ; text-align:center;top: 70%; height:200px; z-index: 1000;"id="descriptionText2"></h1>
 
             <button onclick="ChangePage('characterSelectionPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 88%; left: 20%; width: 5%; z-index: 1001; margin: 0px;"><</button>
 
@@ -260,15 +260,25 @@
             <button onclick="ShowEnemy(21)" style=" font-size:30px; position:absolute; top: 90%; left: 42%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
             <button onclick="ShowEnemy(22)" style=" font-size:30px; position:absolute; top: 90%; left: 61%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
             <button onclick="ShowEnemy(23)" style=" font-size:30px; position:absolute; top: 90%; left: 79%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
-            <button onclick="ShowEnemy(24)" style=" font-size:30px; position:absolute; top: 125%; left: 4%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
-            <button onclick="ShowEnemy(25)" style=" font-size:30px; position:absolute; top: 125%; left: 23%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
-            <button onclick="ShowEnemy(26)" style=" font-size:30px; position:absolute; top: 125%; left: 42%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(24)" style=" font-size:30px; position:absolute; top: 160%; left: 4%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(25)" style=" font-size:30px; position:absolute; top: 160%; left: 23%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(26)" style=" font-size:30px; position:absolute; top: 160%; left: 42%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
             <button onclick="ShowEnemy(27)" style=" font-size:30px; position:absolute; top: 65%; left: 70%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
             <button onclick="ShowEnemy(28)" style=" font-size:30px; position:absolute; top: 40%; left: 70%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
             <button onclick="ShowEnemy(29)" style=" font-size:30px; position:absolute; top: 15%; left: 70%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
-            <button onclick="ShowEnemy(30)" style=" font-size:30px; position:absolute; top: 125%; left: 61%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
-            <button onclick="ShowEnemy(31)" style=" font-size:30px; position:absolute; top: 125%; left: 79%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
-   
+            <button onclick="ShowEnemy(30)" style=" font-size:30px; position:absolute; top: 160%; left: 61%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(31)" style=" font-size:30px; position:absolute; top: 160%; left: 79%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(32)" style=" font-size:30px; position:absolute; top: 125%; left: 4%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(33)" style=" font-size:30px; position:absolute; top: 40%; left: 81%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(1001)" style=" font-size:30px; position:absolute; top: 195%; left: 4%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(1002)" style=" font-size:30px; position:absolute; top: 195%; left: 15%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(1004)" style=" font-size:30px; position:absolute; top: 195%; left: 26%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(1005)" style=" font-size:30px; position:absolute; top: 195%; left: 37%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(1006)" style=" font-size:30px; position:absolute; top: 195%; left: 48%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(1007)" style=" font-size:30px; position:absolute; top: 195%; left: 59%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(1000)" style=" font-size:30px; position:absolute; top: 195%; left: 70%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+
+            
 
             
             <!-- <button onclick="Commence(3)" style="text-align: center; font-size: 67px; position: relative; top: 170px; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Hard</button>
@@ -298,7 +308,30 @@
             <button onclick="ChangePage('IntroPage', false)" style="position:absolute;text-align: center; font-size: 67px; top: 0px; left: 0; width: 100%; z-index: 1000; margin: 0;">Back</button>
 
             <div class="scrollable-box" style="position: absolute; top: 12%; left: 0px; width: 100%; height: 88%; z-index: 1000; margin: 0px;">
+            <h1>Update 4.1 - September 5, 2026</h1>
+            <ul>
+                <li>Added 1 new tier 1 boss</li>
+                <li>Added 1 new upgrade</li>
+                <li>Added 1 new tier 2 enemy</li>
+                <li>Made enemies that don't naturally spawn appear the Enemy Guide</li>
+                <li>Added bar that shows player's current status effects</li>
+                <li>Made game visuals consistent across different screen sizes</li>
 
+
+
+                <li>Balance Changes:</li>
+                <ul>
+                    <li>Decreased the damage that the "+1 Bouncing Bullet Damage" upgrade gives (1 -> 0.5)</li>
+                    <li>Increase the time between attacks for bouncing bullets (2.5s -> 4s)</li>
+                    <b>Developer's note:</b> When creating this upgrade I did not expect piercing damage to be this important. When bouncing bullets have high enough damage, they are able to easily wipe out supporting enemies, making waves just a 1v1 against the boss (which is very easy).
+                    <li>Made Mob spawners immune to knockback</li>
+                    <b>Developer's note:</b> Mob spawners would sometimes got knocked out of bounds and since they aren't able to move they would just stay there and do nothing.
+                    <li>Increased attack speed of Farmer John (4s on hard difficulty -> 3s)</li>
+                    <b>Developer's note:</b> Farmer John's attacks had less impact than I thought even though they lasted permanently. this should make Farmer John + Bessie more difficult.
+                    <li>Bomb attacks no longer aim to enemies that pass through bullets</li>
+
+                </ul>
+            </ul>
             <h1>Update 4.0 - September 1, 2026</h1>
             <ul>
                 <li>Added Co-op mode</li>

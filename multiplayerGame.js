@@ -29,6 +29,7 @@ function createGameState() {
         isBossWave: false,
         scaleMultiplier: 1,
         bossMultiplier: 1,
+        strengthPotionSpawnRate:0,
         deadPlayers:{},
     };
 }
@@ -265,7 +266,7 @@ function MultiplayerGameLogic(gameState) {
         gameState.healthPotionSpawnTimer = Math.random() * 300 + 450;
         gameState.healthPotionSpawnTimer /= 1 + gameState.timeElapsed * 0.0003;
         //healthPotionSpawnTimer*=healthPotionSpawnMultiplier;
-        const newCollectable = new HealthPotion(Math.random() * (2000 - 2000 / 10) + 2000 / 20, Math.random() * (1100 - 1100 / 10) + 1100 / 20);
+        const newCollectable = new HealthPotion(Math.random() * (2000 - 2000 / 10) + 2000 / 20, Math.random() * (1100 - 1100 / 10) + 1100 / 20, gameState);
         collectables.push(newCollectable);
         //console.log(newEnemy.health);
     }

@@ -197,8 +197,10 @@ io.on("connection", (socket) => {
                     game.abilityIcons.push(temp);
                 }
             }
-            else if(data.type=="abilityUpgrade"){
-                
+            else{
+                if(data.stat=="spawnStrengthPotions"){
+                    game.strengthPotionSpawnRate+=data.amount;
+                }
             }
             
         }
@@ -266,7 +268,7 @@ setInterval(() => {
     }
     
     
-}, 1000 / 67);
+}, 1000 / 64);
 
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => console.log("TESTING TESTING 123"));
