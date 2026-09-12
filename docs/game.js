@@ -905,7 +905,7 @@ function drawPlayerInfo(player){
         ctx.beginPath();
         ctx.rect(0, 0, canvas.width, canvas.height);
         //ctx.arc(canvas.width/2, canvas.height/2, 80, 0, Math.PI * 2, true);
-        let gradient = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 0, canvas.width/2, canvas.height/2, 240);
+        let gradient = ctx.createRadialGradient(canvas.width/2+player.width/2, canvas.height/2+player.height/2, 0, canvas.width/2+player.width/2, canvas.height/2+player.height/2, 240);
         gradient.addColorStop(0, "rgba(0,0,0,0)");
         gradient.addColorStop(1, "rgba(0,0,0,1)");
         ctx.fillStyle = gradient;
