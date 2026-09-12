@@ -224,46 +224,46 @@ function Roll(){
         //console.log(gambleText);
         switch (gambleChoice) {
             case 0:
-                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:red; font-size:75px; background-color:gray" id="upgrade">-3 health</div>`
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:300px; z-index:3; color:red; font-size:75px; background-color:gray" id="upgrade">-3 health</div>`
                 break;
             case 1:
-                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:red; font-size:75px;background-color:gray;" id="upgrade">Decrease Speed</div>`
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:300px; z-index:3; color:red; font-size:75px;background-color:gray;" id="upgrade">Decrease Speed</div>`
                 break;
             case 2:
-                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:black; font-size:75px;background-color:gray;" id="upgrade">Nothing</div>`
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:300px; z-index:3; color:black; font-size:75px;background-color:gray;" id="upgrade">Nothing</div>`
                 break;
             case 3:
-                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:black; font-size:75px;background-color:gray;" id="upgrade">Heal 10</div>`
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:300px; z-index:3; color:black; font-size:75px;background-color:gray;" id="upgrade">Heal 10</div>`
                 break;
             case 4:
-                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:green; font-size:75px;background-color:gray;" id="upgrade">Increase Speed</div>`
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:300px; z-index:3; color:green; font-size:75px;background-color:gray;" id="upgrade">Increase Speed</div>`
                 break;
             case 5:
-                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:green; font-size:75px;background-color:gray;" id="upgrade">+0.5 Damage</div>`
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:300px; z-index:3; color:green; font-size:75px;background-color:gray;" id="upgrade">+0.5 Damage</div>`
                 break;
             case 6:
-                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:green; font-size:75px;background-color:gray;" id="upgrade">+2 Projectiles</div>`
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:300px; z-index:3; color:green; font-size:75px;background-color:gray;" id="upgrade">+2 Projectiles</div>`
                 break;
             case 7:
-                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:green; font-size:75px;background-color:gray;" id="upgrade">+0.25 Lifesteal</div>`
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:300px; z-index:3; color:green; font-size:75px;background-color:gray;" id="upgrade">+0.25 Lifesteal</div>`
                 break;
             case 8:
-                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:blue; font-size:75px;background-color:gray;" id="upgrade">+4 Projectiles</div>`
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:300px; z-index:3; color:blue; font-size:75px;background-color:gray;" id="upgrade">+4 Projectiles</div>`
                 break;
             case 9:
-                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:blue; font-size:75px;background-color:gray;" id="upgrade">+20 Max Health</div>`
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:300px; z-index:3; color:blue; font-size:75px;background-color:gray;" id="upgrade">+20 Max Health</div>`
                 break;
             case 10:
-                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:purple; font-size:75px;background-color:gray;" id="upgrade">+1 Damage</div>`
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:300px; z-index:3; color:purple; font-size:75px;background-color:gray;" id="upgrade">+1 Damage</div>`
                 break;
             case 11:
-                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:purple; font-size:75px;background-color:gray;" id="upgrade">x2 XP Gain</div>`
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:300px; z-index:3; color:purple; font-size:75px;background-color:gray;" id="upgrade">x2 XP Gain</div>`
                 break;
             case 12:
-                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:yellow; font-size:75px;background-color:gray;" id="upgrade">+1.5 Damage</div>`
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:300px; z-index:3; color:yellow; font-size:75px;background-color:gray;" id="upgrade">+1.5 Damage</div>`
                 break;
             case 13:
-                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 - 200}px; transform:translateX(-50%); top:300px; z-index:3; color:yellow; font-size:75px;background-color:gray; " id="upgrade">+40 Max Health</div>`
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:300px; z-index:3; color:yellow; font-size:75px;background-color:gray; " id="upgrade">+40 Max Health</div>`
                 break;
 
         }
@@ -545,10 +545,24 @@ function IncreaseBouncingBulletDamage(amount, player){
 function AddStrengthPotions(amount, player){
     if(gamemode==100){
         socket.emit("buyUpgrade", {type: "other", stat:"spawnStrengthPotions", amount:amount});
+        socket.emit("changeBoughtUpgrades", {index: 29, amount:1});
+
     }
     else{
         gameState.strengthPotionSpawnRate+=amount;
     }
     player.boughtUpgrades[29] = 1;
+    ChangePage('gamePage', false)
+}
+function AddStrengthBuff(amount, player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "stat", stat:"overheal", amount:amount});
+        socket.emit("changeBoughtUpgrades", {index: 30, amount:1});
+
+    }
+    else{
+        player.overheal+=1;
+    }
+    player.boughtUpgrades[30] = 1;
     ChangePage('gamePage', false)
 }

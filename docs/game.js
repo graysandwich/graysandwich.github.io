@@ -42,8 +42,8 @@ function Draw() {
     let cameraX = 0;
     let cameraY = 0;
 
-    cameraX = (2000 / 2) - player.x - 200;
-    cameraY = (1100 / 2) - player.y - 100;
+    cameraX = (canvas.width / 2) - player.x+player.width/2;
+    cameraY = (canvas.height / 2) - player.y+player.height/2;
 
     ctx.translate(cameraX, cameraY);
     if (player.statusEffects.speed > 0) {
@@ -296,8 +296,12 @@ function Actions() {
                     enemies[i].killCredit.summonQueue.push([enemies[i].speed, enemies[i].maxHealth * 0.5, enemies[i].width, enemies[i].index])
                 }
             }
-            if (enemies[i].canSiphon == true && player.siphon > 0) {
-                player.Heal(player.siphon, gameState.floatingObjects)
+            if (enemies[i].canSiphon == true) {
+                if(player.siphon > 0) player.Heal(player.siphon, gameState.floatingObjects)
+                player.numKills++;
+                if(player.numKills%15==0 && player.overheal>0){
+                    player.statusEffects.strength=360;
+                }
             }
             if (enemies[i].isBoss) {
                 const bossBars = gameState.bossBars;
@@ -607,6 +611,10 @@ function drawEnemies(enemies){
                     drawOutline(enemies[i]);
                     drawEnemy(enemies[i], bossImages[enemies[i].index]);
                     break;
+                case 11:
+                    drawOutline(enemies[i]);
+                    drawEnemy(enemies[i], bossImages[enemies[i].index]);
+                    break;
                 case 1000:
                     drawOutline(enemies[i]);
                     drawEnemy(enemies[i], otherImages.farmerBossCow);
@@ -717,6 +725,9 @@ function drawEnemies(enemies){
             case 21:
                 drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
                 break;
+            case 22:
+                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
+                break;
             case 1000:
                 if (enemies[i].offsetX == 0) {
                     //console.log(otherImages.zombieEnemyDead);
@@ -776,6 +787,12 @@ function drawEnemies(enemies){
                 ctx.globalAlpha = 0.4;
                 ctx.drawImage(otherImages.frostAura, enemies[i].x - enemies[i].frostAuraWidth / 2, enemies[i].y - enemies[i].frostAuraHeight / 2, enemies[i].frostAuraWidth, enemies[i].frostAuraHeight);
                 drawEnemy(enemies[i], otherImages.iceEngineerEnemy, showHealthBars);
+                ctx.restore();
+                break;
+            case 1008:
+                ctx.save();
+                drawOutline(enemies[i]);
+                drawEnemy(enemies[i], bossImages[11], showHealthBars);
                 ctx.restore();
                 break;
         }
@@ -872,11 +889,29 @@ function drawEnemyBullets(enemyBullets){
             case 23:
                 drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
                 break;
+            case 24:
+                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
+                break;
+            case 25:
+                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
+                break;
         }
 
     }
 }
 function drawPlayerInfo(player){
+    if(player.statusEffects.blindness>0){
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(0, 0, canvas.width, canvas.height);
+        //ctx.arc(canvas.width/2, canvas.height/2, 80, 0, Math.PI * 2, true);
+        let gradient = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 0, canvas.width/2, canvas.height/2, 240);
+        gradient.addColorStop(0, "rgba(0,0,0,0)");
+        gradient.addColorStop(1, "rgba(0,0,0,1)");
+        ctx.fillStyle = gradient;
+        ctx.fill("evenodd");
+        ctx.restore();
+    }
     for (let i = player.abilities.length - 1; i >= 0; i--) {
         let ability = player.abilities[i];
         switch (ability.index) {

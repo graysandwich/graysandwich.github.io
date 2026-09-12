@@ -177,7 +177,7 @@ function ShowEnemy(enemy){
             sourceImage.src="images/iceEnemy.webp";
             sourceText.innerText="Source: Emoji from Discord server of Samen (a PvZ Youtuber)"
             abilityText.innerText="Ability: Shoots ice bullets that slow the player down on contact.";
-            descriptionText.innerText="Don't worry, he's not always this murderous. He's just back from vacation a little earlier than he would have liked after someone identity theft fraud he had to deal with. The knife is just for decoration.";
+            descriptionText.innerText="Don't worry, he's not always this angry. He's just back from vacation a little earlier than he would have liked after some identity theft he had to deal with. The knife is just for decoration.";
             break;
         case 30:
             sourceImage.src="images/engineerBoss.webp";
@@ -200,8 +200,20 @@ function ShowEnemy(enemy){
         case 33:
             sourceImage.src="images/distractionEnemy.webp";
             sourceText.innerText="Source: Minion laughing Twitch emote"
-            abilityText.innerText="Ability: Has infinite health but does zero damage"
+            abilityText.innerText="Ability: Has infinite health but does zero damage."
             descriptionText.innerText="Always puts in the minimum amount of effort possible in group projects. Still doesn't understand why he's chosen to be the meatshield.";
+            break;
+        case 34:
+            sourceImage.src="images/blindnessEnemy.webp";
+            sourceText.innerText="Source: The enemy \"Chester\" from Soul Knight"
+            abilityText.innerText="Ability: On death, shoots a suspicious stew that blinds the player on contact."
+            descriptionText.innerText="A literal chest being named Chester? JK Rowling is that you";
+            break;
+        case 35:
+            sourceImage.src="images/shadowBoss.webp";
+            sourceText.innerText="Source: The assassin character from Soul Knight"
+            abilityText.innerText="Ability: Shoots projectiles that blind the player on contact. Occasionally spawns clones that shoot black holes."
+            descriptionText.innerText="Shoutout Assassin for being my Soul Knight main ever since i started playing -graysandwich";
             break;
         case 1000:
             sourceImage.src="images/farmerBossCow.webp";

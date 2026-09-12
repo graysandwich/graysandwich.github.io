@@ -129,11 +129,11 @@ function MultiplayerGameLogic(gameState) {
             [gameState.isBossWave, gameState.bossesLeft, gameState.currentWave, gameState.SCALE] = ChangeWave(gameState);
             gameState.timeElapsed = 0;
         }
-        if (inputs.dealDamage) {
-            for (let i = 0; i < gameState.enemies.length; i++) {
-                gameState.enemies[i].takeDamage(new Bullet(0, 0, 10, currentPlayer), currentPlayer, gameState);
-            }
-        }
+        // if (inputs.dealDamage) {
+        //     for (let i = 0; i < gameState.enemies.length; i++) {
+        //         gameState.enemies[i].takeDamage(new Bullet(0, 0, 10, currentPlayer), currentPlayer, gameState);
+        //     }
+        // }
         currentPlayer.attackCooldown--;
         currentPlayer.act(gameState.enemies, gameState.bullets, gameState.floatingObjects);
         if (currentPlayer.dead) {
@@ -166,8 +166,12 @@ function MultiplayerGameLogic(gameState) {
                     enemies[i].killCredit.summonQueue.push([enemies[i].speed, enemies[i].maxHealth * 0.5, enemies[i].width, enemies[i].index])
                 }
             }
-            if (enemies[i].canSiphon && enemies[i].killCredit && enemies[i].killCredit.siphon > 0) {
-                enemies[i].killCredit.Heal(enemies[i].killCredit.siphon, gameState.floatingObjects);
+            if (enemies[i].canSiphon && enemies[i].killCredit) {
+                if(enemies[i].killCredit.siphon > 0)enemies[i].killCredit.Heal(enemies[i].killCredit.siphon, gameState.floatingObjects);
+                enemies[i].killCredit.numKills++;
+                if(enemies[i].killCredit.numKills%15==0 && enemies[i].killCredit.overheal>0){
+                    enemies[i].killCredit.statusEffects.strength=360;
+                }
             }
             if (enemies[i].isBoss) {
                 const bossBars = gameState.bossBars;

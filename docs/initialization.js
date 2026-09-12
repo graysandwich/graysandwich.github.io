@@ -67,6 +67,7 @@ let UPGRADES = [
     { onclick: (player) => IncreaseProtectorDamage(1, player), text: "+1 Protector Damage" },
     { onclick: (player) => IncreaseBouncingBulletDamage(1, player), text: "+0.5 Bouncing Bullet Damage" },
     { onclick: (player) => AddStrengthPotions(0.25, player), text: "Health potions sometimes become Strength potions" },
+    { onclick: (player) => AddStrengthBuff(1, player), text: "Every 15 Kills, Gain strength buff for 6 seconds" },
 
 ];
 const NUMUPGRADES = UPGRADES.length;
@@ -726,6 +727,7 @@ if (typeof window !== "undefined") {
         localStorage.setItem("HealerBossFound", HealerBoss.seen);
         localStorage.setItem("EngineerBossFound", EngineerBoss.seen);
         localStorage.setItem("FarmerBossFound", FarmerBoss.seen);
+        localStorage.setItem("ShadowBossFound", FarmerBoss.seen);
 
         localStorage.setItem("TankPlayerUnlocked", TankPlayer.unlocked);
         localStorage.setItem("HealerPlayerUnlocked", HealerPlayer.unlocked);
@@ -768,6 +770,7 @@ if (typeof window !== "undefined") {
         HealerBoss.seen = JSON.parse(localStorage.getItem("HealerBossFound"));
         EngineerBoss.seen = JSON.parse(localStorage.getItem("EngineerBossFound"));
         FarmerBoss.seen = JSON.parse(localStorage.getItem("FarmerBossFound"));
+        ShadowBoss.seen = JSON.parse(localStorage.getItem("ShadowBossFound"));
 
         BasicPlayer.unlocked = true;
         if (JSON.parse(localStorage.getItem("TankPlayerUnlocked")) != null) TankPlayer.unlocked = JSON.parse(localStorage.getItem("TankPlayerUnlocked"));

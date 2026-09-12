@@ -80,6 +80,8 @@ const enemyBulletPaths = [
     "images/farmerBullet.webp",
     "images/farmerBossCowBullet.webp",
     "images/weakenBullet.webp",
+    "images/blindnessBullet.webp",
+    "images/shadowBossBullet.webp",
 ];
 let enemyBulletImages = enemyBulletPaths.map(src => {
     let img = new Image();
@@ -145,6 +147,7 @@ const statusEffectPaths = {
     strength: "images/strength.webp",
     invincibility: "images/invincibility.webp",
     speed: "images/speed.webp",
+    blindness: "images/blindness.webp",
 };
 
 let statusEffectImages = Object.fromEntries(
@@ -177,6 +180,7 @@ const bossPaths = [
     "images/engineerBoss.webp",
     "images/farmerBoss.webp",
     "images/weakenBoss.webp",
+    "images/shadowBoss.webp",
 ];
 let bossImages = bossPaths.map(src => {
     let img = new Image();
@@ -242,14 +246,14 @@ function multiplayerDraw() {
     let cameraY = 0;
     ctx.save();
     if (serverState.players[socket.id]) {
-        cameraX = (2000 / 2) - serverState.players[socket.id].x - 200;
-        cameraY = (1100 / 2) - serverState.players[socket.id].y - 100;
+        cameraX = canvas.width/2 - serverState.players[socket.id].x+serverState.players[socket.id].width/2;
+        cameraY = canvas.height/2 - serverState.players[socket.id].y+serverState.players[socket.id].height/2;
     }
     if(serverState.deadPlayers[socket.id] && Object.keys(serverState.players).length>0){
         canvas.style.filter = "grayscale(40%) brightness(0.8)";
         for(let id in serverState.players){
-            cameraX = (2000 / 2) - serverState.players[id].x - 200;
-            cameraY = (1100 / 2) - serverState.players[id].y - 100;
+            cameraX = canvas.width/2 - serverState.players[id].x+serverState.players[id].width/2;
+            cameraY = canvas.height/2 - serverState.players[id].y+serverState.players[id].height/2;
         }
     }
     else{
