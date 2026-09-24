@@ -1,4 +1,4 @@
-const { Bullet, Enemy, Player, BasicPlayer, FloatingObject, ENEMYTYPES, InitializeStats, currentPage, RandomizeEnemies, ChangeWave, WaveText, Wall, EnemyShield, XPBag, HealthPotion, ProtectorBullet, TankPlayer, HealerPlayer, MagePlayer, PheonixPlayer, NecromancerPlayer } = require('./docs/shared/gameLogic.js')
+const { Bullet, Enemy, Player, BasicPlayer, FloatingObject, ENEMYTYPES, InitializeStats, currentPage, RandomizeEnemies, ChangeWave, WaveText, Wall, EnemyShield, XPBag, HealthPotion, ProtectorBullet, TankPlayer, HealerPlayer, MagePlayer, PheonixPlayer, NecromancerPlayer, BuilderPlayer, Bolt } = require('./docs/shared/gameLogic.js')
 const { controls } = require('./docs/initialization.js')
 function createGameState() {
     return {
@@ -25,12 +25,14 @@ function createGameState() {
         currentWave: 1,
         xpBagTimer: 0,
         healthPotionSpawnTimer: 0,
+        boltSpawnTimer:0,
         bossesLeft: 0,
         isBossWave: false,
         scaleMultiplier: 1,
         bossMultiplier: 1,
         strengthPotionSpawnRate:0,
         deadPlayers:{},
+        ended:false,
     };
 }
 
@@ -82,6 +84,7 @@ function addPlayer(gameState, socketId, chosenCharacter) {
             gameState.abilityIcons.push(player.abilities[0]);
             break;
         case 6: player = new PheonixPlayer(6); break;
+        case 7: player = new BuilderPlayer(8, gameState.abilityIcons); break;
     }
 
     if (gameState.difficulty == 1) {
@@ -116,6 +119,7 @@ function MultiplayerGameLogic(gameState) {
     gameState.timeElapsed++;
     const playerCount = Object.keys(gameState.players).length;
     //console.log(gameState.currentPage)
+    
     if (playerCount === 0 || gameState.currentPage !== "gamePage") {
         return;
     }
@@ -135,16 +139,30 @@ function MultiplayerGameLogic(gameState) {
         //     }
         // }
         currentPlayer.attackCooldown--;
-        currentPlayer.act(gameState.enemies, gameState.bullets, gameState.floatingObjects);
+        currentPlayer.act(gameState.enemies, gameState.bullets, gameState.floatingObjects, gameState);
         if (currentPlayer.dead) {
             if (currentPlayer.rebirth > 0) {
                 currentPlayer.dead = false;
                 currentPlayer.useRebirth(gameState.bullets);
             }
+            else if(currentPlayer.isPlayer==false){
+                delete gameState.players[id];
+            }
             else {
                 gameState.deadPlayers[id]= gameState.players[id];
                 delete gameState.players[id];
             }
+        }
+        
+        if (currentPlayer.index==6) {
+            gameState.boltSpawnTimer--;
+            if(gameState.boltSpawnTimer < 0){
+                gameState.boltSpawnTimer = Math.random() * 200 + 200;
+                gameState.boltSpawnTimer /= 1 + gameState.timeElapsed * 0.0003;
+                const newCollectable = new Bolt(Math.random() * (2000 - 2000 / 10) + 2000 / 20, Math.random() * (1100 - 1100 / 10) + 1100 / 20, gameState);
+                gameState.collectables.push(newCollectable);
+            }
+            //console.log(newEnemy.health);
         }
     }
     let bullets = gameState.bullets;
@@ -162,7 +180,7 @@ function MultiplayerGameLogic(gameState) {
         if (enemies[i].dead) {
             if (enemies[i].giveXP) {
                 gameState.sharedXP += enemies[i].value * enemies[i].killCredit.xpMultiplier;
-                if (enemies[i].killCredit.index == 4) {
+                if (enemies[i].killCredit.index == 4 && !enemies[i].isBoss) {
                     enemies[i].killCredit.summonQueue.push([enemies[i].speed, enemies[i].maxHealth * 0.5, enemies[i].width, enemies[i].index])
                 }
             }
@@ -291,6 +309,9 @@ function MultiplayerGameLogic(gameState) {
             if (player.index == 5) {
                 player.rebirth++;
             }
+            if(player.index==6){
+                player.boltCount+=3;
+            }
         }
         // if(chosenCharacter==6){
         //     player.rebirth++;
@@ -317,11 +338,13 @@ function MultiplayerGameLogic(gameState) {
     }
     let won = false;
     if(Object.keys(gameState.players).length==0){
+        ended=true;
         for(let id in gameState.deadPlayers){
             deadPlayers.push(id);
         }
     }
     if (gameState.currentWave == 12) {
+        ended=true;
         for (let id in players) {
             deadPlayers.push(id);
         }

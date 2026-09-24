@@ -36,6 +36,12 @@
                 height: 200px;
                 overflow-y: auto;
             }
+            #canvas {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
                         
         </style>
         <title>A COMPLETELY ORIGINAL GAME</title>
@@ -43,7 +49,7 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
         
-        <canvas id="myCanvas" width=2000 height=1100 style="position:absolute; z-index: 0"></canvas>
+        <canvas id="canvas" width=2000 height=1100 style="position:absolute; z-index: 0"></canvas>
         <div id="gamePage" style="display:none">
                 <div id="world" style="position: relative;left: 0;right: 0;">
                     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
@@ -172,6 +178,8 @@
             <h1 style="position: absolute  ; text-align:center;top: 32%; left: 7%; width: 15%; height:28.8%; z-index: 1000;" id="necromancerPlayerText">Necromancer</h1>
             <button onclick="SelectCharacter(6)" style=" font-size:30px; position:absolute; top: 42%; left: 32%; width: 13%; height:28.8%; z-index: 1000;padding:0px" id="pheonixPlayer"><img src="images/player.webp" style="height:100%;width: 100%; " id="pheonixPlayerImage"></img></button>
             <h1 style="position: absolute  ; text-align:center;top: 42%; left: 32%; width: 13%; height:28.8%; z-index: 1000;" id="pheonixPlayerText">Pheonix</h1>
+            <button onclick="SelectCharacter(7)" style=" font-size:30px; position:absolute; top: 42%; left: 57%; width: 13%; height:28.8%; z-index: 1000;padding:0px" id="builderPlayer"><img src="images/player.webp" style="height:100%;width: 100%; " id="builderPlayerImage"></img></button>
+            <h1 style="position: absolute  ; text-align:center;top: 42%; left: 57%; width: 13%; height:28.8%; z-index: 1000;" id="builderPlayerText">Mechanic</h1>
   
             <h1 style="position: absolute  ; text-align:center;top: 70%; height:200px; z-index: 1000;"id="descriptionText2"></h1>
 
@@ -280,6 +288,7 @@
             <button onclick="ShowEnemy(1000)" style=" font-size:30px; position:absolute; top: 230%; left: 70%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
             <button onclick="ShowEnemy(34)" style=" font-size:30px; position:absolute; top: 15%; left: 81%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
             <button onclick="ShowEnemy(35)" style=" font-size:30px; position:absolute; top: 195%; left: 4%; width: 225px; height:225px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(36)" style=" font-size:30px; position:absolute; top: 65%; left: 81%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
 
             
 
@@ -311,7 +320,32 @@
             <button onclick="ChangePage('IntroPage', false)" style="position:absolute;text-align: center; font-size: 67px; top: 0px; left: 0; width: 100%; z-index: 1000; margin: 0;">Back</button>
 
             <div class="scrollable-box" style="position: absolute; top: 12%; left: 0px; width: 100%; height: 88%; z-index: 1000; margin: 0px;">
-            <h1>Update 4.2 - September 11, 2026</h1>
+            <h1>Update 4.3 - September 23, 2026</h1>
+            <ul>
+                <li>Added 1 new tier 3 enemy</li>
+                <li>Added 1 new playable character</li>
+                <li>Made screen scaling for different aspect ratios centered on the middle of the screen instead of the top left</li>
+
+
+                <li>Balance Changes:</li>
+                <ul>
+                    <li>Decreased blindness duration of Assassin and Chester attacks (4s -> 3s)</li>
+                    <b>Developer's Note:</b>Blindness is already a mechanic that is difficult to deal with so this change should make it a little better.
+                    <li>Decreased speed boost from "Increase Movement Speed" upgrade (+2 speed -> +1.5 speed)</li>
+                    <b>Developer's Note:</b>I underestimated how powerful being able to just run away from enemies is.
+                    <li>Made Necromancer not able to gain souls from bosses</li>
+                    <b>Developer's Note:</b>Summoning bosses had a lot of weird behaviour and possible game crashes and it was also extremely unbalanced too considering it could deal 50% of a boss's health in one shot.
+                    <li>Made enemies unable to be pushed out of bounds</li>
+                    <b>Developer's Note:</b>There are a lot of times when bosses get pushed out far enough that players' projectiles wouldn't be able to hit them.
+                    <li>Increased size of basic enemy projectiles by 50%</li>
+                    <b>Developer's Note:</b>This change mainly impacts the Collatz Conjecture and Dream enemies. Their bullets were sometimes difficult to see and they weren't that powerful anyways so this buff should help.
+
+
+
+                </ul>
+            </ul>
+
+                <h1>Update 4.2 - September 11, 2026</h1>
             <ul>
                 <li>Added 1 new tier 1 enemy</li>
                 <li>Added 1 new tier 2 boss</li>

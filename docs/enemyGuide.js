@@ -215,6 +215,12 @@ function ShowEnemy(enemy){
             abilityText.innerText="Ability: Shoots projectiles that blind the player on contact. Occasionally spawns clones that shoot black holes."
             descriptionText.innerText="Shoutout Assassin for being my Soul Knight main ever since i started playing -graysandwich";
             break;
+        case 36:
+            sourceImage.src="images/forcefieldEnemy.webp";
+            sourceText.innerText="Source: The brawler \"Buster\" from Brawl Stars"
+            abilityText.innerText="Ability: Has a forcefield that protects enemies in range."
+            descriptionText.innerText="Started questioning his life decisions after getting 500 credits from his last mythic Starr Drop (he already had all Brawlers unlocked).";
+            break;
         case 1000:
             sourceImage.src="images/farmerBossCow.webp";
             sourceText.innerText="Source: The profile picture of BenQ in Codeforces"

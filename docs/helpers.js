@@ -157,11 +157,8 @@ document.addEventListener("keyup", (e)=>{
     }
         
 })
-window.addEventListener("resize", ()=>{
-   
+window.addEventListener("resize", () => {
     const scale = Math.min(window.innerWidth / 1536, window.innerHeight / 695);
     canvas.style.width = `${1536 * scale}px`;
     canvas.style.height = `${695 * scale}px`;
-    canvas.width = 1536;
-    canvas.height = 695; 
 });

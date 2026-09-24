@@ -196,6 +196,26 @@ io.on("connection", (socket) => {
                     player.abilities.push(temp);
                     game.abilityIcons.push(temp);
                 }
+                else if (data.stat === "sentryTower") {
+                    let temp = new gameLogic.BuildIcon(50, player.abilities.length, 7);
+                    player.abilities.push(temp);
+                    game.abilityIcons.push(temp);
+                }
+                else if (data.stat === "damageAuraTower") {
+                    let temp = new gameLogic.BuildIcon(50, player.abilities.length, 8);
+                    player.abilities.push(temp);
+                    game.abilityIcons.push(temp);
+                }
+                else if (data.stat === "healAuraTower") {
+                    let temp = new gameLogic.BuildIcon(50, player.abilities.length, 9);
+                    player.abilities.push(temp);
+                    game.abilityIcons.push(temp);
+                }
+                else if (data.stat === "laserTower") {
+                    let temp = new gameLogic.BuildIcon(50, player.abilities.length, 10);
+                    player.abilities.push(temp);
+                    game.abilityIcons.push(temp);
+                }
             }
             else{
                 if(data.stat=="spawnStrengthPotions"){
@@ -268,7 +288,7 @@ setInterval(() => {
     }
     
     
-}, 1000 / 64);
+}, 1000 / 67);
 
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => console.log("TESTING TESTING 123"));

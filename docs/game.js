@@ -1,6 +1,6 @@
 
 
-const canvas = document.getElementById('myCanvas');
+const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
 
@@ -75,12 +75,8 @@ function Draw() {
     drawBullets(bullets)
     let enemyBullets = gameState.enemyBullets || [];
     drawEnemyBullets(enemyBullets);
-    if (player.index == 1 && player.inputs.right) {
-        drawPlayer(player, otherImages.tankPlayerMirrored);
-    }
-    else {
-        drawPlayer(player, playerImages[player.index]);
-    }
+    drawPlayers([...[player], ...gameState.players]);
+    
 
     let enemies = gameState.enemies || [];
     drawEnemies(enemies);
@@ -141,9 +137,7 @@ function Draw() {
         }
     }
     drawPlayerInfo(player);
-    if (player.index == 5) {
-        drawPheonixIcon(player.icon, otherImages.pheonixPlayerIcon);
-    }
+    
 
     healthBarDesiredLength = (player.health / player.maxHealth) * 400
     if (healthBarDesiredLength < healthBarCurrentLength) {
@@ -236,6 +230,13 @@ function SpawnEnemies() {
                     const shield = new EnemyShield(0, 1000, newEnemy);
                     gameState.enemies.push(shield);
                 }
+                if (newEnemy.index == 23) {
+                    const shield = new ForcefieldShield(0, 35);
+                    newEnemy.shield=shield;
+                    newEnemy.x=shield.x;
+                    newEnemy.y=shield.y;
+                    gameState.enemies.unshift(shield);
+                }
                 gameState.enemies.push(newEnemy);
             }
         }
@@ -243,6 +244,7 @@ function SpawnEnemies() {
 
 }
 function Actions() {
+    gameState.boltSpawnTimer--;
     if (enableShrinking) {
         mapBorders.leftBorder = initialLeftBorder + gameState.timeElapsed / 8;
         mapBorders.rightBorder = initialRightBorder - gameState.timeElapsed /8;
@@ -255,8 +257,13 @@ function Actions() {
             mapBorders.bottomBorder = initialBottomBorder - gameState.timeElapsed / 2.75;
         }
     }
-    player.act(gameState.enemies, gameState.bullets, gameState.floatingObjects);
-
+    player.act(gameState.enemies, gameState.bullets, gameState.floatingObjects, gameState);
+    for(let i=gameState.players.length-1;i>=0;i--){
+        if(gameState.players[i].health<=0){
+            gameState.players.splice(i,1);
+        }
+        else gameState.players[i].act(0,0,0,gameState);
+    }
     SpawnEnemies();
     let bullets = gameState.bullets;
     for (let i = bullets.length - 1; i >= 0; i--) {
@@ -265,22 +272,29 @@ function Actions() {
             bullets.splice(i, 1);
         }
     }
-    if ((player.timeWarpCounter > 0 && TimeWarpIcon.version == 1)) {
+    if ((player.statusEffects.speed > 0 && TimeWarpIcon.version == 1)) {
         return;
     }
 
     if (!(gamemode == 0 && player.level < 2) && xpBagTimer < 0) {
         xpBagTimer = Math.random() * 200 + 200;
-        xpBagTimer /= 1 + timeElapsed * 0.0003;
+        xpBagTimer /= 1 + gameState.timeElapsed * 0.0003;
         const newCollectable = new XPBag(Math.random() * (2000 - 2000 / 10) + 2000 / 20, Math.random() * (1100 - 1100 / 10) + 1100 / 20);
         gameState.collectables.push(newCollectable);
         //console.log(newEnemy.health);
     }
     if (!(gamemode == 0 && player.level < 2) && healthPotionSpawnTimer < 0) {
         healthPotionSpawnTimer = Math.random() * 300 + 450;
-        healthPotionSpawnTimer /= 1 + timeElapsed * 0.0003;
+        healthPotionSpawnTimer /= 1 + gameState.timeElapsed * 0.0003;
         healthPotionSpawnTimer *= healthPotionSpawnMultiplier;
         const newCollectable = new HealthPotion(Math.random() * (2000 - 2000 / 10) + 2000 / 20, Math.random() * (1100 - 1100 / 10) + 1100 / 20, gameState);
+        gameState.collectables.push(newCollectable);
+        //console.log(newEnemy.health);
+    }
+    if (!(gamemode == 0 && player.level < 2) && chosenCharacter==7 && gameState.boltSpawnTimer < 0) {
+        gameState.boltSpawnTimer = Math.random() * 200 + 200;
+        gameState.boltSpawnTimer /= 1 + gameState.timeElapsed * 0.0003;
+        const newCollectable = new Bolt(Math.random() * (2000 - 2000 / 10) + 2000 / 20, Math.random() * (1100 - 1100 / 10) + 1100 / 20, gameState);
         gameState.collectables.push(newCollectable);
         //console.log(newEnemy.health);
     }
@@ -292,7 +306,7 @@ function Actions() {
         if (enemies[i].dead) {
             if (enemies[i].giveXP) {
                 player.GainXP(enemies[i].value);
-                if (chosenCharacter == 5) {
+                if (chosenCharacter == 5 && !enemies[i].isBoss) {
                     enemies[i].killCredit.summonQueue.push([enemies[i].speed, enemies[i].maxHealth * 0.5, enemies[i].width, enemies[i].index])
                 }
             }
@@ -325,15 +339,15 @@ function Actions() {
         }
         else {
             //console.log(enemies[i]);
-            enemies[i].special(gameState.enemyBullets, [player], gameState.enemies, gameState.bullets, gameState.floatingObjects);
-            enemies[i].move([player], gameState.floatingObjects, gameState.enemies);
+            enemies[i].special(gameState.enemyBullets, [...[player], ...gameState.players], gameState.enemies, gameState.bullets, gameState.floatingObjects);
+            enemies[i].move([...[player], ...gameState.players], gameState.floatingObjects, gameState.enemies);
 
         }
     }
     let enemyBullets = gameState.enemyBullets;
     for (let i = enemyBullets.length - 1; i >= 0; i--) {
-        enemyBullets[i].move([player], gameState.floatingObjects, gameState.enemies);
-        enemyBullets[i].special([player], gameState.enemyBullets)
+        enemyBullets[i].move([...[player], ...gameState.players], gameState.floatingObjects, gameState.enemies);
+        enemyBullets[i].special([...[player], ...gameState.players], gameState.enemyBullets)
         if (enemyBullets[i].dead) {
             enemyBullets.splice(i, 1);
         }
@@ -382,6 +396,9 @@ function Actions() {
         if (player.index == 5) {
             player.rebirth++;
         }
+        if(player.index==6){
+            player.boltCount+=3;
+        }
 
         // if(chosenCharacter==6){
         //     player.rebirth++;
@@ -396,7 +413,7 @@ function Actions() {
         ChangePage("upgradePage", false, player);
 
     }
-    if (gameOver == false && !(gameState.timeWarpCounter > 0 && TimeWarpIcon.version == 1)) {
+    if (gameOver == false && !(player.statusEffects.speed > 0 && TimeWarpIcon.version == 1)) {
         if (!gameState.isBossWave && gameState.timeElapsed >= gameState.waveTimer && !(gamemode == 0 && TutorialText.canChangeWave == false) && !(gamemode == 6 && currentWave == 11 && gameState.bossBars.length > 0)) {
             [gameState.isBossWave, gameState.bossesLeft, gameState.currentWave, gameState.SCALE] = ChangeWave(gameState);
             gameState.timeElapsed = 0;
@@ -586,6 +603,7 @@ function drawEnemies(enemies){
                     ctx.save();
                     drawOutline(enemies[i]);
                     ctx.globalAlpha = 0.4;
+                    ctx.filter = 'hue-rotate(-45deg)';
                     if (enemies[i].healAuraTimer > 0) {
                         ctx.drawImage(otherImages.healAura, enemies[i].x - enemies[i].healAuraHeight / 2, enemies[i].y - enemies[i].healAuraHeight / 2, enemies[i].healAuraWidth, enemies[i].healAuraHeight);
                     }
@@ -728,6 +746,9 @@ function drawEnemies(enemies){
             case 22:
                 drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
                 break;
+            case 23:
+                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
+                break;
             case 1000:
                 if (enemies[i].offsetX == 0) {
                     //console.log(otherImages.zombieEnemyDead);
@@ -793,6 +814,12 @@ function drawEnemies(enemies){
                 ctx.save();
                 drawOutline(enemies[i]);
                 drawEnemy(enemies[i], bossImages[11], showHealthBars);
+                ctx.restore();
+                break;
+            case 1009:
+                ctx.save();
+                ctx.globalAlpha = 0.5*enemies[i].health/enemies[i].maxHealth+0.1;
+                drawEnemy(enemies[i], otherImages.forcefield, showHealthBars);
                 ctx.restore();
                 break;
         }
@@ -951,7 +978,7 @@ function drawPlayerInfo(player){
                 ctx.fillStyle = "black";
                 ctx.fillText(ability.counterText, ability.counterTextX, ability.counterTextY);
                 break;
-            case 5:
+            default:
                 drawIcon(ability, abilityIconImages[ability.index]);
                 break;
         }
@@ -963,6 +990,12 @@ function drawPlayerInfo(player){
     if(typeof window !== "undefined" && gamemode==5){
         currentY+=50;
     }
+    if (player.index == 5) {
+        drawPheonixIcon(player.icon, otherImages.pheonixPlayerIcon);
+    }
+    else if(player.index==6){
+        drawPheonixIcon(player.icon, collectableImages[2]);
+    }
     for(let id in player.statusEffects){
         if(player.statusEffects[id]>0){   
             ctx.fillStyle="#676767";
@@ -972,10 +1005,62 @@ function drawPlayerInfo(player){
         }
     }
 }
+function drawPlayers(players){
+    for(let i in players){
+        let player=players[i];
+        switch(player.index){
+            case 1:
+                if (player.inputs.right) {
+                    drawPlayer(player, otherImages.tankPlayerMirrored);
+                }
+                else {
+                    drawPlayer(player, playerImages[player.index]);
+                }
+                break;
+            case 9:
+                ctx.save();
+                ctx.globalAlpha = 0.4;
+                ctx.drawImage(otherImages.redCircle, players[i].x - players[i].damageAuraWidth / 2, players[i].y - players[i].damageAuraHeight / 2, players[i].damageAuraWidth, players[i].damageAuraHeight);
+                ctx.restore();
+                drawPlayer(player, playerImages[player.index]);
+                break;
+            case 10:
+                ctx.save();
+                ctx.globalAlpha = 0.4;
+                if(player.healTimer>0){
+                    ctx.drawImage(otherImages.healAura, players[i].x - players[i].healAuraWidth / 2, players[i].y - players[i].healAuraHeight / 2, players[i].healAuraWidth, players[i].healAuraHeight);
+                }
+                ctx.drawImage(otherImages.healAura, players[i].x - players[i].healAuraWidth / 2, players[i].y - players[i].healAuraHeight / 2, players[i].healAuraWidth, players[i].healAuraHeight);
+                ctx.restore();
+                drawPlayer(player, playerImages[player.index]);
+                break;
+            case 11:
+                ctx.save();
+                
+                ctx.globalAlpha = 0.5;
+                ctx.drawImage(bulletImages[2], player.x-2000, player.y-player.laserWidth/2, 4000, player.laserWidth);
+                ctx.drawImage(bulletImages[2], player.x-player.laserWidth/2, player.y-1500, player.laserWidth, 3000);
+                drawPlayer(player, playerImages[player.index]);
+                ctx.restore();
+                break;
+            default:
+                drawPlayer(player, playerImages[player.index]);
+                break;
+        }
+    }
+}
 
 
 
 async function EndGame(win) {
+    if (typeof window !== "undefined" && difficulty > 1 && win==true && BuilderPlayer.unlocked == false) {
+        BuilderPlayer.unlocked = true;
+        newEnemyQueue.push("images/builderPlayer.webp");
+        
+        ChangePage("newEnemyPage");
+        isPlayerUnlocked.push(true);
+        return;
+    }
     gameOver = true;
     if (gamemode == 0) {
         EndTutorial();
@@ -1062,6 +1147,7 @@ async function newEnemyText() {
     continueFlag = false;
     image.remove();
     isPlayerUnlocked.splice(0, 1);
-    ChangePage("gamePage", false);
+    if(gameState.currentWave!=12)ChangePage("gamePage", false);
+    else EndGame(true);
 }
 

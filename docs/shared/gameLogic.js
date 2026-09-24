@@ -679,38 +679,6 @@ function DecreaseLevelBar() {
         requestAnimationFrame(DecreaseLevelBar)
     }
 }
-class ShieldBar {
-    constructor(owner) {
-        this.image1 = document.createElement("img");
-        this.image2 = document.createElement("img");
-        this.image1.src = 'images/gray.webp';
-        this.image2.src = 'images/red.webp';
-        this.image1.style.position = 'absolute';
-        this.image2.style.position = 'absolute';
-        this.image1.style.width = "400px";
-        this.image1.style.height = "30px";
-        this.image2.style.width = "400px";
-        this.image2.style.height = "30px";
-        this.image1.style.left = "10px";
-        this.image1.style.top = "60px";
-        this.image2.style.left = "10px";
-        this.image2.style.top = "60px";
-        this.image1.style.zIndex = 2;
-        this.image2.style.zIndex = 2;
-        this.owner = owner;
-        //console.log(this.image1.style.width+" "+this.image2.style.width+" "+this.image1.style.left+" "+this.image2.style.left);
-        document.body.appendChild(this.image2);
-        document.body.appendChild(this.image1);
-    }
-    Update() {
-        this.desiredWidth = Math.ceil(this.owner.health / this.owner.maxHealth * 400);
-        if (this.desiredWidth > parseInt(this.image1.style.width)) {
-            this.image1.style.width = this.desiredWidth + "px";
-        }
-        requestAnimationFrame(DecreaseShieldBar);
-
-    }
-}
 
 function DecreaseShieldBar() {
     if (shieldBar.image1.width - 8 < shieldBar.desiredWidth) {
@@ -745,7 +713,6 @@ class BossBar {
 }
 
 function drawIcon(icon, image) {
-
     ctx.save();
     ctx.drawImage(image, icon.x - icon.width / 2, icon.y - icon.height / 2, icon.width, icon.height);
     ctx.font = "50px Black Ops One";
@@ -786,7 +753,9 @@ class BombIcon extends Ability {
         //     this.image.src="images/playerNuke.webp"
         // }
     }
-    Activate(player, bullets, enemies) {
+    Activate(player, gameState) {
+        let enemies=gameState.enemies;
+        let bullets=gameState.bullets
         if (enemies.length == 0) {
             return;
         }
@@ -851,7 +820,8 @@ class BulletDeleterIcon extends Ability {
 
 
     }
-    Activate(player, bullets) {
+    Activate(player, gameState) {
+        let bullets=gameState.bullets
         if (this.cooldown <= 0) {
             this.cooldown = 800;
             this.indicator.Switch();
@@ -926,6 +896,50 @@ class ShockwaveIcon extends Ability {
         }
     }
 }
+class BuildIcon extends Ability {
+    constructor(size, numAbilities, index) {
+        super(size, numAbilities);
+        this.index = index;
+        this.maxCooldown=0;
+        switch(this.index){
+            case 6:
+                this.maxCooldown=400;
+            case 7:
+                this.maxCooldown=540;
+            case 8:
+                this.maxCooldown=720;
+            case 9:
+                this.maxCooldown=720;
+            case 10:
+                this.maxCooldown=720;
+        }
+        //this.counterText = new AbilityIndicator();
+    }
+    Activate(player, gameState) {
+        if (this.cooldown <= 0) {
+            this.cooldown = this.maxCooldown;
+            this.indicator.Switch();
+            player.Build(gameState.players, this.index);
+        }
+    }
+    timer() {
+        super.timer();
+        //this.counterText.text.textContent = player.summonQueue.length + "x"
+    }
+}
+class BuildIconIndicator {
+    constructor(size) {
+        this.width = 50;
+        this.height = 50;
+        this.x = (2000 - 800);
+        this.y = (40);
+
+        this.text = "X";
+        this.textX = (2000 - 760);
+        this.textY = (55);
+
+    }
+}
 class RebirthsIcon {
     constructor(size) {
         this.width = 50;
@@ -934,8 +948,8 @@ class RebirthsIcon {
         this.y = (40);
 
         this.text = "X";
-        this.textX = (2000 - 750);
-        this.textY = (50);
+        this.textX = (2000 - 760);
+        this.textY = (55);
 
     }
 }
@@ -1174,10 +1188,12 @@ class Player {
         this.weakenCountdown=0;
         this.numKills=0;
         this.overheal=0;
+        this.isPlayer=true;
+        this.hasHealthBar=false;
         this.statusEffects={slow:-1, weaken:-1, strength:-1, invincibility:-1, speed:-1, blindness:-1};
 
-        this.boughtUpgrades = new Array(31);
-        let RESTRICTEDUPGRADES = [17, 18, 19, 20, 22, 23, 24, 25, 27, 28]
+        this.boughtUpgrades = new Array(35);
+        let RESTRICTEDUPGRADES = [17, 18, 19, 20, 22, 23, 24, 25, 27, 28, 31, 32, 33, 34];
 
         for (let i = 0; i < this.boughtUpgrades.length; i++) {
             this.boughtUpgrades[i] = 0;
@@ -1210,7 +1226,7 @@ class Player {
             this.statusEffects.weaken=Math.max(this.statusEffects.weaken, 240);
         }
         if(bullet !=null && bullet.blindnessAttack){
-            this.statusEffects.blindness=Math.max(this.statusEffects.blindness, 240);
+            this.statusEffects.blindness=Math.max(this.statusEffects.blindness, 180);
         }
         this.redTimer = 10;
         if (typeof window !== "undefined" && this.health <= 0 && this.rebirth > 0) {
@@ -1227,7 +1243,7 @@ class Player {
         this.rebirth--;
         this.statusEffects.invincibility = 300;
     }
-    act(enemies, bullets, floatingObjects) {
+    act(enemies, bullets, floatingObjects, gameState) {
         if (this.frostProjectiles > 0 && this.frostProjectileCooldown <= 0) {
             this.frostProjectileCooldown = this.frostProjectileMaxCooldown;
             if (enemies.length > 0) {
@@ -1345,19 +1361,19 @@ class Player {
         }
         //console.log(this.slowed);
         if (this.inputs.ability1 && this.abilities.length > 0) {
-            this.abilities[0].Activate(this, bullets, enemies);
+            this.abilities[0].Activate(this, gameState);
         }
         if (this.inputs.ability2 && this.abilities.length > 1) {
-            this.abilities[1].Activate(this, bullets, enemies);
+            this.abilities[1].Activate(this, gameState);
         }
         if (this.inputs.ability3 && this.abilities.length > 2) {
-            this.abilities[2].Activate(this, bullets, enemies);
+            this.abilities[2].Activate(this, gameState);
         }
         if (this.inputs.ability4 && this.abilities.length > 3) {
-            this.abilities[3].Activate(this, bullets, enemies);
+            this.abilities[3].Activate(this, gameState);
         }
         if (this.inputs.ability5 && this.abilities.length > 4) {
-            this.abilities[4].Activate(this, bullets, enemies);
+            this.abilities[4].Activate(this, gameState);
         }
 
 
@@ -1449,13 +1465,13 @@ class BasicPlayer extends Player {
         super(health);
         this.index = 0;
     }
-    act(enemies, bullets, floatingObjects) {
+    act(enemies, bullets, floatingObjects, gameState) {
         if (this.bulletCooldown <= 0) {
             //console.log(this.attackSpeed);
             this.bulletCooldown = this.attackSpeed;
             this.Attack(bullets);
         }
-        super.act(enemies, bullets, floatingObjects);
+        super.act(enemies, bullets, floatingObjects, gameState);
     }
     Attack(bullets) {
         if (!bullets) return;
@@ -1480,7 +1496,7 @@ class TankPlayer extends Player {
         this.shieldTimer = 1800;
         this.boughtUpgrades[14] = 1;
     }
-    act(enemies, bullets, floatingObjects) {
+    act(enemies, bullets, floatingObjects, gameState) {
         if (this.bulletCooldown <= 0) {
             this.bulletCooldown = this.attackSpeed;
             this.Attack(bullets);
@@ -1499,7 +1515,7 @@ class TankPlayer extends Player {
             }
             this.shieldTimer = 1800;
         }
-        super.act(enemies, bullets, floatingObjects);
+        super.act(enemies, bullets, floatingObjects, gameState);
     }
     Attack(bullets) {
 
@@ -1522,12 +1538,12 @@ class HealerPlayer extends Player {
         this.healMultiplier = 2;
         this.index = 2;
     }
-    act(enemies, bullets, floatingObjects) {
+    act(enemies, bullets, floatingObjects, gameState) {
         if (this.bulletCooldown <= 0) {
             this.bulletCooldown = this.attackSpeed;
             this.Attack(bullets);
         }
-        super.act(enemies, bullets, floatingObjects);
+        super.act(enemies, bullets, floatingObjects, gameState);
     }
     Attack(bullets) {
 
@@ -1592,12 +1608,12 @@ class MagePlayer extends Player {
         
         this.index = 3;
     }
-    act(enemies, bullets, floatingObjects) {
+    act(enemies, bullets, floatingObjects, gameState) {
         if (this.bulletCooldown <= 0) {
             this.bulletCooldown = this.attackSpeed * this.attackSpeedMultiplier;
             this.Attack(bullets, enemies);
         }
-        super.act(enemies, bullets, floatingObjects);
+        super.act(enemies, bullets, floatingObjects, gameState);
     }
     Attack(bullets, enemies) {
         if (this.mode == 1) {
@@ -1680,14 +1696,13 @@ class PheonixPlayer extends Player {
         if (typeof window !== "undefined") boughtTier2Upgrades[1] = 1;
 
     }
-    act(enemies, bullets, floatingObjects) {
-
+    act(enemies, bullets, floatingObjects, gameState) {
         this.icon.text = "x" + this.rebirth;
         if (this.bulletCooldown <= 0) {
             this.bulletCooldown = this.attackSpeed;
             this.Attack(bullets);
         }
-        super.act(enemies, bullets, floatingObjects);
+        super.act(enemies, bullets, floatingObjects, gameState);
     }
     Attack(bullets) {
 
@@ -1717,7 +1732,7 @@ class NecromancerPlayer extends Player {
         abilityIcons.push(temp);
         
     }
-    act(enemies, bullets, floatingObjects) {
+    act(enemies, bullets, floatingObjects, gameState) {
         this.ability.counterText = this.summonQueue.length + "x";
         if (this.bulletCooldown <= 0) {
             this.bulletCooldown = this.attackSpeed;
@@ -1751,7 +1766,7 @@ class NecromancerPlayer extends Player {
             bullets.push(temp);
         }
 
-        super.act(enemies, bullets, floatingObjects);
+        super.act(enemies, bullets, floatingObjects, gameState);
     }
     Summon() {
         this.isSummoning = true;
@@ -1766,9 +1781,387 @@ class NecromancerPlayer extends Player {
         }
     }
 }
+class BuilderPlayer extends Player {
+    //can build towers. type and quality of tower depends on amount of bolts collected (bolts spawn like xp bottles)
+    constructor(health, abilityIcons) {
+        super(health);
+        this.index = 6;
+        this.attackSpeed = 60;
+        this.damage = 1;
+        this.boltCount=5;
+        this.speed=4.5;
+        let temp = new BuildIcon(50, abilityIcons.length, 6)
+        this.ability = temp;
+        this.abilities.push(temp);
+        abilityIcons.push(temp);
+        this.icon=new BuildIconIndicator(50);
+        this.boughtUpgrades[31]=0;
+        this.boughtUpgrades[32]=0;
+        this.boughtUpgrades[33]=0;
+        this.boughtUpgrades[34]=0;
+        this.boughtUpgrades[8]=1;
+        this.boughtUpgrades[9]=1;
+        this.boughtUpgrades[15]=1;
+        if(typeof window !== "undefined")boughtTier2Upgrades[6]=1;
+        this.width=47;
+        this.height=63;
+        
+    }
+    act(enemies, bullets, floatingObjects, gameState) {
+        this.icon.text="x"+this.boltCount;
+        //this.boltCount++;
+        this.ability.counterText = this.boltCount + "x";
+        if (this.bulletCooldown <= 0) {
+            this.bulletCooldown = this.attackSpeed;
+            this.Attack(bullets);
+        }
+        
+
+        super.act(enemies, bullets, floatingObjects, gameState);
+    }
+    Build(players, index) {
+        let temp=null;
+        switch(index){
+            case 6:
+                temp=new BuilderPlayerDecoy(10,this.boltCount);
+                break;
+            case 7:
+                temp=new BuilderPlayerSentry(6, this.boltCount, this);
+                break;
+            case 8:
+                temp=new BuilderPlayerDamageAura(5, this.boltCount, this);
+                break;
+            case 9:
+                temp=new BuilderPlayerHealStation(8, this.boltCount, this);
+                break;
+            case 10:
+                temp=new BuilderPlayerLaserTower(6, this.boltCount, this);
+                break;
+        }
+        temp.x=this.x;
+        temp.y=this.y;
+        if(typeof window ==="undefined"){
+            let randomNum=Math.floor(Math.random()*100000)+1;
+            while(Object.hasOwn(players, randomNum)){
+                randomNum=Math.floor(Math.random()*100000)+1;
+            }
+            players.randomNum=temp;
+        }
+        else players.push(temp);
+        this.boltCount=0;
+        // switch(this.boltCount){
+        //     case 0:
+        //         players.push(new PlayerWall(10));
+        //         break;
+        // }
+    }
+    Attack(bullets) {
+
+        let angle = 0;
+        for (let i = 0; i < this.projectiles; i++) {
+            let temp = new Bullet(10 * Math.cos(angle), 10 * Math.sin(angle), this.damage, this);
+            bullets.push(temp);
+            angle += 2 * Math.PI / this.projectiles;
+        }
+    }
+}
+class BuilderPlayerDecoy extends Player {
+    constructor(health, numBolts) {
+        super(health*(1+numBolts*0.5));
+        this.index = 7;
+        this.hasHealthBar=true;
+        this.isPlayer=false;
+        this.width=71;
+        this.height=95;
+        
+    }
+    act(a,b,c,gameState) {
+        this.statusEffects.slow--;
+        this.redTimer--;
+        for(let i=0;i<gameState.enemies.length;i++){
+            if (gameState.enemies[i].isBoss && (gameState.enemies[i].x - gameState.enemies[i].width / 2) < (this.x + this.width / 2) && (gameState.enemies[i].x + gameState.enemies[i].width / 2) > (this.x - this.width / 2) && (gameState.enemies[i].y - gameState.enemies[i].height / 2) < (this.y + this.height / 2) && (gameState.enemies[i].y + gameState.enemies[i].height / 2) > (this.y - this.height / 2)) {
+ 
+                if (this.x > gameState.enemies[i].x) {
+                    gameState.enemies[i].AddForce(-15, 0);
+                }
+                if (this.x < gameState.enemies[i].x) {
+
+                    gameState.enemies[i].AddForce(15, 0);
+                }
+                if (this.y > gameState.enemies[i].y) {
+
+                    gameState.enemies[i].AddForce(0, -15);
+                }
+                if (this.y < gameState.enemies[i].y) {
+
+                    gameState.enemies[i].AddForce(0, 15);
+                }
+            }
+
+        }
+    }
+}
+class BuilderPlayerSentry extends Player {
+    constructor(health, numBolts, owner) {
+        super(Math.ceil(health*(1+numBolts/3)));
+        this.index = 8;
+        this.hasHealthBar=true;
+        this.isPlayer=false;
+        this.shootTimer=0;
+        this.numBolts=numBolts;
+        this.owner=owner;
+        this.width=47;
+        this.height=63;
+        
+    }
+    act(a,b,c,gameState) {
+        this.statusEffects.slow--;
+        this.redTimer--;
+        this.shootTimer--;
+        if(this.shootTimer<=0 && gameState.enemies.length>0){
+            this.shootTimer=Math.max(240/this.numBolts);
+            let enemy=FindClosestPlayer(this.x, this.y, gameState.enemies);
+            if(enemy){
+                let distanceX = enemy.x - this.x;
+                let distanceY = enemy.y - this.y;
+                let distance = distanceX * distanceX + distanceY * distanceY;
+                let vx = 0;
+                let vy = 0;
+
+                if (distance > 0) {
+                    let angle = Math.atan2(distanceY, distanceX);
+                    vx = 10 * Math.cos(angle);
+                    vy = 10 * Math.sin(angle);
+                }
+                let temp=new Bullet(vx, vy, 1, this.owner);
+                temp.x=this.x;
+                temp.y=this.y;
+                temp.width*=2;
+                temp.height*=2;
+                gameState.bullets.push(temp);
+            }
+            
+        }
+        for(let i=0;i<gameState.enemies.length;i++){
+            if (gameState.enemies[i].isBoss && (gameState.enemies[i].x - gameState.enemies[i].width / 2) < (this.x + this.width / 2) && (gameState.enemies[i].x + gameState.enemies[i].width / 2) > (this.x - this.width / 2) && (gameState.enemies[i].y - gameState.enemies[i].height / 2) < (this.y + this.height / 2) && (gameState.enemies[i].y + gameState.enemies[i].height / 2) > (this.y - this.height / 2)) {
+ 
+                if (this.x > gameState.enemies[i].x) {
+                    gameState.enemies[i].AddForce(-15, 0);
+                }
+                if (this.x < gameState.enemies[i].x) {
+
+                    gameState.enemies[i].AddForce(15, 0);
+                }
+                if (this.y > gameState.enemies[i].y) {
+
+                    gameState.enemies[i].AddForce(0, -15);
+                }
+                if (this.y < gameState.enemies[i].y) {
+
+                    gameState.enemies[i].AddForce(0, 15);
+                }
+            }
+
+        }
+    }
+}
+class BuilderPlayerDamageAura extends Player {
+    constructor(health, numBolts, owner) {
+        super(Math.ceil(health*(1+numBolts/3)));
+        this.index = 9;
+        this.hasHealthBar=true;
+        this.isPlayer=false;
+        this.shootTimer=0;
+        this.numBolts=numBolts;
+        this.owner=owner;
+        this.damageAuraHeight=200*(1+numBolts/5);
+        this.damageAuraWidth=200*(1+numBolts/5);
+        this.iFrame=0;
+        this.damage=1;
+        this.width=71;
+        this.height=95;
+        
+    }
+    act(a,b,c,gameState) {
+        this.statusEffects.slow--;
+        this.iFrame--;
+        this.redTimer--;
+        this.shootTimer--;
+        let found=false;
+        for(let i=0;i<gameState.enemies.length;i++){
+            if(this.iFrame<=0 && gameState.enemies[i].ignoreBullets==false && RectCircleColliding(this, gameState.enemies[i],this.damageAuraWidth/2,this.x, this.y)){
+                gameState.enemies[i].takeDamage(this, this.owner, gameState);
+                found=true;
+            }
+        }
+        if(found){
+            this.iFrame=Math.max(8,45*Math.pow(2.71828,-0.1*this.numBolts));
+        }
+        for(let i=0;i<gameState.enemies.length;i++){
+            if (gameState.enemies[i].isBoss && (gameState.enemies[i].x - gameState.enemies[i].width / 2) < (this.x + this.width / 2) && (gameState.enemies[i].x + gameState.enemies[i].width / 2) > (this.x - this.width / 2) && (gameState.enemies[i].y - gameState.enemies[i].height / 2) < (this.y + this.height / 2) && (gameState.enemies[i].y + gameState.enemies[i].height / 2) > (this.y - this.height / 2)) {
+ 
+                if (this.x > gameState.enemies[i].x) {
+                    gameState.enemies[i].AddForce(-15, 0);
+                }
+                if (this.x < gameState.enemies[i].x) {
+
+                    gameState.enemies[i].AddForce(15, 0);
+                }
+                if (this.y > gameState.enemies[i].y) {
+
+                    gameState.enemies[i].AddForce(0, -15);
+                }
+                if (this.y < gameState.enemies[i].y) {
+
+                    gameState.enemies[i].AddForce(0, 15);
+                }
+            }
+
+        }
+    }
+}
+class BuilderPlayerHealStation extends Player {
+    constructor(health, numBolts, owner) {
+        super(Math.ceil(health*(1+numBolts/3)));
+        this.index = 10;
+        this.hasHealthBar=true;
+        this.isPlayer=false;
+        this.shootTimer=0;
+        this.numBolts=numBolts;
+        this.owner=owner;
+        this.healAuraHeight=400;
+        this.healAuraWidth=400;
+        this.iFrame=0;
+        this.damage=1;
+        this.width=47;
+        this.height=63;
+        this.healTimer=0;
+        
+    }
+    act(a,b,c,gameState) {
+        this.statusEffects.slow--;
+        this.iFrame--;
+        this.redTimer--;
+        this.shootTimer--;
+        this.healTimer--;
+        let found=false;
+        if(typeof window ==="undefined"){
+            for(let id in gameState.players){
+                if(RectCircleColliding(this, gameState.players[id],this.healAuraHeight,this.x, this.y)){
+                    gameState.players[id].Heal(1, gameState.floatingObjects);
+                    this.healTimer=10;
+                    found=true;
+                }
+            }
+            if(found){
+                this.iFrame=Math.max(8,180/this.numBolts);
+            }
+        }
+        else{
+            if(this.iFrame<=0 && RectCircleColliding(this, player,this.healAuraLength,this.x, this.y)){
+                player.Heal(1, gameState.floatingObjects);
+                this.healTimer=10;
+                found=true;
+            }
+            if(found){
+                this.iFrame=Math.max(8,180/this.numBolts);
+            }
+        }
+        for(let i=0;i<gameState.enemies.length;i++){
+            if (gameState.enemies[i].isBoss && (gameState.enemies[i].x - gameState.enemies[i].width / 2) < (this.x + this.width / 2) && (gameState.enemies[i].x + gameState.enemies[i].width / 2) > (this.x - this.width / 2) && (gameState.enemies[i].y - gameState.enemies[i].height / 2) < (this.y + this.height / 2) && (gameState.enemies[i].y + gameState.enemies[i].height / 2) > (this.y - this.height / 2)) {
+ 
+                if (this.x > gameState.enemies[i].x) {
+                    gameState.enemies[i].AddForce(-15, 0);
+                }
+                if (this.x < gameState.enemies[i].x) {
+
+                    gameState.enemies[i].AddForce(15, 0);
+                }
+                if (this.y > gameState.enemies[i].y) {
+
+                    gameState.enemies[i].AddForce(0, -15);
+                }
+                if (this.y < gameState.enemies[i].y) {
+
+                    gameState.enemies[i].AddForce(0, 15);
+                }
+            }
+
+        }
+    }
+}
+class BuilderPlayerLaserTower extends Player {
+    constructor(health, numBolts, owner) {
+        super(Math.ceil(health*(1+numBolts/3)));
+        this.index = 11;
+        this.hasHealthBar=true;
+        this.isPlayer=false;
+        this.shootTimer=0;
+        this.numBolts=numBolts;
+        this.owner=owner;
+        this.iFrame=0;
+        this.damage=1;
+
+        this.width=71;
+        this.height=95;
+        this.laserWidth=5+this.numBolts*5;
+    }
+    act(a,b,c,gameState) {
+        this.statusEffects.slow--;
+        this.iFrame--;
+        this.redTimer--;
+        this.shootTimer--;
+        if(this.iFrame>0)return;
+        let enemies=gameState.enemies;
+        for (let i = 0; i < enemies.length; i++) {
+            let dx = enemies[i].x - this.x;
+            let dy = enemies[i].y - this.y;
+
+            let distanceToLine = Math.abs(dx * Math.sin(-Math.PI / 2) - dy * Math.cos(-Math.PI / 2));
+
+            if (enemies[i].ignoreBullets == false && distanceToLine < (5+this.numBolts*5) + enemies[i].width / 2 ) {
+                enemies[i].takeDamage(this, this.owner, gameState);
+                this.iFrame = 15;
+            }
+            let distanceToLine2 = Math.abs(dx * Math.sin(0) - dy * Math.cos(0));
+
+            if (enemies[i].ignoreBullets == false && distanceToLine2 < (5+this.numBolts*5) + enemies[i].width / 2 ) {
+                enemies[i].takeDamage(this, this.owner, gameState);
+                this.iFrame = 15;
+            }
+        }
+        for(let i=0;i<gameState.enemies.length;i++){
+            if (gameState.enemies[i].isBoss && (gameState.enemies[i].x - gameState.enemies[i].width / 2) < (this.x + this.width / 2) && (gameState.enemies[i].x + gameState.enemies[i].width / 2) > (this.x - this.width / 2) && (gameState.enemies[i].y - gameState.enemies[i].height / 2) < (this.y + this.height / 2) && (gameState.enemies[i].y + gameState.enemies[i].height / 2) > (this.y - this.height / 2)) {
+ 
+                if (this.x > gameState.enemies[i].x) {
+                    gameState.enemies[i].AddForce(-15, 0);
+                }
+                if (this.x < gameState.enemies[i].x) {
+
+                    gameState.enemies[i].AddForce(15, 0);
+                }
+                if (this.y > gameState.enemies[i].y) {
+
+                    gameState.enemies[i].AddForce(0, -15);
+                }
+                if (this.y < gameState.enemies[i].y) {
+
+                    gameState.enemies[i].AddForce(0, 15);
+                }
+            }
+
+        }
+    }
+}
 
 function drawPlayer(currentPlayer, image) {
     ctx.save();
+    if (showHealthBars && currentPlayer.hasHealthBar) {
+        ctx.fillStyle = "red";
+        ctx.fillRect(currentPlayer.x - currentPlayer.width / 2 - currentPlayer.width / 4, currentPlayer.y - currentPlayer.height, currentPlayer.width * 1.5, 15)
+        ctx.fillStyle = "green";
+        ctx.fillRect(currentPlayer.x - currentPlayer.width / 2 - currentPlayer.width / 4, currentPlayer.y - currentPlayer.height, (currentPlayer.width * 1.5) / currentPlayer.maxHealth * currentPlayer.health, 15)
+    }
     if (currentPlayer.statusEffects.rebirth > 0) {
         ctx.globalCompositeOperation = 'source-over';
         ctx.filter = 'brightness(500%)';
@@ -1819,7 +2212,7 @@ class Enemy {
         this.id = nextEntityId;
         nextEntityId++;
         if (Math.random() < 0.5) {
-            this.y = Math.random() * (mapBorders.rightBorder-mapBorders.leftBorder);
+            this.y = Math.random() * (mapBorders.bottomBorder-mapBorders.topBorder)+mapBorders.topBorder;
             if (Math.random() < 0.5) {
                 this.x = mapBorders.leftBorder-200;
             }
@@ -1828,7 +2221,7 @@ class Enemy {
             }
         }
         else {
-            this.x = Math.random() * (mapBorders.bottomBorder-mapBorders.topBorder);
+            this.x = Math.random() * (mapBorders.rightBorder-mapBorders.leftBorder)+mapBorders.leftBorder;
             if (Math.random() < 0.5) {
                 this.y = mapBorders.topBorder-200;
             }
@@ -1928,9 +2321,12 @@ class Enemy {
         }
         this.checkForCollisions(players, floatingObjects);
         this.CheckForCramming(enemies);
-
-        this.x += this.accelerationX;
-        this.y += this.accelerationY;
+        if(this.x>mapBorders.leftBorder && this.x<mapBorders.rightBorder){
+            this.x += this.accelerationX;
+        }
+        if(this.y>mapBorders.topBorder && this.y<mapBorders.bottomBorder){
+            this.y += this.accelerationY;
+        }
         this.accelerationX /= 1.05;
         this.accelerationY /= 1.05;
         this.knockbackIFrame--;
@@ -2523,8 +2919,13 @@ class ChargingEnemy extends Enemy {
             }
             if(typeof window !== "undefined")this.speed/=enemySpeedMultiplier;
         }
-        this.x += this.accelerationX;
-        this.y += this.accelerationY;
+        
+        if(this.x>mapBorders.leftBorder && this.x<mapBorders.rightBorder){
+            this.x += this.accelerationX;
+        }
+        if(this.y>mapBorders.topBorder && this.y<mapBorders.bottomBorder){
+            this.y += this.accelerationY;
+        }
         this.accelerationX /= 1.05;
         this.accelerationY /= 1.05;
         super.checkForCollisions(players, floatingObjects);
@@ -3546,6 +3947,75 @@ class BlindnessEnemy extends Enemy {
     special(enemyBullets, players) {
     }
 }
+class ForcefieldEnemy extends Enemy {
+    constructor(speed, health) {
+        super(speed, health);
+        this.value = 30;
+        this.index = 23;
+        this.height=75;
+        this.width=75;
+        //console.log(this.shootTimer);
+    }
+    move(players,floatingObjects,enemies){
+        super.move(players,floatingObjects,enemies);
+        this.shield.x=this.x;
+        this.shield.y=this.y;
+    
+    }
+    special(enemyBullets, players) {
+
+    }
+}
+class ForcefieldShield extends Enemy{
+    constructor(speed, health) {
+        super(speed, health);
+        this.index = 1009;
+        this.width=300;
+        this.height=300;
+        this.hasHealthBar=false;
+    }
+    move(players, floatingObjects, enemies){
+        for (let id = 0; id < players.length; id++) {
+            let player = players[id];
+            if ((player.x - player.width / 2) < (this.x + this.width / 2) && (player.x + player.width / 2) > (this.x - this.width / 2) && (player.y - player.height / 2) < (this.y + this.height / 2) && (player.y + player.height / 2) > (this.y - this.height / 2) && this.knockbackIFrame <= 0) {
+                if (this.x > player.x) {
+                    player.AddForce(-15, 0);
+                }
+                if (this.x < player.x) {
+
+                    player.AddForce(15, 0);
+                }
+                if (this.y > player.y) {
+
+                    player.AddForce(0, -15);
+                }
+                if (this.y < player.y) {
+
+                    player.AddForce(0, 15);
+                }
+                this.knockbackIFrame = 15;
+
+            }
+        }
+        this.knockbackIFrame--;
+        this.redTimer=0;
+        this.slowCountdown--;
+    }
+    Heal(){
+
+    }
+    takeDamage(bullet, owner, gameState){
+        super.takeDamage(bullet, owner, gameState);
+        if(bullet.index==7){
+            bullet.speedX*=-1;
+            bullet.speedY*=-1;
+            bullet.x+=bullet.speedX;
+            bullet.y+=bullet.speedY;
+        }
+        this.redTimer=0;
+        
+    }
+}
 
 function drawMachineGunEnemy(enemy, image, angle, showHealthBars) {
     if (enemy.dead) return;
@@ -3564,7 +4034,7 @@ function drawMachineGunEnemy(enemy, image, angle, showHealthBars) {
 
     if (enemy.healTimer > 0) {
         ctx.globalCompositeOperation = 'source-over';
-        ctx.drawImage(image, x - enemy.width / 2, y - enemy.height / 2, enemy.width, enemy.height);
+        ctx.drawImage(image,-enemy.width / 2, - enemy.height / 2, enemy.width, enemy.height);
         ctx.globalCompositeOperation = 'multiply';
         ctx.fillStyle = 'lime';
         ctx.beginPath();
@@ -3605,7 +4075,7 @@ function FindClosestPlayer(x, y, players) {
     let minDistID = null;
     for (let id = 0; id < players.length; id++) {
         let dist = Math.hypot(players[id].x - x, players[id].y - y)
-        if (dist < minDist) {
+        if (dist < minDist && players[id].ignoreBullets!=true) {
             minDist = dist;
             minDistID = id;
         }
@@ -5613,7 +6083,7 @@ class ShadowBoss extends Enemy {
         this.health = Math.ceil(this.health * bossMultiplier);
         if(isLeader){
 
-            this.bossBar = new BossBar(bossBars, "Assassain");
+            this.bossBar = new BossBar(bossBars, "Assassin");
             bossBars.push(this.bossBar);
         }
         else{
@@ -5792,8 +6262,8 @@ class EnemyBullet {
         this.x = x;
         this.y = y;
         this.damage = damage;
-        this.width = 10;
-        this.height = 10;
+        this.width = 15;
+        this.height = 15;
         this.frostbite = false;
         this.ignoreShield = false;
         this.ignoreWipe = false;
@@ -5814,7 +6284,7 @@ class EnemyBullet {
             if (distance < (player.width / 2 - 10) + this.width / 2) {
                 player.takeDamage(this.damage, this, floatingObjects);
                 this.dead = true;
-                this.hitPlayer = true;
+                if(player.isPlayer)this.hitPlayer = true;
             }
             if (this.x < mapBorders.leftBorder - 500 || this.y < mapBorders.topBorder - 500 || this.x > mapBorders.rightBorder + 500 || this.y >= mapBorders.bottomBorder + 500) {
                 this.dead = true;
@@ -6845,7 +7315,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
     bossesLeft = numTier1Boss + numTier2Boss;
     let tier1 = [1, 2, 3, 4, 5, 6, 7, 8];//
     let tier2 = [1, 2, 3, 4, 5, 6, 7, 8]; // 
-    let tier3 = [1, 2, 3, 4, 5, 6, 7]; //
+    let tier3 = [1, 2, 3, 4, 5, 6, 7, 8]; //
     let tier1Bosses = [1, 2, 3, 4, 5, 6];//
     let tier2Bosses = [1, 2, 3, 4, 5, 6];
     tier1 = shuffle(tier1);
@@ -7048,6 +7518,14 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                     isPlayerUnlocked.push(false);
                 }
                 break;
+            case 8:
+                ForcefieldEnemy.isActive = true;
+                if (typeof window !== "undefined" && !ForcefieldEnemy.seen) {
+                    ForcefieldEnemy.seen = true;
+                    newEnemyQueue.push("images/forcefieldEnemy.webp");
+                    isPlayerUnlocked.push(false);
+                }
+                break;
         }
     }
     for (let i = 0; i < numTier1Boss; i++) {
@@ -7106,7 +7584,6 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
         }
     }
     for (let i = 0; i < numTier2Boss; i++) {
-            console.log(tier1Bosses[i])
         switch (tier2Bosses[i]) {
             case 1:
                 boss = new GambleBoss(1.5, 175, bossBars, bossMultiplier);
@@ -7154,7 +7631,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 }
                 break;
             case 6:
-                boss = new ShadowBoss(1.5, 150, bossBars, bossMultiplier, true);
+                boss = new ShadowBoss(1.5, 175, bossBars, bossMultiplier, true);
                 enemies[enemies.length] = boss;
                 if (typeof window !== "undefined" && !ShadowBoss.seen) {
                     ShadowBoss.seen = true;
@@ -7164,9 +7641,9 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 break;
         }
     }
-    //BlindnessEnemy.isActive=true;
+    //ForcefieldEnemy.isActive=true;
     // ShieldEnemy.isActive=true;
-    // boss = new SnakeBoss(2.5,300,true,79, bossBars, bossMultiplier, null);
+    // boss = new HealerBoss(1.5, 175, bossBars, bossMultiplier);
     // enemies[enemies.length] = boss;
 
 }
@@ -7315,6 +7792,12 @@ function InitializeStats() {
     BlindnessEnemy.health = 3;
     BlindnessEnemy.speed = 2.5;
 
+    ForcefieldEnemy.baseTimer = 800;
+    ForcefieldEnemy.randomTimer = 800;
+    ForcefieldEnemy.index = 23;
+    ForcefieldEnemy.health = 20;
+    ForcefieldEnemy.speed = 1.5;
+
 }
 function ChangePage(id, reset, player) {
     if (continueFlag) return;
@@ -7444,6 +7927,24 @@ function ChangePage(id, reset, player) {
             pheonixPlayerText.textContent = "Pheonix";
             pheonixPlayerText.style.fontSize = "30px";
             pheonixPlayerText.style.top = "225px";
+        }
+
+        let builderPlayerButton = document.getElementById("builderPlayer");
+        let builderPlayerImage = document.getElementById("builderPlayerImage");
+        let builderPlayerText = document.getElementById("builderPlayerText");
+        if (BuilderPlayer.unlocked == false) {
+            builderPlayerButton.style.pointerEvents = "none";
+            builderPlayerImage.src = "images/black.webp";
+            builderPlayerText.textContent = "Beat the game in Medium, Hard, or Extreme Demon Difficulty to Unlock";
+            builderPlayerText.style.fontSize = "20px";
+            builderPlayerText.style.top = "150px";
+        }
+        else {
+            builderPlayerButton.style.pointerEvents = "auto";
+            builderPlayerImage.src = "images/builderPlayer.webp";
+            builderPlayerText.textContent = "Mechanic";
+            builderPlayerText.style.fontSize = "30px";
+            builderPlayerText.style.top = "225px";
         }
     }
     else if (id == "gamemodeSelectionPage") {
@@ -7641,6 +8142,10 @@ function ChangePage(id, reset, player) {
         if (ShadowBoss.seen) {
             images[41].src = "images/shadowBoss.webp";
             images[41].style.pointerEvents = "auto";
+        }
+        if (ForcefieldEnemy.seen) {
+            images[42].src = "images/forcefieldEnemy.webp";
+            images[42].style.pointerEvents = "auto";
         }
     }
     else if (id == "gamePage") {
@@ -7950,7 +8455,7 @@ function ChangeWave(gameState) {
     return [isBossWave, bossesLeft, gameState.currentWave, SCALE];
     //originalScale=SCALE;
 }
-const ENEMYTYPES = [BasicEnemy, ShooterEnemy, AimingEnemy, HomingEnemy, TrapperEnemy, ZombieEnemy, ShieldEnemy, ChargingEnemy, GhostEnemy, PoisonEnemy, BlackHoleEnemy, MimicEnemy, BuilderEnemy, WindupEnemy, SpawnerEnemy, SelfDestructEnemy, MachineGunEnemy, SmokeBombEnemy, SplitterEnemy, TeleporterEnemy, IceEnemy, DistractionEnemy, BlindnessEnemy];
+const ENEMYTYPES = [BasicEnemy, ShooterEnemy, AimingEnemy, HomingEnemy, TrapperEnemy, ZombieEnemy, ShieldEnemy, ChargingEnemy, GhostEnemy, PoisonEnemy, BlackHoleEnemy, MimicEnemy, BuilderEnemy, WindupEnemy, SpawnerEnemy, SelfDestructEnemy, MachineGunEnemy, SmokeBombEnemy, SplitterEnemy, TeleporterEnemy, IceEnemy, DistractionEnemy, BlindnessEnemy, ForcefieldEnemy];
 // Rest of enemy types:
 
 class FloatingObject {
@@ -8059,6 +8564,26 @@ class HealthPotion extends Collectable {
         }
     }
 }
+class Bolt extends Collectable {
+    constructor(x, y) {
+        super(x, y);
+        this.size = 40;
+        this.width = this.size * 2;
+        this.height = this.size * 2;
+        this.timer = 600;
+        this.index = 2;
+    }
+    act(players) {
+        super.act();
+        for (let id = 0; id < players.length; id++) {
+            let player = players[id];
+            if (this.x < player.x + player.width && this.x + this.width - this.width / 6 > player.x && this.y < player.y + player.height && this.y + this.height - this.width / 6 > player.y) {
+                player.boltCount++;
+                this.dead = true;
+            }
+        }
+    }
+}
 function drawCollectable(collectable, image) {
     ctx.save();
     if(collectable.index==1 && collectable.version==2){
@@ -8072,7 +8597,7 @@ function drawCollectable(collectable, image) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { Bullet, Enemy, Player, FloatingObject, ENEMYTYPES, InitializeStats, EnemyBullet, PlayerLaser, BasicPlayer, BombIcon, TimeWarpIcon, RandomizeEnemies, ChangeWave, WaveText, Wall, EnemyShield, XPBag, HealthPotion, ProtectorBullet, PlayerShield, BulletDeleterIcon, TankPlayer, MagePlayer, HealerPlayer, PheonixPlayer, NecromancerPlayer };
+    module.exports = { Bullet, Enemy, Player, FloatingObject, ENEMYTYPES, InitializeStats, EnemyBullet, PlayerLaser, BasicPlayer, BombIcon, TimeWarpIcon, RandomizeEnemies, ChangeWave, WaveText, Wall, EnemyShield, XPBag, HealthPotion, ProtectorBullet, PlayerShield, BulletDeleterIcon, TankPlayer, MagePlayer, HealerPlayer, PheonixPlayer, NecromancerPlayer, BuilderPlayer, Bolt, BuildIcon};
 }
 
 

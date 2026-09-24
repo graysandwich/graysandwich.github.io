@@ -4,7 +4,7 @@ const SERVER_URL =
   location.hostname === "localhost" || location.hostname === "127.0.0.1"
     ? "http://localhost:8080"
     : "https://ewow-score-checker-698852688376.us-west1.run.app";
-let serverState = { code: "", players: {}, bullets: [], enemies: [], floatingObjects: [], enemyBullets: [], abilityIcons: [], mapObjects: [], sharedXP: 0, nextLevel: 0, currentPage: "", readyCount: 0, waveText: null, deadPlayers:{}};
+let serverState = { code: "", players: {}, bullets: [], enemies: [], floatingObjects: [], enemyBullets: [], abilityIcons: [], mapObjects: [], sharedXP: 0, nextLevel: 0, currentPage: "", readyCount: 0, waveText: null, deadPlayers:{}, ended:false    };
 
 const backgroundImage = new Image();
 backgroundImage.src = "images/background.webp";
@@ -92,6 +92,7 @@ let enemyBulletImages = enemyBulletPaths.map(src => {
 const collectablePaths = [
     "images/xpBag.webp",
     "images/healthPotion.webp",
+    "images/bolt.webp",
 ];
 let collectableImages = collectablePaths.map(src => {
     let img = new Image();
@@ -132,8 +133,10 @@ const otherImagePaths = {
     timeStopIcon: "images/timeStopIcon.webp",
     nukeIcon: "images/playerNuke.webp",
     strengthPotion:"images/strengthPotion.webp",
+    forcefield: "images/black.webp",
+    redCircle:"images/redCircle.webp",
 };
-
+let drawLoopRunning=false;
 let otherImages = Object.fromEntries(
     Object.entries(otherImagePaths).map(([key, src]) => {
         const img = new Image();
@@ -159,7 +162,7 @@ let statusEffectImages = Object.fromEntries(
 );
 
 const abilityIconPaths = [
-    "images/bomb.webp", "images/green.webp", "images/blue.webp", "images/playerFire.webp", "images/necromancerPlayer.webp", "images/red.webp",
+    "images/bomb.webp", "images/green.webp", "images/blue.webp", "images/playerFire.webp", "images/necromancerPlayer.webp", "images/red.webp","images/dummyPlayer.webp","images/sentryTower.webp","images/damageAuraTower.webp","images/healingStation.webp","images/laserTower.webp"
 ];
 let abilityIconImages = abilityIconPaths.map(src => {
     let img = new Image();
@@ -188,7 +191,7 @@ let bossImages = bossPaths.map(src => {
     return img;
 });
 const playerPaths = [
-    "images/player.webp", "images/tankPlayer.webp", "images/healerPlayer.webp", "images/magePlayer.webp", "images/necromancerPlayer.webp", "images/pheonixPlayer.webp"
+    "images/player.webp", "images/tankPlayer.webp", "images/healerPlayer.webp", "images/magePlayer.webp", "images/necromancerPlayer.webp", "images/pheonixPlayer.webp", "images/builderPlayer.webp","images/dummyPlayer.webp","images/sentryTower.webp","images/damageAuraTower.webp","images/healingStation.webp","images/laserTower.webp"
 ];
 let playerImages = playerPaths.map(src => {
     let img = new Image();
@@ -215,6 +218,7 @@ function createListeners() {
             requestAnimationFrame(multiplayerDraw);
         });
         socket.on("gameOver", () => {
+            drawLoopRunning=false;
             socket.disconnect();
             socket = null;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -223,6 +227,7 @@ function createListeners() {
 
         socket.on("gameWin", () => {
             socket.disconnect();
+            drawLoopRunning=false;
             socket = null;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ChangePage("winPage", false);
@@ -233,6 +238,17 @@ function createListeners() {
     }
 }
 function startMultiplayer() {
+    healthBarCurrentLength = 0;
+    levelBarCurrentLength = 0;
+    shieldBarCurrentLength = 0;
+    bossBarState.clear();
+    isLevelling = false;
+    hasReadiedUp = false;
+    canvas.style.filter = "none";
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (drawLoopRunning) return;
+    drawLoopRunning = true;
     socket.emit("startLobby", result => {
         if (!result.ok) document.getElementById("coopCodeText").textContent = result.error;
     });
@@ -252,8 +268,10 @@ function multiplayerDraw() {
     if(serverState.deadPlayers[socket.id] && Object.keys(serverState.players).length>0){
         canvas.style.filter = "grayscale(40%) brightness(0.8)";
         for(let id in serverState.players){
-            cameraX = canvas.width/2 - serverState.players[id].x+serverState.players[id].width/2;
-            cameraY = canvas.height/2 - serverState.players[id].y+serverState.players[id].height/2;
+            if(serverState.players[id].isPlayer){
+                cameraX = canvas.width/2 - serverState.players[id].x+serverState.players[id].width/2;
+                cameraY = canvas.height/2 - serverState.players[id].y+serverState.players[id].height/2;
+            }
         }
     }
     else{
@@ -273,15 +291,7 @@ function multiplayerDraw() {
     drawBullets(bullets);
     let enemyBullets = serverState.enemyBullets || [];
     drawEnemyBullets(enemyBullets)
-    for (let id in serverState.players) {
-        let currentPlayer = serverState.players[id];
-        if (currentPlayer.index == 1 && currentPlayer.inputs.right) {
-            drawPlayer(currentPlayer, otherImages.tankPlayerMirrored);
-        }
-        else {
-            drawPlayer(currentPlayer, playerImages[currentPlayer.index]);
-        }
-    }
+    drawPlayers(serverState.players);
     let enemies = serverState.enemies || [];
     drawEnemies(enemies)
     let floatingObjects = serverState.floatingObjects || [];
@@ -432,7 +442,6 @@ function multiplayerDraw() {
     if (serverState.currentPage !== "upgradePage") {
         //console.log("ready")
         hasReadiedUp = false;
-        requestAnimationFrame(multiplayerDraw);
     }
     else if(serverState.players[socket.id]) {
         if (hasReadiedUp) {
@@ -440,12 +449,12 @@ function multiplayerDraw() {
             ctx.fillStyle = "black";
             ctx.font = "30px Black Ops One";
             ctx.fillText("Waiting for other players to upgrade...", 500, 300);
-            requestAnimationFrame(multiplayerDraw);
         }
         else {
             ChangePage("upgradePage", false, serverState.players[socket.id]);
         }
     }
+    if (drawLoopRunning) requestAnimationFrame(multiplayerDraw);
 }
 function changeMultiplayerPage(page) {
     if (socket) {

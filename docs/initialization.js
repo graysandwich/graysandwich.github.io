@@ -46,7 +46,7 @@ let UPGRADES = [
     { onclick: (player) => addSiphon(0.25, player), text: "+0.25 Lifesteal" },
     { onclick: (player) => multiplyXPGain(1.5, player), text: "x1.5 XP gain" },
     { onclick: (player) => addBomb(1, player), text: "Bomb Ability" },
-    { onclick: (player) => addTimeWarp(1, player), text: "Speed Burst Ability" },
+    { onclick: (player) => addTimeWarp(1, player), text: "Speed Boost Ability" },
     { onclick: (player) => AddPassiveHealing(1, player), text: "+1 Passive Healing" },
     { onclick: (player) => Gamble(1, player), text: "Mystery Box" },
     { onclick: (player) => AddProtectorBullet(2, player), text: "+2 Protectors" },
@@ -58,18 +58,26 @@ let UPGRADES = [
     { onclick: (player) => IncreaseFireDamage(0.25, player), text: "+0.25 Fire Damage" },
     { onclick: (player) => PassiveSpawns(player), text: "Passively Spawn Souls" },
     { onclick: (player) => IncreaseTornadoDamage(1, player), text: "+1 Tornado Damage" },
-    { onclick: (player) => AddSpeed(2, player), text: "Increase Movement Speed" },
+    { onclick: (player) => AddSpeed(1.5, player), text: "Increase Movement Speed" },
     { onclick: (player) => IncreaseSlowedDamage(1.5, player), text: "Slowed Enemies Take 1.5x Damage" },
     { onclick: (player) => IncreaseBombDamage(4, player), text: "+4 Bomb Damage" },
     { onclick: (player) => IncreaseLaserDamage(0.5, player), text: "+0.5 Laser Damage" },
-    { onclick: (player) => AddTimeStop(player), text: "Speed Burst -> Time Stop" },
+    { onclick: (player) => AddTimeStop(player), text: "Speed Boost Ability -> Time Stop Ability" },
     { onclick: (player) => AddBouncingProjectile(1, player), text: "+1 Bouncing Bullet" },
     { onclick: (player) => IncreaseProtectorDamage(1, player), text: "+1 Protector Damage" },
     { onclick: (player) => IncreaseBouncingBulletDamage(1, player), text: "+0.5 Bouncing Bullet Damage" },
     { onclick: (player) => AddStrengthPotions(0.25, player), text: "Health potions sometimes become Strength potions" },
     { onclick: (player) => AddStrengthBuff(1, player), text: "Every 15 Kills, Gain strength buff for 6 seconds" },
+    { onclick: (player) => AddSentryTower(player), text: "New Build: Turret" },
+    { onclick: (player) => AddDamageAuraTower(player), text: "New Build: Fire Tower"},
+    { onclick: (player) => AddHealAuraTower(player), text: "New Build: Healing Station" },
+    { onclick: (player) => AddLaserTower(player), text: "New Build: Laser Tower" },
 
 ];
+let originalUpgrades=[];
+for(let i=0;i<UPGRADES.length;i++){
+    originalUpgrades[i]=UPGRADES[i];
+}
 const NUMUPGRADES = UPGRADES.length;
 let boughtUpgrades = new Array(NUMUPGRADES);
 for (let i = 0; i < boughtUpgrades.length; i++) {
@@ -196,6 +204,16 @@ function SelectCharacter(character) {
             }
             document.getElementById("pheonixPlayer").style.border = "5px solid red";
             break;
+        case 7:
+            if (BuilderPlayer.unlocked) {
+                descriptionText2.innerText = "Starts with an ability that spawns a Decoy tower. Unlock more towers when upgrading. Bolts spawn around the map, and collecting them boosts the strength of towers that are built."
+
+            }
+            else {
+                descriptionText2.innerText = "LOCKED"
+            }
+            document.getElementById("builderPlayer").style.border = "5px solid red";
+            break;
     }
     document.getElementById("startButton").disabled = false;
     document.getElementById("startButton2").disabled = false;
@@ -285,6 +303,7 @@ function Start() {
     canvas.style.height = `${695 * scale}px`;
     canvas.width = 1536;
     canvas.height = 695; 
+    canvas.style.display = "block";
     if (gamemode == 100) {
         ChangePage("coopWaitingPage", false);
         if (createdRoom) createRoom();
@@ -295,7 +314,7 @@ function Start() {
     }
     gameOver = false;
     gameState = {
-        players: {},
+        players: [],
         bullets: [],
         enemies: [],
         floatingObjects: [],
@@ -317,6 +336,7 @@ function Start() {
         currentWave: 1,
         xpBagTimer: 0,
         healthPotionSpawnTimer: 0,
+        boltSpawnTimer:0,
         bossesLeft: 0,
         isBossWave: false,
         scaleMultiplier: 1,
@@ -324,7 +344,7 @@ function Start() {
         waveTimer: 2000,
         strengthPotionSpawnRate:0
     };
-
+    UPGRADES = originalUpgrades;
     healthPotionSpawnTimer = Math.random() * 600 + 700;
     xpBagTimer = Math.random() * 200 + 200;
     timeElapsed = 0;
@@ -369,7 +389,6 @@ function Start() {
 
     background = new Image();
     background.src = 'images/background.webp';
-    canvas.style.display = "block";
 
     lastTime = Date.now();
     switch (chosenCharacter) {
@@ -379,6 +398,7 @@ function Start() {
         case 4: player = new MagePlayer(10, gameState.abilityIcons); break;
         case 5: player = new NecromancerPlayer(10, gameState.abilityIcons); break;
         case 6: player = new PheonixPlayer(6); break;
+        case 7: player = new BuilderPlayer(8, gameState.abilityIcons); break;
     }
     if (difficulty == 1) {
         gameState.scaleMultiplier = 0.5;
@@ -488,7 +508,7 @@ function Start() {
     else {
         RandomizeEnemies(2, 0, 0, 0, 0, gameState.enemies, gameState.bossBars, gameState.bossMultiplier);
     }
-    ctx.clearRect(0, 0, 2000, 1100);
+    //ctx.clearRect(0, 0, 2000, 1100);
     currentPage = "gamePage";
 
 }
@@ -734,6 +754,7 @@ if (typeof window !== "undefined") {
         localStorage.setItem("MagePlayerUnlocked", MagePlayer.unlocked);
         localStorage.setItem("NecromancerPlayerUnlocked", NecromancerPlayer.unlocked);
         localStorage.setItem("PheonixPlayerUnlocked", PheonixPlayer.unlocked);
+        localStorage.setItem("BuilderPlayerUnlocked", BuilderPlayer.unlocked);
 
         localStorage.setItem("ShowHealthbarSetting", showHealthBars);
     });
@@ -779,8 +800,7 @@ if (typeof window !== "undefined") {
         if (JSON.parse(localStorage.getItem("MagePlayerUnlocked")) != null) MagePlayer.unlocked = JSON.parse(localStorage.getItem("MagePlayerUnlocked"));
         if (JSON.parse(localStorage.getItem("NecromancerPlayerUnlocked")) != null) NecromancerPlayer.unlocked = JSON.parse(localStorage.getItem("NecromancerPlayerUnlocked"));
         if (JSON.parse(localStorage.getItem("PheonixPlayerUnlocked")) != null) PheonixPlayer.unlocked = JSON.parse(localStorage.getItem("PheonixPlayerUnlocked"));
-        NecromancerPlayer.unlocked = true;
-
+        if (JSON.parse(localStorage.getItem("BuilderPlayerUnlocked")) != null) BuilderPlayer.unlocked = JSON.parse(localStorage.getItem("BuilderPlayerUnlocked"));
         if (JSON.parse(localStorage.getItem("ShowHealthbarSetting")) != null) showHealthBars = JSON.parse(localStorage.getItem("ShowHealthbarSetting"));
 
     });

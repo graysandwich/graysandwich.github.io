@@ -566,3 +566,55 @@ function AddStrengthBuff(amount, player){
     player.boughtUpgrades[30] = 1;
     ChangePage('gamePage', false)
 }
+function AddSentryTower(player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "object", stat:"sentryTower", amount:1});
+        socket.emit("changeBoughtUpgrades", {index: 31, amount:1});
+    }
+    else{
+        let temp = new BuildIcon(50, player.abilities.length, 7);
+        player.abilities.push(temp);
+        gameState.abilityIcons.push(temp);
+        player.boughtUpgrades[31] = 1;
+    }
+    ChangePage('gamePage', false)
+}
+function AddDamageAuraTower(player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "object", stat:"damageAuraTower", amount:1});
+        socket.emit("changeBoughtUpgrades", {index: 32, amount:1});
+    }
+    else{
+        let temp = new BuildIcon(50, player.abilities.length, 8);
+        player.abilities.push(temp);
+        gameState.abilityIcons.push(temp);
+        player.boughtUpgrades[32] = 1;
+    }
+    ChangePage('gamePage', false)
+}
+function AddHealAuraTower(player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "object", stat:"healAuraTower", amount:1});
+        socket.emit("changeBoughtUpgrades", {index: 33, amount:1});
+    }
+    else{
+        let temp = new BuildIcon(50, player.abilities.length, 9);
+        player.abilities.push(temp);
+        gameState.abilityIcons.push(temp);
+        player.boughtUpgrades[33] = 1;
+    }
+    ChangePage('gamePage', false)
+}
+function AddLaserTower(player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "object", stat:"laserTower", amount:1});
+        socket.emit("changeBoughtUpgrades", {index: 34, amount:1});
+    }
+    else{
+        let temp = new BuildIcon(50, player.abilities.length, 10);
+        player.abilities.push(temp);
+        gameState.abilityIcons.push(temp);
+        player.boughtUpgrades[34] = 1;
+    }
+    ChangePage('gamePage', false)
+}
