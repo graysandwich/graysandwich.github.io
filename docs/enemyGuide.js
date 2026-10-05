@@ -195,7 +195,7 @@ function ShowEnemy(enemy){
             sourceImage.src="images/weakenBoss.webp";
             sourceText.innerText="Source: The boss blind \"The Flint\" from Balatro"
             abilityText.innerText="Ability: Dashes before shooting bullets that weaken the player's damage to 50%."
-            descriptionText.innerText="Started his villain arc after going to a casino a while back. The poker table didn't want to give him his $4.384e17 payout...";
+            descriptionText.innerText="Started his villain arc after going to a casino a while back. He only received $10 despite earning 4.384e17 chips from the poker table...";
             break;
         case 33:
             sourceImage.src="images/distractionEnemy.webp";

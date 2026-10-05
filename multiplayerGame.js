@@ -13,6 +13,8 @@ function createGameState() {
         collectables: [],
         bossBars: [],
         protectorBullets: [],
+        seenTier1Bosses:[],
+        seenTier2Bosses:[],
         SCALE: 0.0012,
         timeElapsed: 0,
         sharedXP: 0,

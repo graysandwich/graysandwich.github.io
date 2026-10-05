@@ -34,6 +34,10 @@ document.addEventListener("keydown", (e)=>{
                 gameState.enemies[i].takeDamage(new Bullet(1,1,2000, player), player, gameState);
             }
         }
+        if(key=='l'){
+            player.killedBoss=true;
+            changePage("upgradePage", false, player);
+        }
         if(key==controls["ability1"] && player.abilities.length>0){
             player.inputs.ability1=true;
         }

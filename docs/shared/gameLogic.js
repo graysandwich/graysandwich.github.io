@@ -283,7 +283,7 @@ class ProtectorBullet extends Bullet {
         this.damage = this.owner.protectorDamage;
         this.width = 40 * this.owner.projectileSizeMultiplier;
         this.height = 40 * this.owner.projectileSizeMultiplier;
-        if (this.owner.statusEffects.slow == true) {
+        if (this.owner.statusEffects.slow>=0) {
             this.angle += 0.07 / 3;
         }
         else {
@@ -450,6 +450,7 @@ class BouncingBullet extends Bullet {
         this.height *= owner.projectileSizeMultiplier;
         this.timer = 900;
         this.index = 7;
+        this.numHits=0;
         this.hitEnemies = new Set();
     }
     move(enemies, gameState) {
@@ -496,11 +497,15 @@ class BouncingBullet extends Bullet {
                 if (!this.hitEnemies.has(enemies[i])) {
                     enemies[i].takeDamage(this, this.owner, gameState);
                     this.hitEnemies.add(enemies[i]);
+                    this.numHits++;
                 }
             }
         }
         if (this.timer <= 0) {
             this.dead = true;
+        }
+        if(this.numHits>=10){
+            this.dead=true;
         }
     }
 }
@@ -1115,6 +1120,7 @@ if (typeof module !== 'undefined' && module.exports) {
 
 class Player {
     static unlocked = false;
+    static positiveEffects=["strength", "invincibility", "speed", "regeneration"];
     constructor(health) {
         if (typeof window !== "undefined") {
             this.image = new Image();
@@ -1190,10 +1196,12 @@ class Player {
         this.overheal=0;
         this.isPlayer=true;
         this.hasHealthBar=false;
-        this.statusEffects={slow:-1, weaken:-1, strength:-1, invincibility:-1, speed:-1, blindness:-1};
-
-        this.boughtUpgrades = new Array(35);
-        let RESTRICTEDUPGRADES = [17, 18, 19, 20, 22, 23, 24, 25, 27, 28, 31, 32, 33, 34];
+        this.statusEffects={slow:-1, weaken:-1, strength:-1, invincibility:-1, speed:-1, blindness:-1, regeneration:-1,};
+        this.doublePositiveEffects=false;
+        this.regenerationTimer=30;
+        this.regenerationAbilityCooldown=0;
+        this.boughtUpgrades = new Array(38);
+        let RESTRICTEDUPGRADES = [17, 18, 19, 20, 22, 23, 24, 25, 27, 28, 31, 32, 33, 34, 35, 36];
 
         for (let i = 0; i < this.boughtUpgrades.length; i++) {
             this.boughtUpgrades[i] = 0;
@@ -1426,6 +1434,14 @@ class Player {
 
             this.takeDamage(this.constantDamageAmount, new EnemyBullet(0,0,1,0,0), floatingObjects);
         }
+        if(this.regenerationTimer<=0 && this.statusEffects.regeneration>0){
+            this.regenerationTimer=30;
+            this.Heal(1,floatingObjects);
+        }
+        if(this.health<=this.maxHealth/3 && this.boughtUpgrades[37]==1 && this.regenerationAbilityCooldown<=0){
+            this.statusEffects.regeneration=Math.max(this.statusEffects.regeneration, 240);
+            this.regenerationAbilityCooldown=1800;
+        }
         this.Timers();
     }
     Timers() {
@@ -1437,10 +1453,14 @@ class Player {
         this.windProjectileCooldown--;
         this.constantDamageTimer--;
         this.bouncingProjectileCooldown--;
+        this.regenerationTimer--;
         this.accelerationX /= 1.05;
         this.accelerationY /= 1.05;
         for(let id in this.statusEffects){
-            this.statusEffects[id]--;
+            if(this.doublePositiveEffects && Player.positiveEffects.includes(id)){
+                this.statusEffects[id]-=0.5;
+            }
+            else this.statusEffects[id]--;
         }
 
     }
@@ -1795,10 +1815,13 @@ class BuilderPlayer extends Player {
         this.abilities.push(temp);
         abilityIcons.push(temp);
         this.icon=new BuildIconIndicator(50);
+        this.passiveBoltProduction=0;
+        this.passiveBoltTimer=600;
         this.boughtUpgrades[31]=0;
         this.boughtUpgrades[32]=0;
         this.boughtUpgrades[33]=0;
         this.boughtUpgrades[34]=0;
+        this.boughtUpgrades[35]=0;
         this.boughtUpgrades[8]=1;
         this.boughtUpgrades[9]=1;
         this.boughtUpgrades[15]=1;
@@ -1809,6 +1832,11 @@ class BuilderPlayer extends Player {
     }
     act(enemies, bullets, floatingObjects, gameState) {
         this.icon.text="x"+this.boltCount;
+        this.passiveBoltTimer--;
+        if(this.passiveBoltTimer<=0){
+            this.boltCount+=this.passiveBoltProduction;
+            this.passiveBoltTimer=480;
+        }
         //this.boltCount++;
         this.ability.counterText = this.boltCount + "x";
         if (this.bulletCooldown <= 0) {
@@ -3153,6 +3181,7 @@ class MimicEnemy extends Enemy {
             this.dead = false;
             //this.image.src = "images/mimicEnemyDead.webp"
             this.trollTimer = 60;
+            this.health=0;
             this.ignoreBullets = true;
         }
     }
@@ -4331,8 +4360,8 @@ class BouncyBoss extends Enemy {
         }
         this.maxSpeed = 20;
         if (bossMultiplier == 0.5) {
-            speed *= 0.75;
-            this.maxSpeed = 10
+            speed *= 1;
+            this.maxSpeed = 15;
         }
         else if (bossMultiplier == 0.75) {
             speed *= 1
@@ -5369,7 +5398,7 @@ class EngineerBoss extends Enemy {
         this.width = 150;
         this.height = 150;
 
-        this.shootTimer = 480;
+        this.shootTimer = 360;
         this.shootTimer -= this.shootTimer * (bossMultiplier - 1) * 0.4
         this.isBoss = true;
         this.value = 750;
@@ -5804,7 +5833,7 @@ class FarmerBoss extends Enemy {
         this.width = 150;
         this.height = 150;
 
-        this.shootTimer = 480;
+        this.shootTimer = 420;
         this.shootTimer -= this.shootTimer * (bossMultiplier - 1) * 0.4
         this.isBoss = true;
         this.value = 0;
@@ -5849,7 +5878,7 @@ class FarmerBoss extends Enemy {
                 vx = 8 * Math.cos(angle);
                 vy = 8 * Math.sin(angle);
             }
-            enemyBullets.push(new FarmerBullet(this.x, this.y, 1, vx, vy));
+            enemyBullets.push(new FarmerBullet(this.x, this.y, 2, vx, vy));
         }
         //console.log(this.healCooldown)
     }
@@ -5916,7 +5945,6 @@ class FarmerBossCow extends Enemy {
         if (this.shootTimer <= 0) {
             this.shootTimer = Math.max(30, 400 / this.speed);
             this.shootTimer -= this.shootTimer * (this.bossMultiplier - 1) * 0.4;
-            console.log(this.angle);
             for (let i = 0; i < this.numBullets; i++) {
                 this.angle += Math.PI * 2 / this.numBullets;
                 let vx = 8 * Math.cos(this.angle);
@@ -5927,7 +5955,6 @@ class FarmerBossCow extends Enemy {
                 temp.index = 22;
                 enemyBullets.push(temp);
             }
-            this.angle += Math.PI / 8;
         }
         for (let i = 0; i < enemyBullets.length; i++) {
             if (enemyBullets[i] instanceof FarmerBullet && (enemyBullets[i].x - enemyBullets[i].width / 2) < (this.x + this.width / 2) &&
@@ -6087,7 +6114,6 @@ class ShadowBoss extends Enemy {
             bossBars.push(this.bossBar);
         }
         else{
-            this.health/=5;
             this.isBoss=false;
             this.canSiphon=false;
             this.value=0;
@@ -6161,9 +6187,9 @@ class ShadowBoss extends Enemy {
             }
         }
         if(this.cloneTimer<=0 && this.isLeader){
-            this.cloneTimer = 1200;
+            this.cloneTimer = 1080;
             this.cloneTimer -= this.shootTimer * (this.bossMultiplier - 1) * 0.4;
-            let temp=new ShadowBoss(1.5, 100, null, this.bossMultiplier, false);
+            let temp=new ShadowBoss(1.5, 30, null, this.bossMultiplier, false);
             if (players.length == 0) return;
             let player = FindClosestPlayer(this.x, this.y, players);
             let differenceX=Math.abs(this.x-player.x);
@@ -7311,7 +7337,11 @@ function drawWall(wall) {
 
 
 
-function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Boss, enemies, bossBars, bossMultiplier) {
+function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Boss, gameState) {
+    let enemies=gameState.enemies;
+    let bossMultiplier=gameState.bossMultiplier;
+    let bossBars=gameState.bossBars;
+    
     bossesLeft = numTier1Boss + numTier2Boss;
     let tier1 = [1, 2, 3, 4, 5, 6, 7, 8];//
     let tier2 = [1, 2, 3, 4, 5, 6, 7, 8]; // 
@@ -7529,6 +7559,14 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
         }
     }
     for (let i = 0; i < numTier1Boss; i++) {
+        if(gameState.seenTier1Bosses.includes(tier1Bosses[i])){
+            continue;
+        }
+        if(i==tier1Bosses.length-1){
+            gameState.seenTier1Bosses=[];
+            RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Boss, gameState);
+            break;
+        }
         switch (tier1Bosses[i]) {
             case 1:
                 enemies.push(new LaserBoss(1, 120, bossBars, bossMultiplier));
@@ -7539,7 +7577,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 }
                 break;
             case 2:
-                enemies.push(new LaserBoss(1, 120, bossBars, bossMultiplier));
+                enemies.push(new IceBoss(1, 150, bossBars, bossMultiplier));
                 if (typeof window !== "undefined" && !IceBoss.seen) {
                     IceBoss.seen = true;
                     newEnemyQueue.push("images/iceBoss.webp");
@@ -7582,8 +7620,18 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 }
                 break;
         }
+        gameState.seenTier1Bosses.push(tier1Bosses[i]);
     }
     for (let i = 0; i < numTier2Boss; i++) {
+        
+        if(gameState.seenTier2Bosses.includes(tier2Bosses[i])){
+            continue;
+        }
+        if(i==tier2Bosses.length-1){
+            gameState.seenTier2Bosses=[];
+            RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Boss, gameState);
+            break;
+        }
         switch (tier2Bosses[i]) {
             case 1:
                 boss = new GambleBoss(1.5, 175, bossBars, bossMultiplier);
@@ -7640,8 +7688,8 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 }
                 break;
         }
+        gameState.seenTier2Bosses.push(tier2Bosses[i]);
     }
-    //ForcefieldEnemy.isActive=true;
     // ShieldEnemy.isActive=true;
     // boss = new HealerBoss(1.5, 175, bossBars, bossMultiplier);
     // enemies[enemies.length] = boss;
@@ -7800,6 +7848,7 @@ function InitializeStats() {
 
 }
 function ChangePage(id, reset, player) {
+    console.log(boughtTier2Upgrades);
     if (continueFlag) return;
     if (id == "upgradePage" && isLevelling) return;
     if ((gameOver && id == "upgradePage")) {
@@ -8202,7 +8251,6 @@ function ChangePage(id, reset, player) {
             isLevelling = false;
         }
         else if (!player || player.killedBoss == false) {
-            console.log(player.boughtUpgrades);
             document.getElementById("upgradeText").style.color = "white";
             document.getElementById('upgradeText').textContent = "Choose Your Upgrade";
             let randomNum = Math.floor(Math.random() * NUMUPGRADES);
@@ -8316,23 +8364,23 @@ function ChangeWave(gameState) {
         switch (gameState.currentWave) {
             case 2:
                 if (typeof window !== "undefined" && gamemode == 0) {
-                    RandomizeEnemies(2, 0, 0, 0, 0, enemies, bossBars, gameState.bossMultiplier);
+                    RandomizeEnemies(2, 0, 0, 0, 0, gameState);
                 }
-                else RandomizeEnemies(2, 1, 0, 0, 0, enemies, bossBars, gameState.bossMultiplier);
+                else RandomizeEnemies(2, 1, 0, 0, 0, gameState);
                 isBossWave = false;
                 SCALE = 0.0015;
                 break;
             case 3:
                 if (typeof window !== "undefined" && gamemode == 0) {
-                    RandomizeEnemies(1, 1, 0, 1, 0, enemies, bossBars, gameState.bossMultiplier);
+                    RandomizeEnemies(1, 1, 0, 1, 0, gameState);
                 }
-                else RandomizeEnemies(2, 1, 0, 1, 0, enemies, bossBars, gameState.bossMultiplier);
+                else RandomizeEnemies(2, 1, 0, 1, 0, gameState);
                 bossesLeft = 1;
                 isBossWave = true;
                 SCALE = 0.0005;
                 break;
             case 4:
-                RandomizeEnemies(3, 2, 1, 0, 0, enemies, bossBars, gameState.bossMultiplier);
+                RandomizeEnemies(3, 2, 1, 0, 0, gameState);
                 isBossWave = false;
                 SCALE = 0.001;
                 if (typeof window !== "undefined" && TankPlayer.unlocked == false) {
@@ -8342,13 +8390,13 @@ function ChangeWave(gameState) {
                 }
                 break;
             case 5:
-                RandomizeEnemies(1, 2, 1, 1, 0, enemies, bossBars, gameState.bossMultiplier);
+                RandomizeEnemies(1, 2, 1, 1, 0, gameState);
                 bossesLeft = 1;
                 isBossWave = true;
                 SCALE = 0.0004;
                 break;
             case 6:
-                RandomizeEnemies(2, 3, 2, 0, 0, enemies, bossBars, gameState.bossMultiplier);
+                RandomizeEnemies(2, 3, 2, 0, 0, gameState);
                 isBossWave = false;
                 SCALE = 0.0015;
                 if (typeof window !== "undefined" && HealerPlayer.unlocked == false) {
@@ -8358,16 +8406,16 @@ function ChangeWave(gameState) {
                 }
                 break;
             case 7:
-                RandomizeEnemies(2, 1, 1, 0, 1, enemies, bossBars, gameState.bossMultiplier);
+                RandomizeEnemies(2, 1, 1, 0, 1, gameState);
                 bossesLeft = 1;
                 isBossWave = true;
                 SCALE = 0.0004;
                 break;
             case 8:
-                RandomizeEnemies(2, 2, 2, 1, 0, enemies, bossBars, gameState.bossMultiplier);
+                RandomizeEnemies(2, 2, 2, 1, 0, gameState);
                 bossesLeft = 1;
                 isBossWave = true;
-                SCALE = 0.0005;
+                SCALE = 0.0009;
                 if (typeof window !== "undefined" && difficulty > 1 && NecromancerPlayer.unlocked == false) {
                     NecromancerPlayer.unlocked = true;
                     newEnemyQueue.push("images/necromancerPlayer.webp");
@@ -8375,13 +8423,13 @@ function ChangeWave(gameState) {
                 }
                 break;
             case 9:
-                RandomizeEnemies(2, 2, 3, 0, 1, enemies, bossBars, gameState.bossMultiplier);
+                RandomizeEnemies(2, 2, 3, 0, 1, gameState);
                 bossesLeft = 1;
                 isBossWave = true;
-                SCALE = 0.0007;
+                SCALE = 0.0009;
                 break;
             case 10:
-                RandomizeEnemies(2, 2, 1, 2, 0, enemies, bossBars, gameState.bossMultiplier);
+                RandomizeEnemies(2, 2, 1, 2, 0, gameState);
                 bossesLeft = 2;
                 isBossWave = true;
                 SCALE = 0.0006;
@@ -8392,7 +8440,7 @@ function ChangeWave(gameState) {
                 }
                 break;
             case 11:
-                RandomizeEnemies(2, 2, 2, 1, 1, enemies, bossBars, gameState.bossMultiplier);
+                RandomizeEnemies(2, 2, 2, 1, 1, gameState);
                 bossesLeft = 2;
                 isBossWave = true;
                 SCALE = 0.0006;
@@ -8405,43 +8453,43 @@ function ChangeWave(gameState) {
     else {
         switch (gameState.currentWave) {
             case 2:
-                RandomizeEnemies(0, 0, 0, 1, 0, enemies, bossBars, gameState.bossMultiplier);
+                RandomizeEnemies(0, 0, 0, 1, 0, gameState);
                 bossesLeft = 1;
                 break;
             case 3:
-                RandomizeEnemies(0, 0, 0, 0, 1, enemies, bossBars, gameState.bossMultiplier);
+                RandomizeEnemies(0, 0, 0, 0, 1, gameState);
                 bossesLeft = 1;
                 break;
             case 4:
-                RandomizeEnemies(0, 0, 0, 2, 0, enemies, bossBars, gameState.bossMultiplier);
+                RandomizeEnemies(0, 0, 0, 2, 0, gameState);
                 bossesLeft = 2;
                 break;
             case 5:
-                RandomizeEnemies(0, 0, 0, 0, 2, enemies, bossBars, gameState.bossMultiplier);
+                RandomizeEnemies(0, 0, 0, 0, 2, gameState);
                 bossesLeft = 2;
                 break;
             case 6:
-                RandomizeEnemies(0, 0, 0, 2, 1, enemies, bossBars, gameState.bossMultiplier);
+                RandomizeEnemies(0, 0, 0, 2, 1, gameState);
                 bossesLeft = 3;
                 break;
             case 7:
-                RandomizeEnemies(0, 0, 0, 0, 3, enemies, bossBars, gameState.bossMultiplier);
+                RandomizeEnemies(0, 0, 0, 0, 3, gameState);
                 bossesLeft = 3;
                 break;
             case 8:
-                RandomizeEnemies(0, 0, 0, 3, 1, enemies, bossBars, gameState.bossMultiplier);
+                RandomizeEnemies(0, 0, 0, 3, 1, gameState);
                 bossesLeft = 4;
                 break;
             case 9:
-                RandomizeEnemies(0, 0, 0, 1, 3, enemies, bossBars, gameState.bossMultiplier);
+                RandomizeEnemies(0, 0, 0, 1, 3, gameState);
                 bossesLeft = 4;
                 break;
             case 10:
-                RandomizeEnemies(0, 0, 0, 3, 2, enemies, bossBars, gameState.bossMultiplier);
+                RandomizeEnemies(0, 0, 0, 3, 2, gameState);
                 bossesLeft = 5;
                 break;
             case 11:
-                RandomizeEnemies(0, 0, 0, 3, 3, enemies, bossBars, gameState.bossMultiplier);
+                RandomizeEnemies(0, 0, 0, 3, 3, gameState);
                 bossesLeft = 6;
                 break;
             case 12:

@@ -72,11 +72,14 @@ let UPGRADES = [
     { onclick: (player) => AddDamageAuraTower(player), text: "New Build: Fire Tower"},
     { onclick: (player) => AddHealAuraTower(player), text: "New Build: Healing Station" },
     { onclick: (player) => AddLaserTower(player), text: "New Build: Laser Tower" },
+    { onclick: (player) => AddPassiveBolts(1,player), text: "+1 Passive Bolt Production" },
+    { onclick: (player) => DoublePositiveEffects(player), text: "2x Duration of Positive Effects" },
+    { onclick: (player) => AddRegeneration(player), text: "When below 33% health, gain 5s regeneration (30s cooldown)" },
 
 ];
 let originalUpgrades=[];
 for(let i=0;i<UPGRADES.length;i++){
-    originalUpgrades[i]=UPGRADES[i];
+    originalUpgrades[i]={onclick:UPGRADES[i].onclick, text:UPGRADES[i].text};
 }
 const NUMUPGRADES = UPGRADES.length;
 let boughtUpgrades = new Array(NUMUPGRADES);
@@ -106,7 +109,7 @@ let ENEMYUPGRADES = [
     { onclick: "IncreaseScale(2)", text: "Next Wave has 2x More Enemies" },
 ]
 const RESTRICTEDUPGRADES = [17, 18, 19, 20, 22, 23, 24, 25, 27, 28]
-const RESTRICTEDTIER2UPGRADES = [9];
+const RESTRICTEDTIER2UPGRADES = [];
 let timeWarpCounter = 0;
 let gambleTimer = 0;
 let gambleChoice = 0;
@@ -324,6 +327,8 @@ function Start() {
         collectables: [],
         bossBars: [],
         protectorBullets: [],
+        seenTier1Bosses:[],
+        seenTier2Bosses:[],
         SCALE: 0.0012,
         timeElapsed: 0,
         sharedXP: 0,
@@ -344,7 +349,9 @@ function Start() {
         waveTimer: 2000,
         strengthPotionSpawnRate:0
     };
-    UPGRADES = originalUpgrades;
+    for(let i=0;i<UPGRADES.length;i++){
+        UPGRADES[i]={onclick:originalUpgrades[i].onclick, text:originalUpgrades[i].text};
+    }
     healthPotionSpawnTimer = Math.random() * 600 + 700;
     xpBagTimer = Math.random() * 200 + 200;
     timeElapsed = 0;
@@ -503,10 +510,10 @@ function Start() {
         [gameState.isBossWave, gameState.bossesLeft, gameState.currentWave, gameState.SCALE] = ChangeWave(gameState);
     }
     else if (gamemode == 6) {
-        RandomizeEnemies(0, 0, 0, 1, 0, gameState.enemies, gameState.bossBars, gameState.bossMultiplier);
+        RandomizeEnemies(0, 0, 0, 1, 0, gameState);
     }
     else {
-        RandomizeEnemies(2, 0, 0, 0, 0, gameState.enemies, gameState.bossBars, gameState.bossMultiplier);
+        RandomizeEnemies(2, 0, 0, 0, 0, gameState);
     }
     //ctx.clearRect(0, 0, 2000, 1100);
     currentPage = "gamePage";

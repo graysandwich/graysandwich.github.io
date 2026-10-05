@@ -164,6 +164,9 @@ io.on("connection", (socket) => {
                 else if(data.stat==="bouncingProjectileMaxCooldown"){
                     player.bouncingProjectileMaxCooldown = 240 / player.bouncingProjectiles;
                 }
+                else if(data.stat==="doublePositiveEffects"){
+                    player.doublePositiveEffects=true;
+                }
                 else if (typeof player[data.stat] === "number") {
                     player[data.stat] = data.amount;
                 }

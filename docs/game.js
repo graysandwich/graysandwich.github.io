@@ -231,7 +231,7 @@ function SpawnEnemies() {
                     gameState.enemies.push(shield);
                 }
                 if (newEnemy.index == 23) {
-                    const shield = new ForcefieldShield(0, 35);
+                    const shield = new ForcefieldShield(0, 45);
                     newEnemy.shield=shield;
                     newEnemy.x=shield.x;
                     newEnemy.y=shield.y;
@@ -292,7 +292,7 @@ function Actions() {
         //console.log(newEnemy.health);
     }
     if (!(gamemode == 0 && player.level < 2) && chosenCharacter==7 && gameState.boltSpawnTimer < 0) {
-        gameState.boltSpawnTimer = Math.random() * 200 + 200;
+        gameState.boltSpawnTimer = Math.random() * 250 + 250;
         gameState.boltSpawnTimer /= 1 + gameState.timeElapsed * 0.0003;
         const newCollectable = new Bolt(Math.random() * (2000 - 2000 / 10) + 2000 / 20, Math.random() * (1100 - 1100 / 10) + 1100 / 20, gameState);
         gameState.collectables.push(newCollectable);
@@ -641,21 +641,6 @@ function drawEnemies(enemies){
             continue;
         }
         switch (enemies[i].index) {
-            case 0:
-                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
-            case 1:
-                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
-            case 2:
-                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
-            case 3:
-                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
-            case 4:
-                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
             case 5:
                 if (enemies[i].deathTimer >= 0) {
                     //console.log(otherImages.zombieEnemyDead);
@@ -665,20 +650,8 @@ function drawEnemies(enemies){
                     drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
                 }
                 break;
-            case 6:
-                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
-            case 7:
-                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
             case 8:
                 drawGhostEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
-            case 9:
-                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
-            case 10:
-                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
                 break;
             case 11:
                 if (enemies[i].trollTimer > 0) {
@@ -687,12 +660,6 @@ function drawEnemies(enemies){
                 else {
                     drawEnemy(enemies[i], enemyImages[enemies[i].index], enemies[i].showHealthBar);
                 }
-                break;
-            case 12:
-                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
-            case 13:
-                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
                 break;
             case 14:
                 if (enemies[i].releasing == true) {
@@ -731,24 +698,7 @@ function drawEnemies(enemies){
                 ctx.strokeRect(enemies[i].x - enemies[i].width / 2, enemies[i].y - enemies[i].height / 2, enemies[i].width, enemies[i].height);
                 drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
                 break;
-            case 18:
-                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
-            case 19:
-                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
-            case 20:
-                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
-            case 21:
-                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
-            case 22:
-                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
-            case 23:
-                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
-                break;
+            
             case 1000:
                 if (enemies[i].offsetX == 0) {
                     //console.log(otherImages.zombieEnemyDead);
@@ -821,6 +771,9 @@ function drawEnemies(enemies){
                 ctx.globalAlpha = 0.5*enemies[i].health/enemies[i].maxHealth+0.1;
                 drawEnemy(enemies[i], otherImages.forcefield, showHealthBars);
                 ctx.restore();
+                break;
+            default:
+                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
                 break;
         }
     }

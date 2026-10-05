@@ -10,6 +10,9 @@ function increaseDamage(amount, player){
         player.boughtUpgrades[0]+=0.5;
     }
     boughtTier2Upgrades[0]+=0.5;
+    if(amount==1){
+        boughtTier2Upgrades[0]=1;
+    }
     
     ChangePage('gamePage', false)
 }
@@ -40,6 +43,9 @@ function increaseProjectiles(amount, player){
         player.boughtUpgrades[2]+=0.5;
     }
     boughtTier2Upgrades[2]+=0.5;
+    if(amount==4){
+        boughtTier2Upgrades[2]=1;
+    }
     
     ChangePage('gamePage', false)
 }
@@ -95,9 +101,15 @@ function speedUpAttacks(amount, player){
 function addSiphon(amount, player){
     if(gamemode==100){
         socket.emit("buyUpgrade", {type: "stat", stat:"siphon", amount:amount});
+        socket.emit("changeBoughtUpgrades", {index: 6, amount:0.5});
     }
     else{
         player.siphon += amount;
+        player.boughtUpgrades[6]+=0.5;
+        boughtTier2Upgrades[1]+=0.5;
+    }
+    if(amount==0.5){
+        boughtTier2Upgrades[1]=1;
     }
     ChangePage('gamePage', false)
 }
@@ -133,12 +145,14 @@ function addTimeWarp(amount, player){
     if(gamemode==100){
         socket.emit("buyUpgrade", {type: "object", stat:"timeWarp", amount:amount});
         socket.emit("changeBoughtUpgrades", {index: 9, amount:1});
+        socket.emit("changeBoughtUpgrades", {index: 36, amount:-1});
     }
     else{
         let temp = new TimeWarpIcon(50, player.abilities.length)
         player.abilities.push(temp)
         gameState.abilityIcons.push(temp);
         player.boughtUpgrades[25] = 0;
+        player.boughtUpgrades[36] = 0;
     }
     player.boughtUpgrades[9] = 1;
     ChangePage('gamePage', false)
@@ -546,10 +560,12 @@ function AddStrengthPotions(amount, player){
     if(gamemode==100){
         socket.emit("buyUpgrade", {type: "other", stat:"spawnStrengthPotions", amount:amount});
         socket.emit("changeBoughtUpgrades", {index: 29, amount:1});
+        socket.emit("changeBoughtUpgrades", {index: 36, amount:-1});
 
     }
     else{
         gameState.strengthPotionSpawnRate+=amount;
+        player.boughtUpgrades[36] = 0;
     }
     player.boughtUpgrades[29] = 1;
     ChangePage('gamePage', false)
@@ -558,10 +574,12 @@ function AddStrengthBuff(amount, player){
     if(gamemode==100){
         socket.emit("buyUpgrade", {type: "stat", stat:"overheal", amount:amount});
         socket.emit("changeBoughtUpgrades", {index: 30, amount:1});
+        socket.emit("changeBoughtUpgrades", {index: 36, amount:-1});
 
     }
     else{
         player.overheal+=1;
+        player.boughtUpgrades[36] = 0;
     }
     player.boughtUpgrades[30] = 1;
     ChangePage('gamePage', false)
@@ -616,5 +634,36 @@ function AddLaserTower(player){
         gameState.abilityIcons.push(temp);
         player.boughtUpgrades[34] = 1;
     }
+    ChangePage('gamePage', false)
+}
+function AddPassiveBolts(amount, player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "stat", stat:"passiveBoltProduction", amount:amount});
+    }
+    else{
+        player.passiveBoltProduction += amount;
+    }
+    ChangePage('gamePage', false)
+}
+function DoublePositiveEffects(player){
+    if(gamemode==100){
+        
+        socket.emit("buyUpgrade", {type: "changeStat", stat:"doublePositiveEffects", amount:1});
+        socket.emit("changeBoughtUpgrades", {index: 36, amount:1});
+    }
+    else{
+        player.doublePositiveEffects=true;
+    }
+    player.boughtUpgrades[36] = 1;
+    ChangePage('gamePage', false)
+}
+function AddRegeneration(player){
+    if(gamemode==100){
+        
+        socket.emit("changeBoughtUpgrades", {index: 37, amount:1});
+    }
+    else{
+    }
+    player.boughtUpgrades[37] = 1;
     ChangePage('gamePage', false)
 }

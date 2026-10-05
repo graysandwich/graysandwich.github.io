@@ -151,6 +151,7 @@ const statusEffectPaths = {
     invincibility: "images/invincibility.webp",
     speed: "images/speed.webp",
     blindness: "images/blindness.webp",
+    regeneration: "images/regeneration.webp",
 };
 
 let statusEffectImages = Object.fromEntries(
