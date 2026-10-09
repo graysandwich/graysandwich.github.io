@@ -2283,13 +2283,13 @@ class Enemy {
                     multiplier=1.2;
                     break;
                 case 9:
-                    multiplier=1.4;
+                    multiplier=1.5;
                     break;
                 case 10:
-                    multiplier=1.7;
+                    multiplier=1.9;
                     break;
                 case 11:
-                    multiplier=2;
+                    multiplier=2.4;
                     break;
             }
             multiplier*=enemyHealthMultiplier;
@@ -5150,11 +5150,11 @@ class SnakeBoss extends Enemy {
         if ((this.isLeader && this.spawnDelay == 0 && this.bodyCount > 0) || (this.spawnDelay == 0 && this.bodyCount > 0 && this.leader.count < this.leader.maxCount)) {
             let temp = null;
             if (this.isLeader) {
-                temp = new SnakeBoss(2.5, 1, false, this.bodyCount - 1, null, this.bossMultiplier, this);
+                temp = new SnakeBoss(3, 1, false, this.bodyCount - 1, null, this.bossMultiplier, this);
                 this.count++;
             }
             else {
-                temp = new SnakeBoss(2.5, 1, false, this.bodyCount - 1, null, this.bossMultiplier, this.leader);
+                temp = new SnakeBoss(3, 1, false, this.bodyCount - 1, null, this.bossMultiplier, this.leader);
                 this.leader.count++;
             }
             enemies.push(temp)
@@ -5398,7 +5398,7 @@ class EngineerBoss extends Enemy {
         this.width = 150;
         this.height = 150;
 
-        this.shootTimer = 360;
+        this.shootTimer = 240;
         this.shootTimer -= this.shootTimer * (bossMultiplier - 1) * 0.4
         this.isBoss = true;
         this.value = 750;
@@ -5423,7 +5423,7 @@ class EngineerBoss extends Enemy {
             this.shootTimer--;
         }
         if (this.shootTimer <= 0) {
-            this.shootTimer = 390;
+            this.shootTimer = 240;
             this.shootTimer -= this.shootTimer * (this.bossMultiplier - 1) * 0.4;
             if (players.length == 0) return;
             let player = FindClosestPlayer(this.x, this.y, players);
@@ -5477,7 +5477,7 @@ class SentryEngineerEnemy extends Enemy {
         this.ignoreKnockback = true;
         this.ignoreShield = true;
         this.iFrame = 0;
-        this.shootTimer = 60;
+        this.shootTimer = 45;
         this.index = 1004;
         //console.log(this.shootTimer);
     }
@@ -6922,7 +6922,7 @@ class EngineerBullet extends EnemyBullet {
             this.y = Math.min(mapBorders.bottomBorder + 20, this.y);
             switch (this.type) {
                 case 1:
-                    enemies.push(new SentryEngineerEnemy(this.x, this.y, 12));
+                    enemies.push(new SentryEngineerEnemy(this.x, this.y, 15));
                     break;
                 case 2:
                     enemies.push(new LaserEngineerEnemy(this.x, this.y, 20));
@@ -7341,7 +7341,9 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
     let enemies=gameState.enemies;
     let bossMultiplier=gameState.bossMultiplier;
     let bossBars=gameState.bossBars;
-    
+    let originalTier1BossCount=numTier1Boss;
+    let originalTier2BossCount=numTier2Boss;
+
     bossesLeft = numTier1Boss + numTier2Boss;
     let tier1 = [1, 2, 3, 4, 5, 6, 7, 8];//
     let tier2 = [1, 2, 3, 4, 5, 6, 7, 8]; // 
@@ -7558,14 +7560,71 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 break;
         }
     }
+    let spawnedBossCount=0;
     for (let i = 0; i < numTier1Boss; i++) {
-        if(gameState.seenTier1Bosses.includes(tier1Bosses[i])){
-            continue;
-        }
         if(i==tier1Bosses.length-1){
             gameState.seenTier1Bosses=[];
-            RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Boss, gameState);
+            for (let j = 0; j < originalTier1BossCount-spawnedBossCount; j++) {
+                switch (tier1Bosses[j]) {
+                    case 1:
+                        enemies.push(new LaserBoss(1, 120, bossBars, bossMultiplier));
+                        if (typeof window !== "undefined" && !LaserBoss.seen) {
+                            LaserBoss.seen = true;
+                            newEnemyQueue.push("images/laserBoss.webp");
+                            isPlayerUnlocked.push(false);
+                        }
+                        break;
+                    case 2:
+                        enemies.push(new IceBoss(1, 150, bossBars, bossMultiplier));
+                        if (typeof window !== "undefined" && !IceBoss.seen) {
+                            IceBoss.seen = true;
+                            newEnemyQueue.push("images/iceBoss.webp");
+                            isPlayerUnlocked.push(false);
+                        }
+                        break;
+                    case 3:
+                        boss = new BouncyBoss(5, 120, true, bossBars, bossMultiplier);
+                        if (typeof window !== "undefined" && !BouncyBoss.seen) {
+                            BouncyBoss.seen = true;
+                            newEnemyQueue.push("images/bouncyBoss.webp");
+                            isPlayerUnlocked.push(false);
+                        }
+                        enemies[enemies.length] = boss;
+                        break;
+                    case 4:
+                        boss = new MageBoss(2.5, 100, bossBars, bossMultiplier);
+                        if (typeof window !== "undefined" && !MageBoss.seen) {
+                            MageBoss.seen = true;
+                            newEnemyQueue.push("images/mageWaterMode.webp");
+                            isPlayerUnlocked.push(false);
+                        }
+                        enemies[enemies.length] = boss;
+                        break;
+                    case 5:
+                        boss = new BulletHellBoss(3, 100, bossBars, bossMultiplier);
+                        if (typeof window !== "undefined" && !BulletHellBoss.seen) {
+                            BulletHellBoss.seen = true;
+                            newEnemyQueue.push("images/bulletHellBoss.webp");
+                            isPlayerUnlocked.push(false);
+                        }
+                        enemies[enemies.length] = boss;
+                        break;
+                    case 6:
+                        enemies.push(new WeakenBoss(2.5, 100, bossBars, bossMultiplier));
+                        if (typeof window !== "undefined" && !WeakenBoss.seen) {
+                            WeakenBoss.seen = true;
+                            newEnemyQueue.push("images/weakenBoss.webp");
+                            isPlayerUnlocked.push(false);
+                        }
+                        break;
+                }
+                gameState.seenTier1Bosses.push(tier1Bosses[j]);
+            }
             break;
+        }
+        if(gameState.seenTier1Bosses.includes(tier1Bosses[i])){
+            numTier1Boss++;
+            continue;
         }
         switch (tier1Bosses[i]) {
             case 1:
@@ -7620,17 +7679,82 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 }
                 break;
         }
+        spawnedBossCount++;
         gameState.seenTier1Bosses.push(tier1Bosses[i]);
+        if(gameState.seenTier1Bosses.length==numTier1Boss.length){
+            gameState.seenTier1Bosses=[];
+        }
     }
+    let spawnedBossCount2=0;
     for (let i = 0; i < numTier2Boss; i++) {
         
-        if(gameState.seenTier2Bosses.includes(tier2Bosses[i])){
-            continue;
-        }
         if(i==tier2Bosses.length-1){
             gameState.seenTier2Bosses=[];
-            RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Boss, gameState);
-            break;
+            for (let j = 0; j < originalTier2BossCount-spawnedBossCount2; j++) {
+                switch (tier2Bosses[j]) {
+                    case 1:
+                        boss = new GambleBoss(1.5, 175, bossBars, bossMultiplier);
+                        enemies[enemies.length] = boss;
+                        if (typeof window !== "undefined" && !GambleBoss.seen) {
+                            GambleBoss.seen = true;
+                            newEnemyQueue.push("images/gambleBoss.webp");
+                            isPlayerUnlocked.push(false);
+                        }
+                        break;
+                    case 2:
+                        boss = new SnakeBoss(3, 300, true, 79, bossBars, bossMultiplier);
+                        enemies[enemies.length] = boss;
+                        if (typeof window !== "undefined" && !SnakeBoss.seen) {
+                            SnakeBoss.seen = true;
+                            newEnemyQueue.push("images/snakeBoss.webp");
+                            isPlayerUnlocked.push(false);
+                        }
+                        break;
+                    case 3:
+                        boss = new HealerBoss(1.5, 175, bossBars, bossMultiplier);
+                        enemies[enemies.length] = boss;
+                        if (typeof window !== "undefined" && !HealerBoss.seen) {
+                            HealerBoss.seen = true;
+                            newEnemyQueue.push("images/healingBoss.webp");
+                            isPlayerUnlocked.push(false);
+                        }
+                        break;
+                    case 4:
+                        boss = new EngineerBoss(1, 175, bossBars, bossMultiplier);
+                        enemies[enemies.length] = boss;
+                        if (typeof window !== "undefined" && !EngineerBoss.seen) {
+                            EngineerBoss.seen = true;
+                            newEnemyQueue.push("images/engineerBoss.webp");
+                            isPlayerUnlocked.push(false);
+                        }
+                        break;
+                    case 5:
+                        boss = new FarmerBoss(2, 75, bossBars, bossMultiplier);
+                        enemies[enemies.length] = boss;
+                        if (typeof window !== "undefined" && !FarmerBoss.seen) {
+                            FarmerBoss.seen = true;
+                            newEnemyQueue.push("images/farmerBoss.webp");
+                            isPlayerUnlocked.push(false);
+                        }
+                        break;
+                    case 6:
+                        boss = new ShadowBoss(1.5, 175, bossBars, bossMultiplier, true);
+                        enemies[enemies.length] = boss;
+                        if (typeof window !== "undefined" && !ShadowBoss.seen) {
+                            ShadowBoss.seen = true;
+                            newEnemyQueue.push("images/shadowBoss.webp");
+                            isPlayerUnlocked.push(false);
+                        }
+                        break;
+                    
+                    break;
+                }
+                gameState.seenTier2Bosses.push(tier2Bosses[j]);
+            }
+        }
+        if(gameState.seenTier2Bosses.includes(tier2Bosses[i])){
+            numTier2Boss++;
+            continue;
         }
         switch (tier2Bosses[i]) {
             case 1:
@@ -7643,7 +7767,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 }
                 break;
             case 2:
-                boss = new SnakeBoss(2.5, 300, true, 79, bossBars, bossMultiplier);
+                boss = new SnakeBoss(3, 300, true, 79, bossBars, bossMultiplier);
                 enemies[enemies.length] = boss;
                 if (typeof window !== "undefined" && !SnakeBoss.seen) {
                     SnakeBoss.seen = true;
@@ -7689,6 +7813,10 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier1Boss, numTier2Bo
                 break;
         }
         gameState.seenTier2Bosses.push(tier2Bosses[i]);
+        spawnedBossCount2++;
+        if(gameState.seenTier2Bosses.length==numTier2Boss.length){
+            gameState.seenTier2Bosses=[];
+        }
     }
     // ShieldEnemy.isActive=true;
     // boss = new HealerBoss(1.5, 175, bossBars, bossMultiplier);
@@ -8254,7 +8382,7 @@ function ChangePage(id, reset, player) {
             document.getElementById("upgradeText").style.color = "white";
             document.getElementById('upgradeText').textContent = "Choose Your Upgrade";
             let randomNum = Math.floor(Math.random() * NUMUPGRADES);
-            while (player.boughtUpgrades[randomNum] == 1) {
+            while (player.boughtUpgrades[randomNum] >= 1) {
                 randomNum = Math.floor(Math.random() * NUMUPGRADES);
             }
 
@@ -8266,7 +8394,7 @@ function ChangePage(id, reset, player) {
             };
 
             let randomNum2 = Math.floor(Math.random() * NUMUPGRADES);
-            while (randomNum == randomNum2 || player.boughtUpgrades[randomNum2] == 1) {
+            while (randomNum == randomNum2 || player.boughtUpgrades[randomNum2] >= 1) {
                 randomNum2 = Math.floor(Math.random() * NUMUPGRADES);
             }
             choice2.innerHTML = `<button onmouseover="this.style.backgroundColor='#00CCFF'" onmouseout="this.style.backgroundColor='cyan'" onclick="${UPGRADES[randomNum2].onclick}" style="position:absolute;left:${screen.width / 2}px;transform:translateX(-50%);top:30%;width:15%;height:30%;z-index:3;background-color:cyan; font-size:150%;font-family:'black ops one'" id="upgrade2">${UPGRADES[randomNum2].text}</button>`;
@@ -8277,7 +8405,7 @@ function ChangePage(id, reset, player) {
             };
 
             let randomNum3 = Math.floor(Math.random() * NUMUPGRADES);
-            while (randomNum == randomNum3 || randomNum3 == randomNum2 || player.boughtUpgrades[randomNum3] == 1) {
+            while (randomNum == randomNum3 || randomNum3 == randomNum2 || player.boughtUpgrades[randomNum3] >= 1) {
                 randomNum3 = Math.floor(Math.random() * NUMUPGRADES);
             }
             choice3.innerHTML = `<button onmouseover="this.style.backgroundColor='#00CCFF'" onmouseout="this.style.backgroundColor='cyan'" onclick="${UPGRADES[randomNum3].onclick}" style="position:absolute;left:${screen.width / 2 + 400}px;transform:translateX(-50%);top:30%;width:15%;height:30%;z-index:3;background-color:cyan; font-size:150%;font-family:'black ops one'" id="upgrade3">${UPGRADES[randomNum3].text}</button>`;
@@ -8290,7 +8418,7 @@ function ChangePage(id, reset, player) {
             document.getElementById("upgradeText").style.color = "yellow";
             document.getElementById('upgradeText').textContent = "Choose Your Upgrade";
             let randomNum = Math.floor(Math.random() * NUMTIER2UPGRADES);
-            while (boughtTier2Upgrades[randomNum] == 1) {
+            while (boughtTier2Upgrades[randomNum] >= 1) {
                 randomNum = Math.floor(Math.random() * NUMTIER2UPGRADES);
             }
 
@@ -8302,7 +8430,7 @@ function ChangePage(id, reset, player) {
             };
 
             let randomNum2 = Math.floor(Math.random() * NUMTIER2UPGRADES);
-            while (randomNum == randomNum2 || boughtTier2Upgrades[randomNum2] == 1) {
+            while (randomNum == randomNum2 || boughtTier2Upgrades[randomNum2] >= 1) {
                 randomNum2 = Math.floor(Math.random() * NUMTIER2UPGRADES);
             }
             choice2.innerHTML = `<button onmouseover="this.style.backgroundColor='#E4D00A'" onmouseout="this.style.backgroundColor='yellow'" onclick="${TIER2UPGRADES[randomNum2].onclick}" style="position:absolute;left:${screen.width / 2 + 200}px;transform:translateX(-50%);top:30%;width:15%;height:30%;z-index:3;background-color:yellow; font-size:150%;font-family:'black ops one'" id="upgrade2">${TIER2UPGRADES[randomNum2].text}</button>`;

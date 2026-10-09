@@ -43,6 +43,7 @@ function increaseProjectiles(amount, player){
         player.boughtUpgrades[2]+=0.5;
     }
     boughtTier2Upgrades[2]+=0.5;
+    
     if(amount==4){
         boughtTier2Upgrades[2]=1;
     }

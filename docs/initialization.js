@@ -316,6 +316,12 @@ function Start() {
         return;
     }
     gameOver = false;
+    healthBarCurrentLength = 400;
+    healthBarDesiredLength = 400;
+    levelBarCurrentLength = 0;
+    levelBarDesiredLength = 0;
+    shieldBarCurrentLength = 0;
+    shieldBarDesiredLength = 0;
     gameState = {
         players: [],
         bullets: [],
