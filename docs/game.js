@@ -328,7 +328,7 @@ function Actions() {
                     }
                 }
                 gameState.bossesLeft--;
-                if (gameState.bossesLeft == 0 && gameState.isBossWave) {
+                if (gameState.bossBars.length == 0 && gameState.isBossWave) {
                     [gameState.isBossWave, gameState.bossesLeft, gameState.currentWave, gameState.SCALE] = ChangeWave(gameState);
                     gameState.timeElapsed = 0;
 
@@ -1085,13 +1085,11 @@ async function newEnemyText() {
     }
     let image = document.createElement("img");
     image.src = newEnemyQueue[0];
-    image.style.width = 300;
-    image.style.height = 300;
-    image.style.position = 'absolute';
-    image.style.width = "300px";
-    image.style.height = "300px";
-    image.style.left = (2000 / 2 - 200) + "px";
-    image.style.top = (1100 / 2 - 200) + "px";
+    image.style.position = 'fixed';
+    image.style.width = "40vmin";
+    image.style.height = "40vmin";
+    image.style.left =  "50%";
+    image.style.top =  "50%";
     image.style.transform = "translate(-50%, -50%)";
     image.style.zIndex = 100;
     document.body.appendChild(image);

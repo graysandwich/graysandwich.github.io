@@ -7,7 +7,7 @@ document.addEventListener("mousemove", (e)=>{
     mouseY=e.clientY;
 })
 document.addEventListener("keydown", (e)=>{ 
-    if(typeof window ==="undefined")return;
+    if(typeof window === "undefined")return;
     if(currentPage=="gamePage"){
         let key=e.key.toLowerCase();
         if(key==controls["up"]){
@@ -166,3 +166,6 @@ window.addEventListener("resize", () => {
     canvas.style.width = `${1536 * scale}px`;
     canvas.style.height = `${695 * scale}px`;
 });
+function MisprintRandom(){
+    return Math.pow(Math.random(),4)*3.75+0.25;
+}

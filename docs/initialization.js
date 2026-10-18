@@ -1,5 +1,4 @@
 
-
 let enemies = [];
 let bullets = [];
 let enemyBullets = [];
@@ -37,44 +36,44 @@ for (let i = 0; i < boughtTier2Upgrades.length; i++) {
     boughtTier2Upgrades[i] = 0;
 }
 let UPGRADES = [
-    { onclick: (player) => increaseDamage(0.5, player), text: "+0.5 Damage" },
-    { onclick: (player) => increaseMaxHealth(10, player), text: "+10 Max Health" },
-    { onclick: (player) => increaseProjectiles(2, player), text: "+2 Projectiles" },
-    { onclick: (player) => addFrostProjectiles(1, player), text: "+1 Frost Projectile" },
-    { onclick: (player) => addLaserProjectiles(1, player), text: "Laser Attack" },
-    { onclick: (player) => speedUpAttacks(1.2, player), text: "Faster Attack Speed" },
-    { onclick: (player) => addSiphon(0.25, player), text: "+0.25 Lifesteal" },
-    { onclick: (player) => multiplyXPGain(1.5, player), text: "x1.5 XP gain" },
-    { onclick: (player) => addBomb(1, player), text: "Bomb Ability" },
-    { onclick: (player) => addTimeWarp(1, player), text: "Speed Boost Ability" },
-    { onclick: (player) => AddPassiveHealing(1, player), text: "+1 Passive Healing" },
-    { onclick: (player) => Gamble(1, player), text: "Mystery Box" },
-    { onclick: (player) => AddProtectorBullet(2, player), text: "+2 Protectors" },
-    { onclick: (player) => TradeoffDeal(2, player), text: "x2 Damage but x2 Damage Taken" },
-    { onclick: (player) => AddShield(1, player), text: "Gain 50hp Shield" },
-    { onclick: (player) => BulletDeleterAbility(1, player), text: "Bullet Wipe Ability" },
-    { onclick: (player) => IncreaseProjectileSize(1.5, player), text: "Increase Projectile Size" },
-    { onclick: (player) => MakeIceBulletsPierce(player), text: "Frost Bullets Pierce Through Enemies" },
-    { onclick: (player) => IncreaseFireDamage(0.25, player), text: "+0.25 Fire Damage" },
-    { onclick: (player) => PassiveSpawns(player), text: "Passively Spawn Souls" },
-    { onclick: (player) => IncreaseTornadoDamage(1, player), text: "+1 Tornado Damage" },
-    { onclick: (player) => AddSpeed(1.5, player), text: "Increase Movement Speed" },
-    { onclick: (player) => IncreaseSlowedDamage(1.5, player), text: "Slowed Enemies Take 1.5x Damage" },
-    { onclick: (player) => IncreaseBombDamage(4, player), text: "+4 Bomb Damage" },
-    { onclick: (player) => IncreaseLaserDamage(0.5, player), text: "+0.5 Laser Damage" },
-    { onclick: (player) => AddTimeStop(player), text: "Speed Boost Ability -> Time Stop Ability" },
-    { onclick: (player) => AddBouncingProjectile(1, player), text: "+1 Bouncing Bullet" },
-    { onclick: (player) => IncreaseProtectorDamage(1, player), text: "+1 Protector Damage" },
-    { onclick: (player) => IncreaseBouncingBulletDamage(1, player), text: "+0.5 Bouncing Bullet Damage" },
-    { onclick: (player) => AddStrengthPotions(0.25, player), text: "Health potions sometimes become Strength potions" },
-    { onclick: (player) => AddStrengthBuff(1, player), text: "Every 15 Kills, Gain strength buff for 6 seconds" },
-    { onclick: (player) => AddSentryTower(player), text: "New Build: Turret" },
-    { onclick: (player) => AddDamageAuraTower(player), text: "New Build: Fire Tower"},
-    { onclick: (player) => AddHealAuraTower(player), text: "New Build: Healing Station" },
-    { onclick: (player) => AddLaserTower(player), text: "New Build: Laser Tower" },
-    { onclick: (player) => AddPassiveBolts(1,player), text: "+1 Passive Bolt Production" },
-    { onclick: (player) => DoublePositiveEffects(player), text: "2x Duration of Positive Effects" },
-    { onclick: (player) => AddRegeneration(player), text: "When below 33% health, gain 5s regeneration (30s cooldown)" },
+    { onclick:  increaseDamage, text: v => `+${v} Damage`, defaultValue:0.5},
+    { onclick:  increaseMaxHealth, text: v =>`+${v} Max Health`, defaultValue:8},
+    { onclick:  increaseProjectiles, text: v =>`+${v} Projectiles`, defaultValue:2},
+    { onclick:  addFrostProjectiles, text: v => `+${v} Frost Projectile`, defaultValue:1},
+    { onclick:  addLaserProjectiles, text: v=> "Laser Attack", defaultValue:1},
+    { onclick:  speedUpAttacks, text:v=> `${v}X Faster Attack Speed`, defaultValue:1.2},
+    { onclick:  addSiphon,text:v=> `+${v} Lifesteal`, defaultValue:0.25},
+    { onclick:  multiplyXPGain, text:v=> `X${v} XP gain`, defaultValue:1.5},
+    { onclick:  addBomb, text:v=> "Bomb Ability", defaultValue:1},
+    { onclick: addTimeWarp, text:v=> "Speed Boost Ability"},
+    { onclick: AddPassiveHealing, text:v=> `+${v} Passive Healing`, defaultValue:1 },
+    { onclick: Gamble, text:v=> `Mystery Box`, defaultValue:1},
+    { onclick: AddProtectorBullet, text:v=> `+${v} Protectors`, defaultValue:2},
+    { onclick: TradeoffDeal, text:v=> `X${v} Damage but X${v} Damage Taken`, defaultValue:2},
+    { onclick: AddShield, text:v=> `Gain ${v}hp Shield`, defaultValue:50 },
+    { onclick: BulletDeleterAbility, text:v=> `Bullet Wipe Ability` },
+    { onclick: IncreaseProjectileSize, text:v=> `${v}X Projectile Size`, defaultValue:1.5},
+    { onclick: MakeIceBulletsPierce, text:v=> "Frost Bullets Pierce Through Enemies" },
+    { onclick: IncreaseFireDamage, text:v=> `+${v} Fire Damage`, defaultValue:0.25 },
+    { onclick: PassiveSpawns, text:v=> "Passively Spawn Souls" },
+    { onclick: IncreaseTornadoDamage, text:v=> `+${v} Tornado Damage`, defaultValue:1 },
+    { onclick: AddSpeed, text:v=> `Increase Movement Speed`, defaultValue:1.5},
+    { onclick: IncreaseSlowedDamage, text:v=> `Slowed Enemies Take ${v}X Damage`, defaultValue:1.5 },
+    { onclick: IncreaseBombDamage, text:v=> `+${v} Bomb Damage`, defaultValue:4 },
+    { onclick: IncreaseLaserDamage, text: v=>`+${v} Laser Damage`, defaultValue:0.5 },
+    { onclick: AddTimeStop, text:v=> "Speed Boost Ability -> Time Stop Ability" },
+    { onclick: AddBouncingProjectile, text: v=> `+${v} Bouncing Bullet`, defaultValue:1 },
+    { onclick: IncreaseProtectorDamage, text:v=> `+${v} Protector Damage`, defaultValue:1 },
+    { onclick: IncreaseBouncingBulletDamage, text:v=> `+${v} Bouncing Bullet Damage`, defaultValue:0.5 },
+    { onclick: AddStrengthPotions, text:v=> "Health potions sometimes become Strength potions", defaultValue:0.25},
+    { onclick: AddStrengthBuff, text:v=> "Every 15 Kills, Gain strength buff for 6 seconds" },
+    { onclick: AddSentryTower, text:v=> "New Build: Turret" },
+    { onclick: AddDamageAuraTower, text:v=> "New Build: Fire Tower"},
+    { onclick: AddHealAuraTower, text:v=> "New Build: Healing Station" },
+    { onclick: AddLaserTower, text:v=> "New Build: Laser Tower" },
+    { onclick: AddPassiveBolts, text:v=> `+${v} Passive Bolt Production`, defaultValue:1 },
+    { onclick: DoublePositiveEffects, text:v=> "2x Duration of Positive Effects" },
+    { onclick: AddRegeneration, text:v=> "When below 33% health, gain 5s regeneration (30s cooldown)" },
 
 ];
 let originalUpgrades=[];
@@ -87,16 +86,16 @@ for (let i = 0; i < boughtUpgrades.length; i++) {
     boughtUpgrades[i] = 0;
 }
 let TIER2UPGRADES = [
-    { onclick: (player) => increaseDamage(1, player), text: "+1 Damage" },
-    { onclick: (player) => increaseMaxHealth(20, player), text: "+20 Max Health" },
-    { onclick: (player) => increaseProjectiles(4, player), text: "+4 Projectiles" },
-    { onclick: (player) => HalveCollisionDamage(0.5, player), text: "Enemy Collisions Deal 0.5x Damage" },
-    { onclick: (player) => addSiphon(0.5, player), text: "+0.5 Lifesteal" },
-    { onclick: (player) => IncreaseHealthPotionDensity(0.5, player), text: "2x Health Potion Spawn Rate" },
-    { onclick: (player) => AddShockwave(player), text: "Shockwave Ability" },
-    { onclick: (player) => AddRebirth(1, player), text: "Rebirth On Death" },
-    { onclick: (player) => AddWindAttack(2, player), text: "+2 Tornado Projectiles" },
-    { onclick: (player) => AddNuke(player), text: "Bomb attack -> Nuke Attack" },
+    { onclick:  increaseDamage, text:v=> `+${v} Damage`, defaultValue:1 },
+    { onclick:  increaseMaxHealth, text:v=> `+${v} Max Health`, defaultValue:15 },
+    { onclick:  increaseProjectiles, text:v=> `+${v} Projectiles`, defaultValue:4 },
+    { onclick:  HalveCollisionDamage, text:v=> `Enemy Collisions Deal ${v}X Damage`, defaultValue:0.25 },
+    { onclick:  addSiphon, text: v=>`+${v} Lifesteal`, defaultValue:0.5 },
+    { onclick:  IncreaseHealthPotionDensity, text: v=>`${Math.round(1/v*100)/100}x Health Potion Spawn Rate`, defaultValue:0.5 },
+    { onclick:  AddShockwave, text: v=>`Shockwave Ability` },
+    { onclick:  AddRebirth, text:v=> "Rebirth On Death" },
+    { onclick:  AddWindAttack, text:v=> `+${v} Tornado Projectiles`, defaultValue:2},
+    { onclick:  AddNuke, text:v=> "Bomb attack -> Nuke Attack" },
 ]
 let ENEMYUPGRADES = [
     { onclick: "IncreaseEnemyHealth(1.5)", text: "Healthier Enemies" },
@@ -256,6 +255,9 @@ function SelectMode(mode) {
             case 6:
                 document.getElementById("gamemodeDescriptionText").innerText = "Waves consist of only bosses. If you don't kill them fast enough, the next wave will spawn."
                 break;
+            case 7:
+                document.getElementById("gamemodeDescriptionText").innerText = "All Enemy stats (e.g. health, attack speed) and upgrade values are randomized between x0.25 and x4 when possible."
+                break;
         }
         if (mode < 100) gamemodes[mode - 2].style.border = "5px solid red";
         document.getElementById("difficultyConfirmationButton").disabled = false;
@@ -355,9 +357,9 @@ function Start() {
         waveTimer: 2000,
         strengthPotionSpawnRate:0
     };
-    for(let i=0;i<UPGRADES.length;i++){
-        UPGRADES[i]={onclick:originalUpgrades[i].onclick, text:originalUpgrades[i].text};
-    }
+    // for(let i=0;i<UPGRADES.length;i++){
+    //     UPGRADES[i]={onclick:originalUpgrades[i].onclick, text:originalUpgrades[i].text};
+    // }
     healthPotionSpawnTimer = Math.random() * 600 + 700;
     xpBagTimer = Math.random() * 200 + 200;
     timeElapsed = 0;
@@ -405,13 +407,13 @@ function Start() {
 
     lastTime = Date.now();
     switch (chosenCharacter) {
-        case 1: player = new BasicPlayer(10); break;
-        case 2: player = new TankPlayer(35); break;
-        case 3: player = new HealerPlayer(12); break;
-        case 4: player = new MagePlayer(10, gameState.abilityIcons); break;
-        case 5: player = new NecromancerPlayer(10, gameState.abilityIcons); break;
+        case 1: player = new BasicPlayer(12); break;
+        case 2: player = new TankPlayer(42); break;
+        case 3: player = new HealerPlayer(15); break;
+        case 4: player = new MagePlayer(12, gameState.abilityIcons); break;
+        case 5: player = new NecromancerPlayer(12, gameState.abilityIcons); break;
         case 6: player = new PheonixPlayer(6); break;
-        case 7: player = new BuilderPlayer(8, gameState.abilityIcons); break;
+        case 7: player = new BuilderPlayer(9, gameState.abilityIcons); break;
     }
     if (difficulty == 1) {
         gameState.scaleMultiplier = 0.5;
@@ -480,6 +482,8 @@ function Start() {
             waveTimer = 3000;
             boughtUpgrades[7] = 1;
             break;
+        case 7:
+            mapType=1;
     }
     if (mapType == 1) {
         mapBorders.topBorder = 0;
@@ -817,4 +821,680 @@ if (typeof window !== "undefined") {
         if (JSON.parse(localStorage.getItem("ShowHealthbarSetting")) != null) showHealthBars = JSON.parse(localStorage.getItem("ShowHealthbarSetting"));
 
     });
+}
+
+
+
+function increaseDamage(amount, player){
+    console.log(amount);
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "stat", stat:"damage", amount:amount});
+        socket.emit("changeBoughtUpgrades", {index: 0, amount:0.5});
+    }
+    else{
+        player.damage += amount;
+        player.boughtUpgrades[0]+=0.5;
+    }
+    boughtTier2Upgrades[0]+=0.5;
+    if(amount==1){
+        boughtTier2Upgrades[0]=1;
+        player.boughtUpgrades[0]=1;
+    }
+    
+    ChangePage('gamePage', false)
+}
+
+function increaseMaxHealth(amount, player){
+    if(chosenCharacter!=6){
+        if(gamemode==100){
+            socket.emit("buyUpgrade", {type: "stat", stat:"health", amount:amount});
+            socket.emit("buyUpgrade", {type: "stat", stat:"maxHealth", amount:amount});
+            socket.emit("buyUpgrade", {type: "stat", stat:"originalMaxHealth", amount:amount});
+        }
+        else{
+            player.health += amount;
+            player.maxHealth += amount;
+            player.originalMaxHealth+=amount;
+        }
+    }
+    ChangePage('gamePage', false)
+}
+
+function increaseProjectiles(amount, player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "stat", stat:"projectiles", amount:amount});
+        socket.emit("changeBoughtUpgrades", {index: 2, amount:0.5});
+    }
+    else{
+        player.projectiles += amount;
+        player.boughtUpgrades[2]+=0.5;
+    }
+    boughtTier2Upgrades[2]+=0.5;
+    
+    if(amount==4){
+        boughtTier2Upgrades[2]=1;
+        player.boughtUpgrades[2]=1;
+    }
+    
+    ChangePage('gamePage', false)
+}
+
+function addFrostProjectiles(amount, player){
+    if(player.boughtUpgrades[3]==0){
+        if(gamemode==100){
+            socket.emit("changeBoughtUpgrades", {index: 3, amount:0.001});
+            socket.emit("changeBoughtUpgrades", {index: 22, amount:-1});
+        }
+        else{
+            player.boughtUpgrades[22]=0;
+            player.boughtUpgrades[3]=0.1;
+        }
+    }
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "stat", stat:"frostProjectiles", amount:amount});
+        socket.emit("buyUpgrade", {type: "changeStat", stat:"frostProjectileMaxCooldown", amount:0});
+    }
+    else{
+        player.frostProjectiles += amount;
+        player.frostProjectileMaxCooldown = 100 / player.frostProjectiles;
+    }
+    ChangePage('gamePage', false)
+}
+function addLaserProjectiles(amount, player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "object", stat:"laser", amount:amount});
+        socket.emit("changeBoughtUpgrades", {index: 4, amount:1});
+        socket.emit("changeBoughtUpgrades", {index: 24, amount:-1});
+
+    }
+    else{
+        gameState.bullets.push(new PlayerLaser(-Math.PI / 2, player.x, player.y, player))
+        player.boughtUpgrades[4] = 1;
+        player.boughtUpgrades[24]=0;
+    }
+    ChangePage('gamePage', false)
+}
+function speedUpAttacks(amount, player){
+    console.log(player);
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "changeStat", stat:"attackSpeed", amount:amount});
+        socket.emit("changeBoughtUpgrades", {index: 5, amount:0.25});
+    }
+    else{
+        player.attackSpeed /= amount;
+        player.attackSpeedMultiplier/=amount;
+        player.boughtUpgrades[5]+=0.25;
+    }
+    ChangePage('gamePage', false)
+}
+function addSiphon(amount, player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "stat", stat:"siphon", amount:amount});
+        socket.emit("changeBoughtUpgrades", {index: 6, amount:0.5});
+    }
+    else{
+        player.siphon += amount;
+        player.boughtUpgrades[6]+=0.5;
+        boughtTier2Upgrades[1]+=0.5;
+    }
+    if(amount==0.5){
+        boughtTier2Upgrades[1]=1;
+    }
+    ChangePage('gamePage', false)
+}
+function multiplyXPGain(amount, player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "changeStat", stat:"xpMultiplier", amount:amount});
+        socket.emit("changeBoughtUpgrades", {index: 7, amount:1});
+    }
+    else{
+        player.xpMultiplier *= amount;
+        player.boughtUpgrades[7] =1;
+    }
+    ChangePage('gamePage', false)
+}
+function addBomb(amount, player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "stat", stat:"bombCount", amount:amount});
+        socket.emit("buyUpgrade", {type: "object", stat:"bomb", amount:amount});
+        socket.emit("changeBoughtUpgrades", {index: 8, amount:1});
+        socket.emit("changeBoughtUpgrades", {index: 23, amount:-1});
+    }
+    else{
+        let temp = new BombIcon(50, player.abilities.length)
+        player.abilities.push(temp)
+        gameState.abilityIcons.push(temp);
+        player.boughtUpgrades[8] = 1;
+        player.boughtUpgrades[23]=0;
+    }
+    boughtTier2Upgrades[9]=0;
+    ChangePage('gamePage', false)
+}
+function addTimeWarp(amount, player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "object", stat:"timeWarp", amount:amount});
+        socket.emit("changeBoughtUpgrades", {index: 9, amount:1});
+        socket.emit("changeBoughtUpgrades", {index: 36, amount:-1});
+    }
+    else{
+        let temp = new TimeWarpIcon(50, player.abilities.length)
+        player.abilities.push(temp)
+        gameState.abilityIcons.push(temp);
+        player.boughtUpgrades[25] = 0;
+        player.boughtUpgrades[36] = 0;
+    }
+    player.boughtUpgrades[9] = 1;
+    ChangePage('gamePage', false)
+}
+function AddPassiveHealing(amount, player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "stat", stat:"passiveHealing", amount:amount});
+    }
+    else{
+        player.passiveHealing += amount;
+    }
+    ChangePage('gamePage', false)
+}
+function Gamble(numGambles, player) {
+    Gamble2();
+}
+function Gamble2(){
+    
+    gambleText = document.createElement("div");
+    gambleTimer = Math.floor(Math.random() * 240) + 300;
+    gambleText.innerHTML = `<div></div>`;
+    document.body.appendChild(gambleText);
+    textSpeed = 5;
+    
+    choice1.remove();
+    choice2.remove();
+    if(choice3) choice3.remove();
+
+    Roll();
+}
+function AddProtectorBullet(amount, player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "object", stat:"protectorBullet", amount:amount});
+        socket.emit("changeBoughtUpgrades", {index: 27, amount:-1});
+    }
+    else{
+        for(let i=0;i<amount;i++){
+            gameState.bullets.push(new ProtectorBullet(1, player, gameState.protectorBullets));
+
+        }
+        ProtectorBullet.Spacing(player, gameState.protectorBullets);
+    }
+    player.boughtUpgrades[27]=0;
+    ChangePage('gamePage', false)
+}
+function AddShield(health, player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "object", stat:"playerShield", amount:1});
+        socket.emit("changeBoughtUpgrades", {index: 14, amount:1});
+    }
+    else{
+        let temp=new PlayerShield(health, player);
+        gameState.bullets.push(temp);
+        
+    }
+    player.boughtUpgrades[14]=1;
+    ChangePage('gamePage', false)
+}
+function Roll(){
+    if (gambleTimer % textSpeed == 0 && gambleTimer > 50) {
+        let randomNum = Math.random() * 100;
+        let prevChoice = gambleChoice;
+        while (prevChoice == gambleChoice) {
+
+            if (randomNum < 15) {
+                gambleChoice = Math.floor(Math.random() * 2);
+            }
+            else if (randomNum < 47) {
+                gambleChoice = Math.floor(Math.random() * 2) + 2;
+            }
+            else if (randomNum < 74) {
+                gambleChoice = Math.floor(Math.random() * 4) + 4;
+            }
+            else if (randomNum < 88) {
+                gambleChoice = Math.floor(Math.random() * 2) + 8;
+            }
+            else if (randomNum < 95) {
+                gambleChoice = Math.floor(Math.random() * 2) + 10;
+            }
+            else {
+                gambleChoice = Math.floor(Math.random() * 2) + 12;
+            }
+        }
+
+        //console.log(gambleText);
+        switch (gambleChoice) {
+            case 0:
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:300px; z-index:3; color:red; font-size:75px; background-color:gray" id="upgrade">-3 health</div>`
+                break;
+            case 1:
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:300px; z-index:3; color:red; font-size:75px;background-color:gray;" id="upgrade">Decrease Speed</div>`
+                break;
+            case 2:
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:300px; z-index:3; color:black; font-size:75px;background-color:gray;" id="upgrade">Nothing</div>`
+                break;
+            case 3:
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:300px; z-index:3; color:black; font-size:75px;background-color:gray;" id="upgrade">Heal 10</div>`
+                break;
+            case 4:
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:300px; z-index:3; color:green; font-size:75px;background-color:gray;" id="upgrade">Increase Speed</div>`
+                break;
+            case 5:
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:300px; z-index:3; color:green; font-size:75px;background-color:gray;" id="upgrade">+0.5 Damage</div>`
+                break;
+            case 6:
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:300px; z-index:3; color:green; font-size:75px;background-color:gray;" id="upgrade">+2 Projectiles</div>`
+                break;
+            case 7:
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:300px; z-index:3; color:green; font-size:75px;background-color:gray;" id="upgrade">+0.25 Lifesteal</div>`
+                break;
+            case 8:
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:300px; z-index:3; color:blue; font-size:75px;background-color:gray;" id="upgrade">+4 Projectiles</div>`
+                break;
+            case 9:
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:300px; z-index:3; color:blue; font-size:75px;background-color:gray;" id="upgrade">+15 Max Health</div>`
+                break;
+            case 10:
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:300px; z-index:3; color:purple; font-size:75px;background-color:gray;" id="upgrade">+1 Damage</div>`
+                break;
+            case 11:
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:300px; z-index:3; color:purple; font-size:75px;background-color:gray;" id="upgrade">x2 XP Gain</div>`
+                break;
+            case 12:
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:300px; z-index:3; color:yellow; font-size:75px;background-color:gray;" id="upgrade">+1.5 Damage</div>`
+                break;
+            case 13:
+                gambleText.innerHTML = `<div style="position:absolute;left:${canvas.width / 2 }px; transform:translateX(-50%); top:300px; z-index:3; color:yellow; font-size:75px;background-color:gray; " id="upgrade">+30 Max Health</div>`
+                break;
+
+        }
+    }
+    if (gambleTimer == 400) {
+        textSpeed = 7;
+    }
+    if (gambleTimer == 300) {
+        textSpeed = 12;
+    }
+    if (gambleTimer == 200) {
+        textSpeed = 20;
+    }
+    if (gambleTimer == 150) {
+        textSpeed = 30;
+    }
+    if (gambleTimer == 120) {
+        textSpeed = 40;
+    }
+    if (gambleTimer > 0) {
+        gambleTimer--;
+        requestAnimationFrame(Roll);
+    }
+    else {
+        gambleText.remove();
+        switch (gambleChoice) {
+            case 0:
+                player.health -= 3;
+                //console.log(this.health);
+                if (player.health <= 0) {
+                    EndGame(false);
+                }
+                ChangePage('gamePage', false)
+                break;
+            case 1:
+                player.speed -= 1;
+                ChangePage('gamePage', false)
+                break;
+            case 2:
+                ChangePage('gamePage', false)
+                break;
+            case 3:
+                player.health = Math.min(player.health + 10, player.maxHealth);
+                ChangePage('gamePage', false)
+                break;
+            case 4:
+                player.speed += 2;
+                ChangePage('gamePage', false)
+                break;
+            case 5:
+                increaseDamage(0.5, player);
+                break;
+            case 6:
+                increaseProjectiles(2, player);
+                break;
+            case 7:
+                addSiphon(0.25, player);
+                break;
+            case 8:
+                increaseProjectiles(4, player);
+                break;
+            case 9:
+                increaseMaxHealth(15, player);
+                break;
+            case 10:
+                increaseDamage(1, player);
+                break;
+            case 11:
+                multiplyXPGain(2, player);
+                break;
+            case 12:
+                increaseDamage(1.5, player);
+                break;
+            case 13:
+                increaseMaxHealth(30, player);
+                break;
+        }
+    }
+}
+function TradeoffDeal(amount, player){
+    if(gamemode==100){
+        
+        socket.emit("buyUpgrade", {type: "changeStat", stat:"damageMultiplier", amount:amount});
+        socket.emit("buyUpgrade", {type: "changeStat", stat:"damageTakenMultiplier", amount:amount});
+        socket.emit("changeBoughtUpgrades", {index: 13, amount:1});
+    }
+    else{
+        player.damageMultiplier *= amount;
+        player.damageTakenMultiplier *= amount;
+    }
+    player.boughtUpgrades[13] = 1;
+    ChangePage('gamePage', false)
+}
+function BulletDeleterAbility(amount, player){
+    
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "object", stat:"bulletWipe", amount:amount});
+        socket.emit("changeBoughtUpgrades", {index: 15, amount:1});
+    }
+    else{
+        let temp = new BulletDeleterIcon(50, player.abilities.length)
+        player.abilities.push(temp)
+        gameState.abilityIcons.push(temp);
+    }
+    player.boughtUpgrades[15] = 1;
+    ChangePage('gamePage', false)
+}
+function IncreaseProjectileSize(amount, player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "changeStat", stat:"projectileSizeMultiplier", amount:amount});
+        socket.emit("changeBoughtUpgrades", {index: 16, amount:0.5});
+    }
+    else{
+        player.projectileSizeMultiplier *=amount;
+    }
+    player.boughtUpgrades[16]+=0.5;
+    ChangePage('gamePage', false)
+}
+function HalveCollisionDamage(amount, player){
+    player.collisionDamageMultiplier *=amount;
+    boughtTier2Upgrades[3]=1;
+    ChangePage('gamePage', false)
+}
+function IncreaseHealthPotionDensity(amount, player){
+    healthPotionSpawnMultiplier *=amount;
+    boughtTier2Upgrades[5]=1;
+    ChangePage('gamePage', false)
+}
+function MakeIceBulletsPierce(amount, player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "changeStat", stat:"iceBulletsPierce", amount:0});
+        socket.emit("changeBoughtUpgrades", {index: 17, amount:1});
+    }
+    else{
+        player.iceBulletsPierce=true;
+    }
+    player.boughtUpgrades[17]=1;
+    ChangePage('gamePage', false)
+}
+function IncreaseFireDamage(amount, player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "stat", stat:"fireDamage", amount:amount});
+        socket.emit("changeBoughtUpgrades", {index: 18, amount:0.5});
+    }
+    else{
+        player.fireDamage+=amount;
+    }
+    player.boughtUpgrades[18]+=0.5;
+    ChangePage('gamePage', false)
+}
+function PassiveSpawns(amount,player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "changeStat", stat:"passiveSpawning", amount:0});
+        socket.emit("changeBoughtUpgrades", {index: 19, amount:1});
+    }
+    else{
+        player.passiveSpawning=true;
+    }
+    player.boughtUpgrades[19]=1;
+    ChangePage('gamePage', false)
+}
+function AddShockwave(amount,player){
+    
+    let temp = new ShockwaveIcon(50, player.abilities.length)
+    player.abilities.push(temp)
+    gameState.abilityIcons.push(temp);
+    boughtTier2Upgrades[6] = 1;
+    ChangePage('gamePage', false)
+}
+function IncreaseTornadoDamage(amount, player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "stat", stat:"tornadoDamage", amount:amount});
+        socket.emit("changeBoughtUpgrades", {index: 20, amount:0.5});
+    }
+    else{
+        player.tornadoDamage+=amount;
+    }
+    player.boughtUpgrades[20]+=0.5;
+    ChangePage('gamePage', false)
+}
+function AddRebirth(amount, player){
+    player.rebirth+=1;
+    boughtTier2Upgrades[7]=1;
+    ChangePage('gamePage', false)
+}
+function AddWindAttack(amount, player){
+    if(chosenCharacter!=4)player.windProjectiles+=amount;
+    else player.projectiles+=amount;
+    ChangePage('gamePage', false)
+}
+function AddSpeed(amount, player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "stat", stat:"speed", amount:1});
+    }
+    else{
+        player.speed +=1;
+    }
+    ChangePage('gamePage', false)
+}
+function IncreaseSlowedDamage(amount, player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "changeStat", stat:"slowedDamageMultiplier", amount:amount});
+        socket.emit("changeBoughtUpgrades", {index: 22, amount:1});
+    }
+    else{
+        player.slowedDamageMultiplier=amount;
+    }
+    player.boughtUpgrades[22]=1;
+    ChangePage('gamePage', false)
+}
+function IncreaseBombDamage(amount, player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "stat", stat:"bombDamage", amount:amount});
+    }
+    else{
+        player.bombDamage+=amount;
+    }
+    
+    ChangePage('gamePage', false)
+}
+function IncreaseLaserDamage(amount, player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "stat", stat:"laserDamage", amount:amount});
+    }
+    else{
+        player.laserDamage+=amount;
+    }
+    ChangePage('gamePage', false)
+}
+function AddTimeStop(amount,player){
+    if(gamemode==100){
+        
+    }
+    else{
+        TimeWarpIcon.version=1;
+    }
+    player.boughtUpgrades[25] = 1;
+    ChangePage('gamePage', false)
+}
+function AddBouncingProjectile(amount, player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "stat", stat:"bouncingProjectiles", amount:amount});
+        socket.emit("buyUpgrade", {type: "changeStat", stat:"bouncingProjectileMaxCooldown", amount:amount});
+        socket.emit("changeBoughtUpgrades", {index: 28, amount:-1});
+    }
+    else{
+        player.bouncingProjectiles+=amount;
+        player.bouncingProjectileMaxCooldown = 240 / player.bouncingProjectiles;
+    }
+    player.boughtUpgrades[28]=0;
+    ChangePage('gamePage', false)
+}
+function IncreaseProtectorDamage(amount, player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "stat", stat:"protectorDamage", amount:amount});
+    }
+    else{
+        player.protectorDamage+=amount;
+    }
+    
+    ChangePage('gamePage', false)
+}
+function AddNuke(amount,player){
+    BombIcon.version=1;
+    boughtTier2Upgrades[9] = 1;
+    UPGRADES[23].text="+8 Bomb Damage";
+    ChangePage('gamePage', false)
+}
+function IncreaseBouncingBulletDamage(amount, player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "stat", stat:"bouncingBulletDamage", amount:amount});
+    }
+    else{
+        player.bouncingBulletDamage+=amount;
+    }
+    
+    ChangePage('gamePage', false)
+}
+function AddStrengthPotions(amount, player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "other", stat:"spawnStrengthPotions", amount:amount});
+        socket.emit("changeBoughtUpgrades", {index: 29, amount:1});
+        socket.emit("changeBoughtUpgrades", {index: 36, amount:-1});
+
+    }
+    else{
+        gameState.strengthPotionSpawnRate+=amount;
+        player.boughtUpgrades[36] = 0;
+    }
+    player.boughtUpgrades[29] = 1;
+    ChangePage('gamePage', false)
+}
+function AddStrengthBuff(amount, player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "stat", stat:"overheal", amount:1});
+        socket.emit("changeBoughtUpgrades", {index: 30, amount:1});
+        socket.emit("changeBoughtUpgrades", {index: 36, amount:-1});
+
+    }
+    else{
+        player.overheal+=1;
+        player.boughtUpgrades[36] = 0;
+    }
+    player.boughtUpgrades[30] = 1;
+    ChangePage('gamePage', false)
+}
+function AddSentryTower(amount,player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "object", stat:"sentryTower", amount:1});
+        socket.emit("changeBoughtUpgrades", {index: 31, amount:1});
+    }
+    else{
+        let temp = new BuildIcon(50, player.abilities.length, 7);
+        player.abilities.push(temp);
+        gameState.abilityIcons.push(temp);
+        player.boughtUpgrades[31] = 1;
+    }
+    ChangePage('gamePage', false)
+}
+function AddDamageAuraTower(amount,player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "object", stat:"damageAuraTower", amount:1});
+        socket.emit("changeBoughtUpgrades", {index: 32, amount:1});
+    }
+    else{
+        let temp = new BuildIcon(50, player.abilities.length, 8);
+        player.abilities.push(temp);
+        gameState.abilityIcons.push(temp);
+        player.boughtUpgrades[32] = 1;
+    }
+    ChangePage('gamePage', false)
+}
+function AddHealAuraTower(amount,player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "object", stat:"healAuraTower", amount:1});
+        socket.emit("changeBoughtUpgrades", {index: 33, amount:1});
+    }
+    else{
+        let temp = new BuildIcon(50, player.abilities.length, 9);
+        player.abilities.push(temp);
+        gameState.abilityIcons.push(temp);
+        player.boughtUpgrades[33] = 1;
+    }
+    ChangePage('gamePage', false)
+}
+function AddLaserTower(amount,player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "object", stat:"laserTower", amount:1});
+        socket.emit("changeBoughtUpgrades", {index: 34, amount:1});
+    }
+    else{
+        let temp = new BuildIcon(50, player.abilities.length, 10);
+        player.abilities.push(temp);
+        gameState.abilityIcons.push(temp);
+        player.boughtUpgrades[34] = 1;
+    }
+    ChangePage('gamePage', false)
+}
+function AddPassiveBolts(amount, player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "stat", stat:"passiveBoltProduction", amount:amount});
+    }
+    else{
+        player.passiveBoltProduction += amount;
+    }
+    ChangePage('gamePage', false)
+}
+function DoublePositiveEffects(amount,player){
+    if(gamemode==100){
+        
+        socket.emit("buyUpgrade", {type: "changeStat", stat:"doublePositiveEffects", amount:1});
+        socket.emit("changeBoughtUpgrades", {index: 36, amount:1});
+    }
+    else{
+        player.doublePositiveEffects=true;
+    }
+    player.boughtUpgrades[36] = 1;
+    ChangePage('gamePage', false)
+}
+function AddRegeneration(amount,player){
+    if(gamemode==100){
+        
+        socket.emit("changeBoughtUpgrades", {index: 37, amount:1});
+    }
+    else{
+    }
+    player.boughtUpgrades[37] = 1;
+    ChangePage('gamePage', false)
 }

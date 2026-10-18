@@ -74,19 +74,19 @@ function createGame(gameState, difficulty) {
 function addPlayer(gameState, socketId, chosenCharacter) {
     let player;
     switch (chosenCharacter) {
-        case 1: player = new BasicPlayer(10); break;
-        case 2: player = new TankPlayer(35); break;
-        case 3: player = new HealerPlayer(12); break;
+        case 1: player = new BasicPlayer(12); break;
+        case 2: player = new TankPlayer(42); break;
+        case 3: player = new HealerPlayer(15); break;
         case 4: 
-            player = new MagePlayer(10, gameState.abilityIcons); 
+            player = new MagePlayer(12, gameState.abilityIcons); 
             gameState.abilityIcons.push(player.abilities[0]);
             break;
         case 5: 
-            player = new NecromancerPlayer(10, gameState.abilityIcons); 
+            player = new NecromancerPlayer(12, gameState.abilityIcons); 
             gameState.abilityIcons.push(player.abilities[0]);
             break;
         case 6: player = new PheonixPlayer(6); break;
-        case 7: player = new BuilderPlayer(8, gameState.abilityIcons); break;
+        case 7: player = new BuilderPlayer(9, gameState.abilityIcons); break;
     }
 
     if (gameState.difficulty == 1) {
@@ -209,10 +209,7 @@ function MultiplayerGameLogic(gameState) {
                     gameState.timeElapsed = 0;
                     for(let id in gameState.deadPlayers){
                         players[id]=gameState.deadPlayers[id];
-                        players[id].dead=false;
-                        players[id].health=players[id].maxHealth/2;
-                        players[id].x=1000;
-                        players[id].y=550;
+                        players[id].reset();
                         delete gameState.deadPlayers[id];
                     }
                 }
@@ -357,13 +354,9 @@ function MultiplayerGameLogic(gameState) {
     if (gameState.timeElapsed > 2000 && gameState.isBossWave == false) {
         [gameState.isBossWave, gameState.bossesLeft, gameState.currentWave, gameState.SCALE] = ChangeWave(gameState);
         gameState.timeElapsed = 0;
-        console.log(gameState.deadPlayers)
         for(let id in gameState.deadPlayers){
             players[id]=gameState.deadPlayers[id];
-            players[id].dead=false;
-            players[id].health=players[id].maxHealth/2;
-            players[id].x=1000;
-            players[id].y=550;
+            players[id].reset();
             delete gameState.deadPlayers[id];
         }
     }

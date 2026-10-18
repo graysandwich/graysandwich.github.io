@@ -54,11 +54,11 @@
                 <div id="world" style="position: relative;left: 0;right: 0;">
                     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
                     <script src="shared/gameLogic.js" defer></script>
+                    <script src="upgrades.js" defer></script>
                     <script src="initialization.js" defer></script>
                     <script src="helpers.js" defer></script>
                     <script src="players.js" defer></script>
                     <script src="enemyBullets.js" defer></script>
-                    <script src="upgrades.js" defer></script>
                     <script src="enemyUpgrades.js" defer></script>
                     <script src="enemyGuide.js" defer></script>
                     <script src="settings.js" defer></script>
@@ -141,6 +141,7 @@
                 <button onclick="SelectMode(4)" style="text-align: center; font-size: 67px; position: absolute; top: 50%; left: 0px; height:20%; width: 100%; z-index: 1000; margin: 0px;" id="gamemodeSelectionButton">Last Stand</button>
                 <button onclick="SelectMode(5)" style="text-align: center; font-size: 67px; position: absolute; top: 75%; left: 0px; height:20%; width: 100%; z-index: 1000; margin: 0px;" id="gamemodeSelectionButton">Pick Your Poison</button>
                 <button onclick="SelectMode(6)" style="text-align: center; font-size: 67px; position: absolute; top: 100%; left: 0px; height:20%; width: 100%; z-index: 1000; margin: 0px;" id="gamemodeSelectionButton">Boss Rush</button>
+                <button onclick="SelectMode(7)" style="text-align: center; font-size: 67px; position: absolute; top: 125%; left: 0px; height:20%; width: 100%; z-index: 1000; margin: 0px;" id="gamemodeSelectionButton">Misprint Mode</button>
 
             </div>
             <button onclick="ChangePage('IntroPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 0%; left: 80%; width: 20%; z-index: 1000; margin: 0px;">Back</button>
@@ -154,11 +155,11 @@
             <button onclick="SelectCharacter(1)" style=" font-size:30px; position:absolute; top: 42%; left: 8%; width: 13%; height:28.8%; z-index: 1000;padding:0px" id="basicPlayer"><img src="images/player.webp" style="height:100%;width: 100%; "></img></button>
             <h1 style="position: absolute  ; text-align:center;top: 32%; left: 8%; width: 13%; height:28.8%; z-index: 1000;">Basic</h1>
             <button onclick="SelectCharacter(2)" style=" font-size:30px;position: absolute; top: 42%; left: 32%; width: 13%; height:28.8%; z-index: 1000;padding:0px" id="tankPlayer"><img src="images/tankPlayer.webp" style="height:100%;width: 100%; "id="tankPlayerImage"></img></button>
-            <h1 style="position: absolute  ; text-align:center;top: 42%; left: 32%; width: 13%; height:28.8%; z-index: 1000;"id="tankPlayerText">Tank</h1>
+            <h1 style="position: absolute  ; text-align:center;top: 32%; left: 32%; width: 13%; height:28.8%; z-index: 1000;"id="tankPlayerText">Tank</h1>
             <button onclick="SelectCharacter(3)" style=" font-size:30px;position: absolute; top: 42%; left: 56%; width: 13%; height:28.8%; z-index: 1000;padding:0px" id="healerPlayer"><img src="images/healerPlayer.webp" style="height:100%;width: 100%; "id="healerPlayerImage"></img></button>
-            <h1 style="position: absolute  ; text-align:center;top: 42%; left: 56%; width: 13%; height:28.8%; z-index: 1000;"id="healerPlayerText">Healer</h1>
+            <h1 style="position: absolute  ; text-align:center;top: 32%; left: 56%; width: 13%; height:28.8%; z-index: 1000;"id="healerPlayerText">Healer</h1>
             <button onclick="SelectCharacter(4)" style=" font-size:30px;position: absolute; top: 42%; left: 80%; width: 13%; height:28.8%; z-index: 1000;padding:0px" id="magePlayer"><img src="images/magePlayer.webp" style="height:100%;width: 100%; "id="magePlayerImage"></img></button>
-            <h1 style="position: absolute  ; text-align:center;top: 42%; left: 80%; width: 13%; height:28.8%; z-index: 1000;"id="magePlayerText">Mage</h1>
+            <h1 style="position: absolute  ; text-align:center;top: 32%; left: 80%; width: 13%; height:28.8%; z-index: 1000;"id="magePlayerText">Mage</h1>
             
             <h1 style="position: absolute  ; text-align:center;top: 70%; height:200px; z-index: 1000;"id="descriptionText"></h1>
             
@@ -320,6 +321,29 @@
             <button onclick="ChangePage('IntroPage', false)" style="position:absolute;text-align: center; font-size: 67px; top: 0px; left: 0; width: 100%; z-index: 1000; margin: 0;">Back</button>
 
             <div class="scrollable-box" style="position: absolute; top: 12%; left: 0px; width: 100%; height: 88%; z-index: 1000; margin: 0px;">
+            <h1>Update 4.5 - October 17, 2026</h1>
+            <ul>
+                
+                <li>Made multiplayer actually playable</li>
+                <b>Developer's Note:</b> as of this update we are 0/2 on trying to play multiplayer with my friends. surely it is actually fixed now.
+                <li>Fixed some UI bugs</li>
+                <li>Added 1 new gamemode: Misprint Mode</li>
+
+                <li>Balance Changes:</li>
+                <ul>
+                    <li>Roblox enemy now has a maximum amount of walls it can place (infinite -> 5)</li>
+                    <li>Increased health of Roblox enemy (12 -> 15)</li>
+                    <b>Developer's Note:</b> Roblox enemy used to be really easy to deal with in small numbers but run-ending when stacked up. This should make them a little more balanced.
+                    <li>Increased base health for all characters except Pheonix (Basic: 10 -> 12, Tank: 35 -> 42, Healer: 12 -> 15, Mage: 10 -> 12, Necromancer: 10 -> 12. Mechanic: 8 -> 9)</li>
+                    <li>Decreased health gain from "+10 max health" upgrade (10 -> 8).</li>
+                    <li>Decreased health gain from "+20 max health" upgrade (20 -> 15).</li>
+                    <li>Decreased health gain from max health upgrades from Mystery Box (20 -> 15, 40 -> 30).</li>
+                    <b>Developer's Note:</b> Currently the player dies way too easily without +10 max health, and if the upgrade gets obtained many times, the player is almost unkillable. This change nerfs the upgrade while giving the player similar levels of survivability.
+
+                    
+                </ul>
+
+            </ul>
             <h1>Update 4.4.1 - October 8, 2026</h1>
             <ul>
                 
