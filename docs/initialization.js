@@ -41,9 +41,9 @@ let UPGRADES = [
     { onclick:  increaseProjectiles, text: v =>`+${v} Projectiles`, defaultValue:2},
     { onclick:  addFrostProjectiles, text: v => `+${v} Frost Projectile`, defaultValue:1},
     { onclick:  addLaserProjectiles, text: v=> "Laser Attack", defaultValue:1},
-    { onclick:  speedUpAttacks, text:v=> `${v}X Faster Attack Speed`, defaultValue:1.2},
+    { onclick:  speedUpAttacks, text:v=> `${v}% Faster Attack Speed`, defaultValue:20},
     { onclick:  addSiphon,text:v=> `+${v} Lifesteal`, defaultValue:0.25},
-    { onclick:  multiplyXPGain, text:v=> `X${v} XP gain`, defaultValue:1.5},
+    { onclick:  multiplyXPGain, text:v=> `+${v}% XP Gain From All Sources`, defaultValue:50},
     { onclick:  addBomb, text:v=> "Bomb Ability", defaultValue:1},
     { onclick: addTimeWarp, text:v=> "Speed Boost Ability"},
     { onclick: AddPassiveHealing, text:v=> `+${v} Passive Healing`, defaultValue:1 },
@@ -915,7 +915,7 @@ function addLaserProjectiles(amount, player){
     ChangePage('gamePage', false)
 }
 function speedUpAttacks(amount, player){
-    console.log(player);
+    amount=1+amount/100;
     if(gamemode==100){
         socket.emit("buyUpgrade", {type: "changeStat", stat:"attackSpeed", amount:amount});
         socket.emit("changeBoughtUpgrades", {index: 5, amount:0.25});
@@ -943,6 +943,7 @@ function addSiphon(amount, player){
     ChangePage('gamePage', false)
 }
 function multiplyXPGain(amount, player){
+    amount=1+amount/100;
     if(gamemode==100){
         socket.emit("buyUpgrade", {type: "changeStat", stat:"xpMultiplier", amount:amount});
         socket.emit("changeBoughtUpgrades", {index: 7, amount:1});

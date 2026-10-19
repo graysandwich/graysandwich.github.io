@@ -1235,6 +1235,7 @@ class Player {
         }
         damage *= this.damageTakenMultiplier;
         if (bullet.id) damage *= this.collisionDamageMultiplier;
+        damage=Math.round(damage*100)/100;
         this.health -= damage;
 
         //console.log(this.health+" health");
@@ -2457,7 +2458,6 @@ class Enemy {
     takeDamage(bullet, owner, gameState) {
         if (this.dead) return;
         let damage = 0;
-
         damage = bullet.damage * owner.damageMultiplier;
         if(owner.statusEffects.weaken>0){
             damage/=2;
@@ -2467,7 +2467,7 @@ class Enemy {
         }
         if (this.slowCountdown > 0) damage *= owner.slowedDamageMultiplier
         if (damage == 0) return
-        damage=Math.round(damage);
+        damage=Math.round(damage*100)/100;
         this.health -= damage;
         //console.log(this.health);
 
@@ -2792,7 +2792,7 @@ class ZombieEnemy extends Enemy {
     }
     timer() {
         this.deathTimer--;
-        console.log(this.deathTimer+" "+this.health+" "+this.originalHealth);
+        // console.log(this.deathTimer+" "+this.health+" "+this.originalHealth);
         if (this.deathTimer == 0) {
             this.ignoreBullets = false;
             this.health = this.originalHealth;
@@ -4434,11 +4434,11 @@ class IceBoss extends Enemy {
         this.timer(enemyBullets, players);
         for (let id = 0; id < players.length; id++) {
             let player = players[id];
-            if (RectCircleColliding(this, player, this.frostAuraHeight, this.x, this.y)) {
+            if (RectCircleColliding(this, player, this.frostAuraHeight/2, this.x, this.y)) {
                 player.statusEffects.slow = 30;
             }
             for (let i = 0; i < bullets.length; i++) {
-                if (RectCircleColliding(this, bullets[i], this.frostAuraHeight, this.x, this.y)) {
+                if (RectCircleColliding(this, bullets[i], this.frostAuraHeight/2, this.x, this.y)) {
                     bullets[i].slowed = true;
                 }
                 else {
