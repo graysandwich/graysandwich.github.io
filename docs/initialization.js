@@ -78,7 +78,7 @@ let UPGRADES = [
 ];
 let originalUpgrades=[];
 for(let i=0;i<UPGRADES.length;i++){
-    originalUpgrades[i]={onclick:UPGRADES[i].onclick, text:UPGRADES[i].text};
+    originalUpgrades[i]={onclick:UPGRADES[i].onclick, text:UPGRADES[i].text, defaultValue:UPGRADES[i].defaultValue};
 }
 const NUMUPGRADES = UPGRADES.length;
 let boughtUpgrades = new Array(NUMUPGRADES);
@@ -108,7 +108,7 @@ let ENEMYUPGRADES = [
     { onclick: "IncreaseScale(2)", text: "Next Wave has 2x More Enemies" },
 ]
 const RESTRICTEDUPGRADES = [17, 18, 19, 20, 22, 23, 24, 25, 27, 28]
-const RESTRICTEDTIER2UPGRADES = [];
+const RESTRICTEDTIER2UPGRADES = [9];
 let timeWarpCounter = 0;
 let gambleTimer = 0;
 let gambleChoice = 0;
@@ -357,9 +357,9 @@ function Start() {
         waveTimer: 2000,
         strengthPotionSpawnRate:0
     };
-    // for(let i=0;i<UPGRADES.length;i++){
-    //     UPGRADES[i]={onclick:originalUpgrades[i].onclick, text:originalUpgrades[i].text};
-    // }
+    for(let i=0;i<UPGRADES.length;i++){
+        UPGRADES[i]={onclick:originalUpgrades[i].onclick, text:originalUpgrades[i].text, defaultValue:originalUpgrades[i].defaultValue};
+    }
     healthPotionSpawnTimer = Math.random() * 600 + 700;
     xpBagTimer = Math.random() * 200 + 200;
     timeElapsed = 0;

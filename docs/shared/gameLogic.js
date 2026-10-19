@@ -2467,6 +2467,7 @@ class Enemy {
         }
         if (this.slowCountdown > 0) damage *= owner.slowedDamageMultiplier
         if (damage == 0) return
+        damage=Math.round(damage);
         this.health -= damage;
         //console.log(this.health);
 
@@ -4433,11 +4434,11 @@ class IceBoss extends Enemy {
         this.timer(enemyBullets, players);
         for (let id = 0; id < players.length; id++) {
             let player = players[id];
-            if (RectCircleColliding(this, player, 375, this.x, this.y)) {
+            if (RectCircleColliding(this, player, this.frostAuraHeight, this.x, this.y)) {
                 player.statusEffects.slow = 30;
             }
             for (let i = 0; i < bullets.length; i++) {
-                if (RectCircleColliding(this, bullets[i], 375, this.x, this.y)) {
+                if (RectCircleColliding(this, bullets[i], this.frostAuraHeight, this.x, this.y)) {
                     bullets[i].slowed = true;
                 }
                 else {
@@ -6222,6 +6223,7 @@ class WeakenBoss extends Enemy {
             this.dashTime*=MisprintRandom();
             this.projectileCount*=MisprintRandom();
             this.dashSpeed*=MisprintRandom();
+            this.projectileCount=Math.round(this.projectileCount);
         }
         this.bossBar = new BossBar(bossBars, "The Flint");
         bossBars.push(this.bossBar);
