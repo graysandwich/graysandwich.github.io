@@ -256,7 +256,7 @@ function SelectMode(mode) {
                 document.getElementById("gamemodeDescriptionText").innerText = "Waves consist of only bosses. If you don't kill them fast enough, the next wave will spawn."
                 break;
             case 7:
-                document.getElementById("gamemodeDescriptionText").innerText = "All Enemy stats (e.g. health, attack speed) and upgrade values are randomized between x0.25 and x4 when possible."
+                document.getElementById("gamemodeDescriptionText").innerText = "All Enemy stats (e.g. health, attack speed) and upgrade values are randomized between x0.25 and x4 when possible (idea from Balatro Crypid mod)"
                 break;
         }
         if (mode < 100) gamemodes[mode - 2].style.border = "5px solid red";
@@ -1375,7 +1375,7 @@ function IncreaseProtectorDamage(amount, player){
 function AddNuke(amount,player){
     BombIcon.version=1;
     boughtTier2Upgrades[9] = 1;
-    UPGRADES[23].text="+8 Bomb Damage";
+    UPGRADES[23].text=v=> `+${v*2} Bomb Damage`;
     ChangePage('gamePage', false)
 }
 function IncreaseBouncingBulletDamage(amount, player){

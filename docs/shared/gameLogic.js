@@ -8235,7 +8235,6 @@ function InitializeStats() {
 
 }
 function ChangePage(id, reset, player) {
-    console.log(boughtTier2Upgrades);
     if (continueFlag) return;
     if (id == "upgradePage" && isLevelling) return;
     if ((gameOver && id == "upgradePage")) {
@@ -8360,7 +8359,7 @@ function ChangePage(id, reset, player) {
         else {
             pheonixPlayerButton.style.pointerEvents = "auto";
             pheonixPlayerImage.src = "images/pheonixPlayer.webp";
-            pheonixPlayerText.textContent = "Pheonix";
+            pheonixPlayerText.textContent = "Phoenix";
             pheonixPlayerText.style.fontSize = "30px";
             pheonixPlayerText.style.top = "225px";
         }
