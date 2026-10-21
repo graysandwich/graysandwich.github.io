@@ -256,7 +256,7 @@ function SelectMode(mode) {
                 document.getElementById("gamemodeDescriptionText").innerText = "Waves consist of only bosses. If you don't kill them fast enough, the next wave will spawn."
                 break;
             case 7:
-                document.getElementById("gamemodeDescriptionText").innerText = "All Enemy stats (e.g. health, attack speed) and upgrade values are randomized between x0.25 and x4 when possible (idea from Balatro Crypid mod)"
+                document.getElementById("gamemodeDescriptionText").innerText = "All Enemy stats (e.g. health, attack speed) and upgrade values are randomized between x0.25 and x4 when possible (idea from Balatro Cryptid mod)"
                 break;
         }
         if (mode < 100) gamemodes[mode - 2].style.border = "5px solid red";
