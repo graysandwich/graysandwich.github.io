@@ -221,6 +221,18 @@ function ShowEnemy(enemy){
             abilityText.innerText="Ability: Has a forcefield that protects enemies in range."
             descriptionText.innerText="Started questioning his life decisions after getting 500 credits from his last mythic Starr Drop (he already had all Brawlers unlocked).";
             break;
+        case 37:
+            sourceImage.src="images/alchemistEnemy.webp";
+            sourceText.innerText="Source: Alchemist monkey from BTD6"
+            abilityText.innerText="Ability: Alternates between throwing health potions and speed potions at other enemies. Potions will damage the player on contact."
+            descriptionText.innerText="Unfortunately, his 4-0-2 upgrade path was too busy being spammed in CHIMPS mode, so he's chosen as a replacement.";
+            break;
+        case 38:
+            sourceImage.src="images/calculusEnemy.webp";
+            sourceText.innerText="Source: The calculus equation dy/dx sin(2x) written in Latex"
+            abilityText.innerText="Ability: Shoots bullets that move in a sine wave and leave slowing puddles. Splits into 2 and cos(2x) on death"
+            descriptionText.innerText="Chainslop (noun): The use of Calculus problems involving the Chain rule. \"That test had so much chainslop in it!\"";
+            break;
         case 1000:
             sourceImage.src="images/farmerBossCow.webp";
             sourceText.innerText="Source: The profile picture of BenQ in Codeforces"
@@ -262,6 +274,18 @@ function ShowEnemy(enemy){
             sourceText.innerText="Source: Ice Monkey from BTD6"
             abilityText.innerText="Ability: Spawns from The Paragon boss. Slows the player if they enter its range."
             descriptionText.innerText="Is secretly best friends with Sentry tower. They're so in sync, they finish each others'";
+            break;
+        case 1008:
+            sourceImage.src="images/calculusEnemySmallClone.webp";
+            sourceText.innerText="Source: The number 2 written in Latex"
+            abilityText.innerText="Ability: Spawns from Calculus enemy. Shoots bullets at the player."
+            descriptionText.innerText="\"With respect to me, you're derivative!\" \*Proceeds to get tomatoes thrown at him\*";
+            break;
+        case 1009:
+            sourceImage.src="images/calculusEnemyBigClone.webp";
+            sourceText.innerText="Source: The equation cos(2x) written in Latex"
+            abilityText.innerText="Ability: Spawns from Calculus enemy. Shoots bullets that move in a cosine wave and leave slowing puddles."
+            descriptionText.innerText="Grows plants at home, specifically tomatoes. Has a steady supply of them that gets depleted every time he visits his younger brother.";
             break;
     }
 }

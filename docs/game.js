@@ -35,7 +35,6 @@ function GameLogic() {
 
 }
 function Draw() {
-
     ctx.save();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -46,11 +45,15 @@ function Draw() {
     cameraY = (canvas.height / 2) - player.y+player.height/2;
 
     ctx.translate(cameraX, cameraY);
-    if (player.statusEffects.speed > 0) {
+    if (player.statusEffects.timeStop > 0) {
         ctx.drawImage(timeWarpBackground, mapBorders.leftBorder-50, mapBorders.topBorder-50, mapBorders.rightBorder -mapBorders.leftBorder+ 100, mapBorders.bottomBorder-mapBorders.topBorder + 100);
     }
     else {
-        ctx.drawImage(backgroundImage, mapBorders.leftBorder-50, mapBorders.topBorder-50, mapBorders.rightBorder-mapBorders.leftBorder + 100, mapBorders.bottomBorder-mapBorders.topBorder + 100);
+        if(mapType==3){
+            ctx.fillStyle='white';
+            ctx.fillRect( mapBorders.leftBorder-50, mapBorders.topBorder-50, mapBorders.rightBorder-mapBorders.leftBorder + 100, mapBorders.bottomBorder-mapBorders.topBorder + 100)
+        }
+        else ctx.drawImage(backgroundImage, mapBorders.leftBorder-50, mapBorders.topBorder-50, mapBorders.rightBorder-mapBorders.leftBorder + 100, mapBorders.bottomBorder-mapBorders.topBorder + 100);
     }
 
 
@@ -58,7 +61,7 @@ function Draw() {
     for (let i = mapObjects.length - 1; i >= 0; i--) {
         switch(mapObjects[i].index){
             case 0:
-                drawWall(mapObjects[i]);
+                if(mapType!=3) drawWall(mapObjects[i]);
                 break;
             default:
                 mapObjects[i].draw();
@@ -66,6 +69,9 @@ function Draw() {
 
         }
 
+    }
+    for(let i=0;i<rpgStructures.length;i++){
+        rpgStructures[i].draw();
     }
     let collectables = gameState.collectables || [];
     for (let i = 0; i < collectables.length; i++) {
@@ -95,7 +101,6 @@ function Draw() {
 
         ctx.restore();
     }
-
 
     ctx.restore();
     let barSlot = 0;
@@ -224,7 +229,10 @@ function SpawnEnemies() {
             ENEMYTYPES[i].spawnCooldown--;
             if (ENEMYTYPES[i].spawnCooldown <= 0) {
                 ENEMYTYPES[i].spawnCooldown = Math.random() * ENEMYTYPES[i].randomTimer + ENEMYTYPES[i].baseTimer;
-                ENEMYTYPES[i].spawnCooldown /= 1 + gameState.timeElapsed * gameState.SCALE;
+                ENEMYTYPES[i].spawnCooldown /= 1 + Math.min(7200,gameState.timeElapsed) * gameState.SCALE;
+                if(gamemode==8){
+                    ENEMYTYPES[i].spawnCooldown*=1.5;
+                }
                 const newEnemy = new ENEMYTYPES[i](ENEMYTYPES[i].speed, ENEMYTYPES[i].health);
                 if (newEnemy.index == 6) {
                     const shield = new EnemyShield(0, 1000, newEnemy);
@@ -272,7 +280,7 @@ function Actions() {
             bullets.splice(i, 1);
         }
     }
-    if ((player.statusEffects.speed > 0 && TimeWarpIcon.version == 1)) {
+    if ((player.statusEffects.timeStop > 0 && TimeWarpIcon.version == 1)) {
         return;
     }
 
@@ -280,6 +288,10 @@ function Actions() {
         xpBagTimer = Math.random() * 200 + 200;
         xpBagTimer /= 1 + gameState.timeElapsed * 0.0003;
         const newCollectable = new XPBag(Math.random() * (2000 - 2000 / 10) + 2000 / 20, Math.random() * (1100 - 1100 / 10) + 1100 / 20);
+        if(gamemode==8){
+            newCollectable.x+=player.x;
+            newCollectable.y+=player.y;
+        }
         gameState.collectables.push(newCollectable);
         //console.log(newEnemy.health);
     }
@@ -288,6 +300,10 @@ function Actions() {
         healthPotionSpawnTimer /= 1 + gameState.timeElapsed * 0.0003;
         healthPotionSpawnTimer *= healthPotionSpawnMultiplier;
         const newCollectable = new HealthPotion(Math.random() * (2000 - 2000 / 10) + 2000 / 20, Math.random() * (1100 - 1100 / 10) + 1100 / 20, gameState);
+        if(gamemode==8){
+            newCollectable.x+=player.x;
+            newCollectable.y+=player.y;
+        }
         gameState.collectables.push(newCollectable);
         //console.log(newEnemy.health);
     }
@@ -295,6 +311,10 @@ function Actions() {
         gameState.boltSpawnTimer = Math.random() * 250 + 250;
         gameState.boltSpawnTimer /= 1 + gameState.timeElapsed * 0.0003;
         const newCollectable = new Bolt(Math.random() * (2000 - 2000 / 10) + 2000 / 20, Math.random() * (1100 - 1100 / 10) + 1100 / 20, gameState);
+        if(gamemode==8){
+            newCollectable.x+=player.x;
+            newCollectable.y+=player.y;
+        }
         gameState.collectables.push(newCollectable);
         //console.log(newEnemy.health);
     }
@@ -358,7 +378,7 @@ function Actions() {
         collectables[i].act([player], gameState.floatingObjects);
         if (collectables[i].dead) {
             if (collectables[i].index == 0) {
-                player.currentExp += collectables[i].size / 2 * (1 + player.level * player.level / 5 * 0.15)
+                player.currentExp += collectables[i].value* (1 + player.level * player.level / 5 * 0.15);
             }
             collectables.splice(i, 1);
         }
@@ -374,6 +394,10 @@ function Actions() {
     for (let i = playerAbilities.length - 1; i >= 0; i--) {
         playerAbilities[i].timer();
     }
+    for(let i=0;i<rpgStructures.length;i++){
+        rpgStructures[i].act();
+    }
+
     LavaTerrain.timer();
     isLevelling = false;
     if(upgradingEnemy && currentPage=="gamePage"){
@@ -427,7 +451,7 @@ function Actions() {
         }
         xpBagTimer--;
         healthPotionSpawnTimer--;
-        if (gameState.timeElapsed < 7200) {
+        if (gameState.timeElapsed < 7200 || gamemode==8) {
             gameState.timeElapsed++;
         }
         if (player.health <= 0) {
@@ -456,6 +480,12 @@ function Actions() {
     }
     if (gamemode == 0) {
         TutorialText.Update();
+    }
+    if(mapType==3){
+        mapBorders.topBorder = player.y-550;
+        mapBorders.leftBorder = player.x-1000;
+        mapBorders.rightBorder = player.x+1000;
+        mapBorders.bottomBorder = player.y+550;
     }
 }
 function drawBullets(bullets){
@@ -698,6 +728,18 @@ function drawEnemies(enemies){
                 ctx.strokeRect(enemies[i].x - enemies[i].width / 2, enemies[i].y - enemies[i].height / 2, enemies[i].width, enemies[i].height);
                 drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
                 break;
+            case 24:
+                ctx.save();
+                drawOutline(enemies[i]);
+                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
+                ctx.restore();
+                break;
+            case 25:
+                ctx.save();
+                drawOutline(enemies[i]);
+                drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
+                ctx.restore();
+                break;
             
             case 1000:
                 if (enemies[i].offsetX == 0) {
@@ -772,6 +814,50 @@ function drawEnemies(enemies){
                 drawEnemy(enemies[i], otherImages.forcefield, showHealthBars);
                 ctx.restore();
                 break;
+            case 1010:
+                ctx.save();
+                drawOutline(enemies[i]);
+                ctx.globalAlpha = 0.4;
+                ctx.drawImage(otherImages.frostAura, enemies[i].x - enemies[i].frostAuraWidth / 2, enemies[i].y - enemies[i].frostAuraHeight / 2, enemies[i].frostAuraWidth, enemies[i].frostAuraHeight);
+                ctx.restore();
+                drawEnemy(enemies[i], bossImages[1], showHealthBars);
+                break;
+            case 1011:
+                ctx.save();
+                drawOutline(enemies[i]);
+                ctx.filter="hue-rotate(120deg)";
+                drawEnemy(enemies[i], otherImages.spawner, showHealthBars);
+                ctx.restore();
+                ctx.save();
+                let enemy=enemies[i];
+                let x=enemy.x;
+                let y=enemy.y;
+                if (showHealthBars && enemy.hasHealthBar) {
+                    ctx.fillStyle = "red";
+                    ctx.fillRect(x - enemy.width / 2 - enemy.width / 4, y - enemy.height, enemy.width * 1.5, 15)
+                    ctx.fillStyle = "green";
+                    ctx.fillRect(x - enemy.width / 2 - enemy.width / 4, y - enemy.height, (enemy.width * 1.5) / enemy.maxHealth * enemy.health, 15)
+                }
+                ctx.restore();
+                break;
+            case 1012:
+                ctx.save();
+                drawOutline(enemies[i]);
+                drawEnemy(enemies[i], enemyImages[9], showHealthBars);
+                ctx.restore();
+                break;
+            case 1013:
+                ctx.save();
+                drawOutline(enemies[i]);
+                drawEnemy(enemies[i], otherImages.calculusEnemySmallClone, showHealthBars);
+                ctx.restore();
+                break;
+            case 1014:
+                ctx.save();
+                drawOutline(enemies[i]);
+                drawEnemy(enemies[i], otherImages.calculusEnemyBigClone, showHealthBars);
+                ctx.restore();
+                break;
             default:
                 drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
                 break;
@@ -781,18 +867,19 @@ function drawEnemies(enemies){
 function drawEnemyBullets(enemyBullets){
     for (let i = enemyBullets.length - 1; i >= 0; i--) {
         switch (enemyBullets[i].index) {
-            case 0:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 1:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 2:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
             case 3:
                 if (enemyBullets[i].explodeTimer > 0) {
-                    drawEnemy(enemyBullets[i], otherImages.poisonBombExploded);
+                    switch(enemyBullets[i].type){
+                        case 1:   
+                            drawEnemy(enemyBullets[i], otherImages.poisonBombExploded);
+                            break;
+                        case 2:
+                            drawEnemy(enemyBullets[i], enemyBulletImages[26]);
+                            break;
+                        case 3:
+                            drawEnemy(enemyBullets[i], enemyBulletImages[27]);
+                            break;
+                    }
                 }
                 else {
                     drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
@@ -804,50 +891,11 @@ function drawEnemyBullets(enemyBullets){
             case 5:
                 drawLaser(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
                 break;
-            case 6:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 7:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 8:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 9:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 10:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 11:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 12:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 13:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 14:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 15:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 16:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 17:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
             case 18:
                 ctx.save();
                 ctx.filter = "brightness(200%)";
                 drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
                 ctx.restore();
-                break;
-            case 19:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
                 break;
             case 20:
                 ctx.save();
@@ -860,19 +908,7 @@ function drawEnemyBullets(enemyBullets){
                 }
                 ctx.restore();
                 break;
-            case 21:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 22:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 23:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 24:
-                drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
-                break;
-            case 25:
+            default:
                 drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
                 break;
         }
@@ -891,6 +927,24 @@ function drawPlayerInfo(player){
         ctx.fillStyle = gradient;
         ctx.fill("evenodd");
         ctx.restore();
+    }
+    if(typeof window !=="undefined" && mapType==3){
+        
+        ctx.save();
+        ctx.font = "50px Black Ops One";
+        ctx.fillStyle = "black"
+        ctx.fillText("X:"+Math.floor((player.x-1000)/10)+" Y:"+Math.floor((550-player.y)/10), 250, 40);
+        ctx.restore();
+        if(gameState.timeElapsed>10800 && gameState.timeElapsed<10800+360){
+            ctx.save();
+            ctx.font = "45px Black Ops One";
+            ctx.fillStyle = "black"
+            ctx.textAlign = "center";
+            ctx.globalAlpha=Math.min(60,360+10800-gameState.timeElapsed)/60;
+            ctx.fillText("You are taking too long. Enemy health and speed will ",canvas.width/2, 550 );
+            ctx.fillText("start increasing until you defeat the boss.",canvas.width/2, 600 );
+            ctx.restore();
+        }
     }
     for (let i = player.abilities.length - 1; i >= 0; i--) {
         let ability = player.abilities[i];
@@ -938,6 +992,7 @@ function drawPlayerInfo(player){
 
 
     }
+    
     let currentX=45;
     let currentY=175;
     if(typeof window !== "undefined" && gamemode==5){
@@ -955,6 +1010,19 @@ function drawPlayerInfo(player){
             ctx.fillRect(currentX-35, currentY-35, 70, 70);
             ctx.drawImage(statusEffectImages[id], currentX - 35, currentY - 35, 70, 70);
             currentX+=80; 
+        }
+    }
+    currentX=45;
+    for(let id in player.RPGCollectables){
+        if(player.RPGCollectables[id]==true){   
+            ctx.fillStyle="#696969";
+            ctx.fillRect(currentX-35, currentY+50, 100, 100);
+            let temp=new Image();
+            temp.src=`images/${id}.webp`;
+            temp.height=100;
+            temp.width=100;
+            ctx.drawImage(temp, currentX - 35, currentY +50, 100, 100);
+            currentX+=110; 
         }
     }
 }
@@ -992,8 +1060,14 @@ function drawPlayers(players){
                 
                 ctx.globalAlpha = 0.5;
                 ctx.drawImage(bulletImages[2], player.x-2000, player.y-player.laserWidth/2, 4000, player.laserWidth);
-                ctx.drawImage(bulletImages[2], player.x-player.laserWidth/2, player.y-1500, player.laserWidth, 3000);
+                ctx.drawImage(bulletImages[2], player.x-player.laserWidth/2, player.y-2000, player.laserWidth, 4000);
                 drawPlayer(player, playerImages[player.index]);
+                ctx.restore();
+                break;
+            case 12:
+                ctx.save();
+                ctx.filter="invert(100%)";
+                drawPlayer(player, playerImages[player.ownerIndex]);
                 ctx.restore();
                 break;
             default:
@@ -1046,10 +1120,6 @@ async function EndGame(win) {
     if (document.getElementById("modifierText")) {
         document.getElementById("modifierText").remove();
     }
-    for (let i = 0; i < bossBars.length; i++) {
-        bossBars[i].image1.remove();
-        bossBars[i].image2.remove();
-    }
     for (let i = 0; i < playerAbilities.length; i++) {
         playerAbilities[i].indicator.text.remove();
         playerAbilities[i].image.remove();
@@ -1077,7 +1147,11 @@ async function newEnemyText() {
     let text = document.getElementById("introText");
     text.style.color = "white";
     text.style.backgroundColor = "black";
-    if (isPlayerUnlocked[0] == false) {
+    if(obtainingCollectable){
+        text.textContent="Item Acquired!";
+        
+    }
+    else if (isPlayerUnlocked[0] == false) {
         text.textContent = "New Enemy Discovered!";
     }
     else {
@@ -1093,10 +1167,52 @@ async function newEnemyText() {
     image.style.transform = "translate(-50%, -50%)";
     image.style.zIndex = 100;
     document.body.appendChild(image);
+
+    let description = document.createElement("div");
+    description.style.position = 'fixed';
+    description.style.fontSize="40px";
+    description.style.width="90%";
+    description.style.color = "black";
+    description.style.backgroundColor = "white";
+    if(obtainingCollectable){
+        description.style.border="5px solid black";
+        switch(newEnemyQueue[0]){
+            case "images/omenGlobe.webp":
+                description.textContent="Tier 2 Upgrades have a chance of appearing in level-up choices.";
+                image.style.width="39vmin";
+                image.style.height="52.5vmin";
+                image.style.top="45%"
+                break;
+            case "images/cloner.webp":
+                description.textContent="Every 20 damage taken, spawn a temporary invincible clone.";
+                image.style.width="36vmin";
+                image.style.height="48vmin";
+                image.style.top="45%"
+                break;
+            case "images/brewingStand.webp":
+                description.textContent="Speed, Strength, and Regeneration potions can spawn on the map.";
+                image.style.width="50vmin";
+                image.style.height="50vmin";
+                image.style.top="45%"
+                break;
+        }
+    }
+    description.style.fontFamily="Black Ops One";
+    description.style.left =  "50%";
+    description.style.top =  "80%";
+    description.style.transform = "translate(-50%, -50%)";
+    description.style.zIndex = 100;
+    document.body.appendChild(description);
+
     continueFlag = true;
     await delay(3000);
+    if(obtainingCollectable){
+        await delay(1000);
+        obtainingCollectable=false;
+    }
     continueFlag = false;
     image.remove();
+    description.remove();
     isPlayerUnlocked.splice(0, 1);
     if(gameState.currentWave!=12)ChangePage("gamePage", false);
     else EndGame(true);

@@ -25,7 +25,7 @@ let SCALE = 0.001;
 let continueFlag = false;
 let speedMultiplier = 0;
 let upgradingEnemy = false;
-let controls = { left: "a", up: "w", right: "d", down: "s", ability1: "q", ability2: "e", ability3: "r", ability4: "f", ability5: "t", levelUp: "N/A", skipWave: "N/A", dealDamage: "N/A" };
+let controls = { left: "a", up: "w", right: "d", down: "s", ability1: "q", ability2: "e", ability3: "r", ability4: "f", ability5: "t", levelUp: "N/A", skipWave: "N/A", dealDamage: "N/A", pause2:"P"};
 let controlBeingToggled = "";
 let enemyHealthMultiplier=1;
 let enemySpeedMultiplier=1;
@@ -46,7 +46,7 @@ let UPGRADES = [
     { onclick:  multiplyXPGain, text:v=> `+${v}% XP Gain From All Sources`, defaultValue:50},
     { onclick:  addBomb, text:v=> "Bomb Ability", defaultValue:1},
     { onclick: addTimeWarp, text:v=> "Speed Boost Ability"},
-    { onclick: AddPassiveHealing, text:v=> `+${v} Passive Healing`, defaultValue:1 },
+    { onclick: AddPassiveHealing, text:v=> `+${v} Passive Healing`, defaultValue:2 },
     { onclick: Gamble, text:v=> `Mystery Box`, defaultValue:1},
     { onclick: AddProtectorBullet, text:v=> `+${v} Protectors`, defaultValue:2},
     { onclick: TradeoffDeal, text:v=> `X${v} Damage but X${v} Damage Taken`, defaultValue:2},
@@ -74,8 +74,10 @@ let UPGRADES = [
     { onclick: AddPassiveBolts, text:v=> `+${v} Passive Bolt Production`, defaultValue:1 },
     { onclick: DoublePositiveEffects, text:v=> "2x Duration of Positive Effects" },
     { onclick: AddRegeneration, text:v=> "When below 33% health, gain 5s regeneration (30s cooldown)" },
+    //{ onclick: AddBlackHole, text:v=> "Vortex Ability" },
 
 ];
+let abilityUpgradeIndexes=[8,9,15,38];
 let originalUpgrades=[];
 for(let i=0;i<UPGRADES.length;i++){
     originalUpgrades[i]={onclick:UPGRADES[i].onclick, text:UPGRADES[i].text, defaultValue:UPGRADES[i].defaultValue};
@@ -90,13 +92,14 @@ let TIER2UPGRADES = [
     { onclick:  increaseMaxHealth, text:v=> `+${v} Max Health`, defaultValue:15 },
     { onclick:  increaseProjectiles, text:v=> `+${v} Projectiles`, defaultValue:4 },
     { onclick:  HalveCollisionDamage, text:v=> `Enemy Collisions Deal ${v}X Damage`, defaultValue:0.25 },
-    { onclick:  addSiphon, text: v=>`+${v} Lifesteal`, defaultValue:0.5 },
+    { onclick:  AddPassiveHealing, text: v=>`+${v} Passive Healing`, defaultValue:4 },
     { onclick:  IncreaseHealthPotionDensity, text: v=>`${Math.round(1/v*100)/100}x Health Potion Spawn Rate`, defaultValue:0.5 },
     { onclick:  AddShockwave, text: v=>`Shockwave Ability` },
     { onclick:  AddRebirth, text:v=> "Rebirth On Death" },
     { onclick:  AddWindAttack, text:v=> `+${v} Tornado Projectiles`, defaultValue:2},
     { onclick:  AddNuke, text:v=> "Bomb attack -> Nuke Attack" },
 ]
+let tier2AbilityIndexes=[7];
 let ENEMYUPGRADES = [
     { onclick: "IncreaseEnemyHealth(1.5)", text: "Healthier Enemies" },
     { onclick: "IncreaseEnemySpeed(1.5)", text: "Faster Enemies" },
@@ -137,9 +140,11 @@ let topBorder, bottomBorder, leftBorder, rightBorder, initialTopBorder, initialB
 let enableShrinking = false;
 let tiles = [];
 let visited = [];
+let rpgStructures=[];
 let gameState;
 let createdRoom = true;
 let roomCode = "";
+let obtainingCollectable=false;
 //higher number = higher difficulty
 function SetDifficulty(d) {
     difficulty = d;
@@ -257,6 +262,9 @@ function SelectMode(mode) {
                 break;
             case 7:
                 document.getElementById("gamemodeDescriptionText").innerText = "All Enemy stats (e.g. health, attack speed) and upgrade values are randomized between x0.25 and x4 when possible (idea from Balatro Cryptid mod)"
+                break;
+            case 8:
+                document.getElementById("gamemodeDescriptionText").innerText = "The border is removed. Enemies that spawn farther away from the center will have higher stats. Structures will also procedurally generate."
                 break;
         }
         if (mode < 100) gamemodes[mode - 2].style.border = "5px solid red";
@@ -443,7 +451,7 @@ function Start() {
                 new TutorialText(50);
             }
             else {
-                document.getElementById("tutorialText").textContent = "\(Fullscreen encouraged, press escape to go back\)"
+                document.getElementById("tutorialText").textContent = "\(Press escape to go back\)"
                 TutorialText.index = -1;
                 TutorialText.fadeTimer = 0;
                 TutorialText.timer = 0;
@@ -484,6 +492,14 @@ function Start() {
             break;
         case 7:
             mapType=1;
+            break;
+        case 8:
+            mapType=3;
+            SpawnStructures();
+            gameState.seenTier1Bosses.push(5);
+            player.boughtUpgrades[29]=1;
+            boughtTier2Upgrades[5]=1;
+            break;
     }
     if (mapType == 1) {
         mapBorders.topBorder = 0;
@@ -498,6 +514,12 @@ function Start() {
         mapBorders.bottomBorder = 1100 * 1.25;
         enableShrinking = true;
 
+    }
+    else if (mapType == 3) {
+        mapBorders.topBorder = 0;
+        mapBorders.leftBorder = 0;
+        mapBorders.rightBorder = 2000;
+        mapBorders.bottomBorder = 1100;
     }
     player.orignalMaxHealth = player.maxHealth
     if (gamemode == 3) {
@@ -520,10 +542,10 @@ function Start() {
         [gameState.isBossWave, gameState.bossesLeft, gameState.currentWave, gameState.SCALE] = ChangeWave(gameState);
     }
     else if (gamemode == 6) {
-        RandomizeEnemies(0, 0, 0, 1, 0, gameState);
+        RandomizeEnemies(0, 0, 0, 0, 1, 0, gameState);
     }
     else {
-        RandomizeEnemies(2, 0, 0, 0, 0, gameState);
+        RandomizeEnemies(2, 0, 0, 0, 0, 0, gameState);
     }
     //ctx.clearRect(0, 0, 2000, 1100);
     currentPage = "gamePage";
@@ -733,8 +755,45 @@ function CheckTile(x, y, counts, value) {
     }
     return counts;
 }
+function SpawnStructures(){
+    //Each "chunk" is 500x500 area
+    rpgStructures=[];
+    for(let i=-50;i<50;i++){
+        for(let j=-50;j<50;j++){
+            if(i>=-2 && i<=2 && j>=-2 && j<=2 )continue;
+            if(Math.random()<0.03){
+                rpgStructures.push(new Lake(i*500+Math.floor(Math.random()*10)*50,j*500+Math.floor(Math.random()*10)*50,Math.floor(Math.random()*10+5), Math.floor(Math.random()*10+5)));
+            }
+            if(Math.random()<0.03){
+                rpgStructures.push(new Dungeon(i*500+Math.floor(Math.random()*10)*50,j*500+Math.floor(Math.random()*10)*50,5, 5));
+            }
+            if(Math.random()<0.03){
+                rpgStructures.push(new DigSite(i*500+Math.floor(Math.random()*10)*50,j*500+Math.floor(Math.random()*10)*50,5, 5,20));
+            }
+            if(Math.random()<0.01){
+                rpgStructures.push(new HealingSpring(i*500+Math.floor(Math.random()*10)*50,j*500+Math.floor(Math.random()*10)*50,Math.floor(Math.random()*10+5), Math.floor(Math.random()*10+5)));
+            }
+            if(i>=-6 && i<=6 && j>=-6 && j<=6 )continue;
+            if(Math.random()<0.015){
+                rpgStructures.push(new IceStructure(i*500+Math.floor(Math.random()*10)*50,j*500+Math.floor(Math.random()*10)*50,5, 5));
+            }
+            if(Math.random()<0.015){
+                rpgStructures.push(new SpawnerStructure(i*500+Math.floor(Math.random()*10)*50,j*500+Math.floor(Math.random()*10)*50,10, 10));
+            }
+            if(Math.random()<0.015){
+                rpgStructures.push(new PoisonStructure(i*500+Math.floor(Math.random()*10)*50,j*500+Math.floor(Math.random()*10)*50,10, 10));
+            }
+        }
+    }
+
+
+
+}
 if (typeof window !== "undefined") {
     window.addEventListener("beforeunload", (e) => {
+        localStorage.setItem("currentGamestate", JSON.stringify(gameState));
+        localStorage.setItem("currentPlayer", JSON.stringify(player));
+        
         localStorage.setItem("leftControl", controls["left"]);
         localStorage.setItem("rightControl", controls["right"]);
         localStorage.setItem("upControl", controls["up"]);
@@ -744,6 +803,7 @@ if (typeof window !== "undefined") {
         localStorage.setItem("ability3Control", controls["ability3"]);
         localStorage.setItem("ability4Control", controls["ability4"]);
         localStorage.setItem("ability5Control", controls["ability5"]);
+        localStorage.setItem("pause2Control", controls["pause2"]);
         localStorage.setItem("levelUpControl", controls["levelUp"]);
         localStorage.setItem("skipWaveControl", controls["skipWave"]);
         localStorage.setItem("dealDamageControl", controls["dealDamage"]);
@@ -785,6 +845,7 @@ if (typeof window !== "undefined") {
         if (localStorage.getItem("ability3Control") != null) controls["ability3"] = localStorage.getItem("ability3Control");
         if (localStorage.getItem("ability4Control") != null) controls["ability4"] = localStorage.getItem("ability4Control");
         if (localStorage.getItem("ability5Control") != null) controls["ability5"] = localStorage.getItem("ability5Control");
+        if (localStorage.getItem("pause2Control") != null) controls["pause2"] = localStorage.getItem("pause2Control");
         if (localStorage.getItem("levelUpControl") != null) controls["levelUp"] = localStorage.getItem("levelUpControl");
         if (localStorage.getItem("skipWaveControl") != null) controls["skipWave"] = localStorage.getItem("skipWaveControl");
         if (localStorage.getItem("dealDamageControl") != null) controls["dealDamage"] = localStorage.getItem("dealDamageControl");
@@ -1497,5 +1558,18 @@ function AddRegeneration(amount,player){
     else{
     }
     player.boughtUpgrades[37] = 1;
+    ChangePage('gamePage', false)
+}
+function AddBlackHole(amount, player){
+    if(gamemode==100){
+        socket.emit("buyUpgrade", {type: "object", stat:"blackHole", amount:amount});
+        socket.emit("changeBoughtUpgrades", {index: 8, amount:1});
+    }
+    else{
+        let temp = new BlackHoleIcon(50, player.abilities.length)
+        player.abilities.push(temp)
+        gameState.abilityIcons.push(temp);
+        player.boughtUpgrades[38] = 1;
+    }
     ChangePage('gamePage', false)
 }

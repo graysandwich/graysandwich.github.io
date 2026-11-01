@@ -68,7 +68,7 @@ function createGame(gameState, difficulty) {
         new Wall(2025, -25, 30, 1170)
     ];
     InitializeStats();
-    RandomizeEnemies(2, 0, 0, 0, 0, gameState.enemies, gameState.bossBars, gameState.bossMultiplier);
+    RandomizeEnemies(2, 0, 0, 0, 0, 0, gameState.enemies, gameState.bossBars, gameState.bossMultiplier);
 }
 
 function addPlayer(gameState, socketId, chosenCharacter) {
@@ -330,7 +330,7 @@ function MultiplayerGameLogic(gameState) {
         collectables[i].act(playerList, gameState.floatingObjects);
         if (collectables[i].dead) {
             if (collectables[i].index == 0) {
-                gameState.sharedXP += collectables[i].size / 2 * (1 + gameState.playerLevel * gameState.playerLevel / 5 * 0.15)
+                gameState.sharedXP += collectables[i].value* (1 + gameState.playerLevel * gameState.playerLevel / 5 * 0.15);
             }
             collectables.splice(i, 1);
         }

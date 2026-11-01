@@ -83,6 +83,10 @@ const enemyBulletPaths = [
     "images/weakenBullet.webp",
     "images/blindnessBullet.webp",
     "images/shadowBossBullet.webp",
+    "images/healCloud.webp",
+    "images/speedCloud.webp",
+    "images/calculusBullet.webp",
+    "images/blue.webp",
 ];
 let enemyBulletImages = enemyBulletPaths.map(src => {
     let img = new Image();
@@ -94,6 +98,9 @@ const collectablePaths = [
     "images/xpBag.webp",
     "images/healthPotion.webp",
     "images/bolt.webp",
+    "images/omenGlobe.webp",
+    "images/cloner.webp",
+    "images/brewingStand.webp",
 ];
 let collectableImages = collectablePaths.map(src => {
     let img = new Image();
@@ -136,6 +143,11 @@ const otherImagePaths = {
     strengthPotion:"images/strengthPotion.webp",
     forcefield: "images/black.webp",
     redCircle:"images/redCircle.webp",
+    openWorldBackground:"images/openWorldBackground.webp",
+    regenerationPotion:"images/regenerationPotion.webp",
+    speedPotion:"images/speedPotion.webp",
+    calculusEnemySmallClone:"images/calculusEnemySmallClone.webp",
+    calculusEnemyBigClone:"images/calculusEnemyBigClone.webp",
 };
 let drawLoopRunning=false;
 let otherImages = Object.fromEntries(
@@ -153,6 +165,7 @@ const statusEffectPaths = {
     speed: "images/speed.webp",
     blindness: "images/blindness.webp",
     regeneration: "images/regeneration.webp",
+    timeStop: "images/timeStopIcon.webp",
 };
 
 let statusEffectImages = Object.fromEntries(

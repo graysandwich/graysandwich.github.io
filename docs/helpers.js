@@ -94,12 +94,8 @@ async function EndTutorial(){
     if(document.getElementById("waveText")){
         document.getElementById("waveText").remove()
     }
-    document.getElementById("tutorialText").innerText="";
+    if(document.getElementById("tutorialText"))document.getElementById("tutorialText").innerText="";
 
-    for(let i=0;i<bossBars.length;i++){
-        bossBars[i].image1.remove();
-        bossBars[i].image2.remove();
-    }
     for(let i=0;i<playerAbilities.length;i++){
         playerAbilities[i].indicator.text.remove();
         playerAbilities[i].image.remove();
@@ -107,11 +103,6 @@ async function EndTutorial(){
             playerAbilities[i].counterText.text.remove();    
         }
     }
-    if(shieldBar){
-        shieldBar.image1.remove();
-        shieldBar.image2.remove();
-    }
-
     
     chosenCharacter=0;
     let descriptionText=document.getElementById("descriptionText");
@@ -123,7 +114,7 @@ async function EndTutorial(){
     }
     document.getElementById("startButton").disabled = true; 
 
-    ChangePage("IntroPage", false);
+    ChangePage("IntroPage", true);
 }
 
 document.addEventListener("keyup", (e)=>{
@@ -158,6 +149,9 @@ document.addEventListener("keyup", (e)=>{
         if(key==controls["ability5"] && player.abilities.length>4){
             player.inputs.ability5=false;
         }
+        if(currentPage!="upgradePage" && (key=="escape" || key==controls.pause2)){
+            ChangePage("pausePage",false);
+        }
     }
         
 })
@@ -166,6 +160,17 @@ window.addEventListener("resize", () => {
     canvas.style.width = `${1536 * scale}px`;
     canvas.style.height = `${695 * scale}px`;
 });
+function SaveAndExit(){
+    // localStorage.setItem("currentGamestate", JSON.stringify(gameState));
+    // localStorage.setItem("currentPlayer", JSON.stringify(player));
+    EndTutorial();
+}
+
+
 function MisprintRandom(){
     return Math.pow(Math.random(),4)*3.75+0.25;
+}
+function RPGScaling(){
+    let value=Math.sqrt(Math.abs((player.x-1000)*(player.x-1000))+Math.abs((player.y-550)*(player.y-550)))/6500+1;
+    return value;
 }
