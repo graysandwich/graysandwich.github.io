@@ -48,6 +48,7 @@ const bulletPaths = [
     "images/shockwave.webp",
     "images/bullet.webp",
     "images/playerNuke.webp",
+    "images/vortex.webp",
 ];
 let bulletImages = bulletPaths.map(src => {
     let img = new Image();
@@ -87,6 +88,8 @@ const enemyBulletPaths = [
     "images/speedCloud.webp",
     "images/calculusBullet.webp",
     "images/blue.webp",
+    "images/playerBombExploded.webp",
+    "images/questionMark.webp",
 ];
 let enemyBulletImages = enemyBulletPaths.map(src => {
     let img = new Image();
@@ -148,6 +151,7 @@ const otherImagePaths = {
     speedPotion:"images/speedPotion.webp",
     calculusEnemySmallClone:"images/calculusEnemySmallClone.webp",
     calculusEnemyBigClone:"images/calculusEnemyBigClone.webp",
+    enemyPortal:"images/enemyPortal.webp",
 };
 let drawLoopRunning=false;
 let otherImages = Object.fromEntries(
@@ -177,7 +181,7 @@ let statusEffectImages = Object.fromEntries(
 );
 
 const abilityIconPaths = [
-    "images/bomb.webp", "images/green.webp", "images/blue.webp", "images/playerFire.webp", "images/necromancerPlayer.webp", "images/red.webp","images/dummyPlayer.webp","images/sentryTower.webp","images/damageAuraTower.webp","images/healingStation.webp","images/laserTower.webp"
+    "images/bomb.webp", "images/green.webp", "images/blue.webp", "images/playerFire.webp", "images/necromancerPlayer.webp", "images/red.webp","images/dummyPlayer.webp","images/sentryTower.webp","images/damageAuraTower.webp","images/healingStation.webp","images/laserTower.webp", "images/vortex.webp",
 ];
 let abilityIconImages = abilityIconPaths.map(src => {
     let img = new Image();
@@ -206,7 +210,7 @@ let bossImages = bossPaths.map(src => {
     return img;
 });
 const playerPaths = [
-    "images/player.webp", "images/tankPlayer.webp", "images/healerPlayer.webp", "images/magePlayer.webp", "images/necromancerPlayer.webp", "images/pheonixPlayer.webp", "images/builderPlayer.webp","images/dummyPlayer.webp","images/sentryTower.webp","images/damageAuraTower.webp","images/healingStation.webp","images/laserTower.webp"
+    "images/player.webp", "images/tankPlayer.webp", "images/healerPlayer.webp", "images/magePlayer.webp", "images/necromancerPlayer.webp", "images/pheonixPlayer.webp", "images/builderPlayer.webp","images/dummyPlayer.webp","images/sentryTower.webp","images/damageAuraTower.webp","images/healingStation.webp","images/laserTower.webp", "filler", "images/shapeshifterPlayer.webp"
 ];
 let playerImages = playerPaths.map(src => {
     let img = new Image();

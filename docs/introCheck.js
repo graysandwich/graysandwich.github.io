@@ -337,7 +337,7 @@
 //     ChangePage("gamePage",true,67);
 //     ChangePage("pausePage",false);
 // }
-let openingMessages=["I promise if you ignore the graphics this game is actually fun", "If the word larp means what I think it does then I'm larping as a gamedev", "This game reached update 2.2 in 3 weeks, just saying", "If you're seeing this and don't study at [REDACTED], literally how did you get here", "Running out of ideas since update 3.2!", "Credit goes to literally the entire internet for my art assets", "Infinity War was the most ambitious crossove-", "Nothing is more permanent than a temporary solution"];
+let openingMessages=["I promise if you ignore the graphics this game is actually fun", "If the word larp means what I think it does then I'm larping as a gamedev", "This game reached update 2.2 in 3 weeks, just saying", "If you're seeing this and don't study at [REDACTED], how did you get here", "Running out of ideas since update 3.2!", "Credit goes to literally the entire internet for my art assets", "Infinity War was the most ambitious crossove-", "Nothing is more permanent than a temporary solution", "Co-op mode never existed. It was merely a figment of your imagination."];
 if(localStorage.getItem("BasicEnemyFound")!="true"){
     document.getElementById("splashText").innerText=openingMessages[0];
 }

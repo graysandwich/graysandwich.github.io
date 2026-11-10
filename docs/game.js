@@ -1,5 +1,4 @@
 
-
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
@@ -63,6 +62,8 @@ function Draw() {
             case 0:
                 if(mapType!=3) drawWall(mapObjects[i]);
                 break;
+            case 1000:
+                ctx.fillRect(mapObjects[i].x-25,mapObjects[i].y-25,50,50);
             default:
                 mapObjects[i].draw();
                 break;
@@ -146,7 +147,8 @@ function Draw() {
 
     healthBarDesiredLength = (player.health / player.maxHealth) * 400
     if (healthBarDesiredLength < healthBarCurrentLength) {
-        healthBarCurrentLength -= 8;
+        if(!gameOver)healthBarCurrentLength -= 8;
+        else healthBarCurrentLength-=3;
         if (healthBarCurrentLength < healthBarDesiredLength) {
             healthBarCurrentLength = healthBarDesiredLength;
         }
@@ -223,6 +225,13 @@ function SpawnEnemies() {
     if (gamemode == 0 && gameState.currentWave == 1 && gameState.timeElapsed <= 840) {
         return;
     }
+    let count=0;
+    for(let i=0;i<gameState.enemies.length;i++){
+        if(gameState.enemies[i].naturallyGenerating==true){
+            count++;
+        }
+    }
+    if(count>=50)return;
     for (let i = 0; i < ENEMYTYPES.length; i++) {
         //console.log(ENEMYTYPES[i].isActive+" "+ENEMYTYPES[i].spawnCooldown)
         if (ENEMYTYPES[i].isActive) {
@@ -234,6 +243,7 @@ function SpawnEnemies() {
                     ENEMYTYPES[i].spawnCooldown*=1.5;
                 }
                 const newEnemy = new ENEMYTYPES[i](ENEMYTYPES[i].speed, ENEMYTYPES[i].health);
+                newEnemy.naturallyGenerating=true;
                 if (newEnemy.index == 6) {
                     const shield = new EnemyShield(0, 1000, newEnemy);
                     gameState.enemies.push(shield);
@@ -270,12 +280,13 @@ function Actions() {
         if(gameState.players[i].health<=0){
             gameState.players.splice(i,1);
         }
-        else gameState.players[i].act(0,0,0,gameState);
+        else gameState.players[i].act(gameState.enemies,gameState.bullets,0,gameState);
     }
     SpawnEnemies();
     let bullets = gameState.bullets;
     for (let i = bullets.length - 1; i >= 0; i--) {
-        bullets[i].move(gameState.enemies, gameState);
+        bullets[i].move(gameState.enemies, gameState, [...[player], ...[gameState.players]]);
+        bullets[i].special(gameState.enemies, gameState.bullets, gameState.players);
         if (bullets[i].dead) {
             bullets.splice(i, 1);
         }
@@ -319,7 +330,10 @@ function Actions() {
         //console.log(newEnemy.health);
     }
     for (let i = gameState.mapObjects.length - 1; i >= 0; i--) {
-        gameState.mapObjects[i].act();
+        gameState.mapObjects[i].act(gameState, [...[player],...gameState.players]);
+        if (gameState.mapObjects[i].dead) {
+            gameState.mapObjects.splice(i, 1);
+        }
     }
     let enemies = gameState.enemies;
     for (let i = enemies.length - 1; i >= 0; i--) {
@@ -360,14 +374,14 @@ function Actions() {
         else {
             //console.log(enemies[i]);
             enemies[i].special(gameState.enemyBullets, [...[player], ...gameState.players], gameState.enemies, gameState.bullets, gameState.floatingObjects);
-            enemies[i].move([...[player], ...gameState.players], gameState.floatingObjects, gameState.enemies);
+            enemies[i].move([...[player], ...gameState.players], gameState, gameState.enemies);
 
         }
     }
     let enemyBullets = gameState.enemyBullets;
     for (let i = enemyBullets.length - 1; i >= 0; i--) {
-        enemyBullets[i].move([...[player], ...gameState.players], gameState.floatingObjects, gameState.enemies);
-        enemyBullets[i].special([...[player], ...gameState.players], gameState.enemyBullets)
+        enemyBullets[i].move([...[player], ...gameState.players], gameState, gameState.enemies);
+        enemyBullets[i].special([...[player], ...gameState.players], gameState.enemyBullets, gameState.enemies)
         if (enemyBullets[i].dead) {
             enemyBullets.splice(i, 1);
         }
@@ -490,69 +504,112 @@ function Actions() {
 }
 function drawBullets(bullets){
     for (let i = 0; i < bullets.length; i++) {
-        switch (bullets[i].index) {
-            case 0:
-                drawBullet(bullets[i], bulletImages[bullets[i].index]);
-                break;
-            case 1:
-                drawBullet(bullets[i], bulletImages[bullets[i].index]);
-                break;
-            case 2:
-                drawPlayerLaser(bullets[i], bulletImages[bullets[i].index]);
-                break;
-            case 3:
-                if (bullets[i].shootTimer > 0) {
-                    drawBullet(bullets[i], bulletImages[bullets[i].index]);
-                }
-                else {
-                    drawBullet(bullets[i], otherImages.playerBombExploded);
-                }
-                break;
-            case 4:
-                drawBullet(bullets[i], bulletImages[bullets[i].index]);
-                break;
-            case 5:
-                drawBullet(bullets[i], bulletImages[bullets[i].index]);
-                break;
-            case 6:
-                drawBullet(bullets[i], bulletImages[bullets[i].index]);
-                break;
-            case 7:
-                drawBullet(bullets[i], bulletImages[bullets[i].index]);
-                break;
-            case 8:
-                drawBullet(bullets[i], bulletImages[bullets[i].index]);
-                break;
-            case 9:
-                drawBullet(bullets[i], bulletImages[bullets[i].index]);
-                break;
-            case 10:
-                drawBullet(bullets[i], bulletImages[bullets[i].index]);
-                break;
-            case 11:
+        if(typeof window !=="undefined" && bullets[i].isFriendly!=true){
+            let object=bullets[i];
+            if(bullets[i].index!=5){
                 ctx.save();
-                ctx.filter = "brightness(500%)"
-                drawBullet(bullets[i], bulletImages[bullets[i].index]);
+                ctx.lineWidth = 10;
+                ctx.strokeStyle = "green";
+                ctx.strokeRect(object.x - object.width / 2, object.y - object.height / 2, object.width, object.height);
                 ctx.restore();
-                break;
-            case 12:
-                console.log(bullets[i])
-                drawBullet(bullets[i], bulletImages[bullets[i].index]);
-                break;
-            case 13:
-                ctx.save();
-                ctx.filter = "grayscale(100%)";
-                drawBullet(bullets[i], enemyImages[bullets[i].imageIndex]);
-                ctx.restore();
-                break;
-            case 14:
-                if (bullets[i].shootTimer > 0) {
+            }
+            switch(bullets[i].index){
+                case 3:
+                    if (bullets[i].explodeTimer > 0) {
+                        switch(bullets[i].type){
+                            case 1:   
+                                drawEnemy(bullets[i], otherImages.poisonBombExploded);
+                                break;
+                            case 2:
+                                drawEnemy(bullets[i], enemyBulletImages[26]);
+                                break;
+                            case 3:
+                                drawEnemy(bullets[i], enemyBulletImages[27]);
+                                break;
+                        }
+                    }
+                    else {
+                        drawBullet(bullets[i], enemyBulletImages[bullets[i].index]);
+                    }
+                    break;
+                case 4:
+                    drawBlackHole(bullets[i], enemyBulletImages[bullets[i].index], otherImages.blackHoleBackground);
+                    break;
+                case 5:
+                    drawLaser(bullets[i], bulletImages[2]);
+                    break;
+                case 18:
+                    ctx.save();
+                    ctx.filter = "brightness(200%)";
+                    drawBullet(bullets[i], enemyBulletImages[bullets[i].index]);
+                    ctx.restore();
+                    break;
+                case 20:
+                    ctx.save();
+                    if (bullets[i].explodeTimer > 0) {
+                        ctx.filter = "hue-rotate(90deg)";
+                        drawBullet(bullets[i], otherImages.playerBombExploded);
+                    }
+                    else {
+                        drawBullet(bullets[i], enemyBulletImages[bullets[i].index]);
+                    }
+                    ctx.restore();
+                    break;
+                case 30:
+                    
+                    ctx.save();
+                    ctx.filter = 'hue-rotate(90deg)';
+                    ctx.drawImage(otherImages.playerBombExploded, bullets[i].x - bullets[i].width / 2, bullets[i].y - bullets[i].height / 2, bullets[i].width, bullets[i].height);
+                    ctx.restore();
+                    break;
+                default:
+                    drawBullet(bullets[i], enemyBulletImages[bullets[i].index]);
+                    break;
+            }
+            ctx.filter="none";
+        }
+        else{
+            switch (bullets[i].index) {
+                case 2:
+                    drawPlayerLaser(bullets[i], bulletImages[bullets[i].index]);
+                    break;
+                case 3:
+                    if (bullets[i].shootTimer > 0) {
+                        drawBullet(bullets[i], bulletImages[bullets[i].index]);
+                    }
+                    else {
+                        drawBullet(bullets[i], otherImages.playerBombExploded);
+                    }
+                    break;
+                case 11:
+                    ctx.save();
+                    ctx.filter = "brightness(500%)"
                     drawBullet(bullets[i], bulletImages[bullets[i].index]);
-                }
-                else {
-                    drawBullet(bullets[i], otherImages.playerBombExploded);
-                }
-                break;
+                    ctx.restore();
+                    break;
+                case 12:
+                    console.log(bullets[i])
+                    drawBullet(bullets[i], bulletImages[bullets[i].index]);
+                    break;
+                case 13:
+                    ctx.save();
+                    ctx.filter = "grayscale(100%)";
+                    drawBullet(bullets[i], enemyImages[bullets[i].imageIndex]);
+                    ctx.restore();
+                    break;
+                case 14:
+                    if (bullets[i].shootTimer > 0) {
+                        drawBullet(bullets[i], bulletImages[bullets[i].index]);
+                    }
+                    else {
+                        drawBullet(bullets[i], otherImages.playerBombExploded);
+                    }
+                    break;
+                default:
+                    drawBullet(bullets[i], bulletImages[bullets[i].index]);
+                    break;
+            }
+
         }
     }
 }
@@ -712,7 +769,7 @@ function drawEnemies(enemies){
                 if (enemies[i].exploding) {
                     ctx.save();
                     ctx.filter = 'hue-rotate(90deg)';
-                    drawEnemy(enemies[i], otherImages.playerBombExploded, showHealthBars);
+                    ctx.drawImage(otherImages.playerBombExploded, enemyies[i].x - enemies[i].width / 2, enemies[i].y - enemies[i].height / 2, enemies[i].width, enemies[i].height);
                     ctx.restore();
                 }
                 else drawEnemy(enemies[i], enemyImages[enemies[i].index], showHealthBars);
@@ -908,6 +965,13 @@ function drawEnemyBullets(enemyBullets){
                 }
                 ctx.restore();
                 break;
+            case 30:
+                
+                ctx.save();
+                ctx.filter = 'hue-rotate(90deg)';
+                ctx.drawImage(otherImages.playerBombExploded, enemyBullets[i].x - enemyBullets[i].width / 2, enemyBullets[i].y - enemyBullets[i].height / 2, enemyBullets[i].width, enemyBullets[i].height);
+                ctx.restore();
+                break;
             default:
                 drawBullet(enemyBullets[i], enemyBulletImages[enemyBullets[i].index]);
                 break;
@@ -1006,6 +1070,7 @@ function drawPlayerInfo(player){
     }
     for(let id in player.statusEffects){
         if(player.statusEffects[id]>0){   
+            console.log(id);
             ctx.fillStyle="#676767";
             ctx.fillRect(currentX-35, currentY-35, 70, 70);
             ctx.drawImage(statusEffectImages[id], currentX - 35, currentY - 35, 70, 70);
@@ -1029,50 +1094,104 @@ function drawPlayerInfo(player){
 function drawPlayers(players){
     for(let i in players){
         let player=players[i];
-        switch(player.index){
-            case 1:
-                if (player.inputs.right) {
-                    drawPlayer(player, otherImages.tankPlayerMirrored);
-                }
-                else {
+        if(player.isFriendly!=true){
+            let object=players[i];
+            ctx.save();
+            ctx.lineWidth = 10;
+            ctx.strokeStyle = "green";
+            ctx.strokeRect(object.x - object.width / 2, object.y - object.height / 2, object.width, object.height);
+            ctx.restore();
+        
+            switch(player.index){
+            
+                case 1004:
+                    ctx.save();
+                    drawEnemy(player, otherImages.sentryEngineerEnemy, showHealthBars);
+                    ctx.restore();
+                    break;
+                case 1005:
+                    ctx.save();
+                    drawEnemy(player, otherImages.laserEngineerEnemy, showHealthBars);
+                    ctx.restore();
+                    break;
+                case 1006:
+                    ctx.save();
+                    drawEnemy(player, otherImages.bombEngineerEnemy, showHealthBars);
+                    ctx.restore();
+                    break;
+                case 1007:
+                    ctx.save();
+                    ctx.globalAlpha = 0.4;
+                    ctx.drawImage(otherImages.frostAura, player.x - player.frostAuraWidth / 2, player.y - player.frostAuraHeight / 2, player.frostAuraWidth, player.frostAuraHeight);
+                    drawEnemy(player, otherImages.iceEngineerEnemy, showHealthBars);
+                    ctx.restore();
+                    break;
+                case 1001:
+                    ctx.save();
+                    drawEnemy(player, otherImages.enemyWall, showHealthBars);
+                    ctx.restore();
+                    break;
+            }
+        }
+        else{
+            switch(player.index){
+                case 1:
+                    if (player.inputs.right) {
+                        drawPlayer(player, otherImages.tankPlayerMirrored);
+                    }
+                    else {
+                        drawPlayer(player, playerImages[player.index]);
+                    }
+                    break;
+                case 9:
+                    ctx.save();
+                    ctx.globalAlpha = 0.4;
+                    ctx.drawImage(otherImages.redCircle, players[i].x - players[i].damageAuraWidth / 2, players[i].y - players[i].damageAuraHeight / 2, players[i].damageAuraWidth, players[i].damageAuraHeight);
+                    ctx.restore();
                     drawPlayer(player, playerImages[player.index]);
-                }
-                break;
-            case 9:
-                ctx.save();
-                ctx.globalAlpha = 0.4;
-                ctx.drawImage(otherImages.redCircle, players[i].x - players[i].damageAuraWidth / 2, players[i].y - players[i].damageAuraHeight / 2, players[i].damageAuraWidth, players[i].damageAuraHeight);
-                ctx.restore();
-                drawPlayer(player, playerImages[player.index]);
-                break;
-            case 10:
-                ctx.save();
-                ctx.globalAlpha = 0.4;
-                if(player.healTimer>0){
+                    break;
+                case 10:
+                    ctx.save();
+                    ctx.globalAlpha = 0.4;
+                    if(player.healTimer>0){
+                        ctx.drawImage(otherImages.healAura, players[i].x - players[i].healAuraWidth / 2, players[i].y - players[i].healAuraHeight / 2, players[i].healAuraWidth, players[i].healAuraHeight);
+                    }
                     ctx.drawImage(otherImages.healAura, players[i].x - players[i].healAuraWidth / 2, players[i].y - players[i].healAuraHeight / 2, players[i].healAuraWidth, players[i].healAuraHeight);
-                }
-                ctx.drawImage(otherImages.healAura, players[i].x - players[i].healAuraWidth / 2, players[i].y - players[i].healAuraHeight / 2, players[i].healAuraWidth, players[i].healAuraHeight);
-                ctx.restore();
-                drawPlayer(player, playerImages[player.index]);
-                break;
-            case 11:
-                ctx.save();
-                
-                ctx.globalAlpha = 0.5;
-                ctx.drawImage(bulletImages[2], player.x-2000, player.y-player.laserWidth/2, 4000, player.laserWidth);
-                ctx.drawImage(bulletImages[2], player.x-player.laserWidth/2, player.y-2000, player.laserWidth, 4000);
-                drawPlayer(player, playerImages[player.index]);
-                ctx.restore();
-                break;
-            case 12:
-                ctx.save();
-                ctx.filter="invert(100%)";
-                drawPlayer(player, playerImages[player.ownerIndex]);
-                ctx.restore();
-                break;
-            default:
-                drawPlayer(player, playerImages[player.index]);
-                break;
+                    ctx.restore();
+                    drawPlayer(player, playerImages[player.index]);
+                    break;
+                case 11:
+                    ctx.save();
+                    
+                    ctx.globalAlpha = 0.5;
+                    ctx.drawImage(bulletImages[2], player.x-2000, player.y-player.laserWidth/2, 4000, player.laserWidth);
+                    ctx.drawImage(bulletImages[2], player.x-player.laserWidth/2, player.y-2000, player.laserWidth, 4000);
+                    drawPlayer(player, playerImages[player.index]);
+                    ctx.restore();
+                    break;
+                case 12:
+                    ctx.save();
+                    ctx.filter="invert(100%)";
+                    drawPlayer(player, playerImages[player.ownerIndex]);
+                    ctx.restore();
+                    break;
+                case 13:
+                    ctx.save();
+                    for(let i=0;i<player.inheritedEnemies.length;i++){
+                        if(player.inheritedEnemies[i].isBoss && player.inheritedEnemies[i].index==1){
+                            ctx.globalAlpha = 0.4;
+                            ctx.drawImage(otherImages.frostAura, player.x - player.inheritedEnemies[i].frostAuraWidth / 2, player.inheritedEnemies[i].y - player.inheritedEnemies[i].frostAuraHeight / 2, player.inheritedEnemies[i].frostAuraWidth, player.inheritedEnemies[i].frostAuraHeight);
+                            ctx.globalAlpha=1;
+                        }
+                    }
+                    drawPlayer(player, playerImages[13]);
+                    ctx.restore();
+                    break;
+                default:
+                    if(player.health>0)drawPlayer(player, playerImages[player.index]);
+                    break;
+            }
+
         }
     }
 }
@@ -1095,9 +1214,12 @@ async function EndGame(win) {
     }
     if (win) {
         await delay(1500);
+        if(gamemode>1 && gamemode<100 && gamemodeBeaten[gamemode]==0){
+            gamemodeBeaten[gamemode]=1;
+            gamemodeBeatenCount++;
+        }
     }
     else {
-        ctx.filter = "grayscale(100%)"
         await delay(3000);
     }
     ctx.strokeStyle = 'white';
@@ -1204,6 +1326,22 @@ async function newEnemyText() {
     description.style.zIndex = 100;
     document.body.appendChild(description);
 
+    let unlock=true;
+    for(let i=0;i<ENEMYTYPES.length;i++){
+        if(ENEMYTYPES[i].discovered==false){
+            unlock=false;
+            break;
+        }
+    }
+    for(let i=0;i<BOSSENEMYTYPES.length;i++){
+        if(BOSSENEMYTYPES[i].discovered==false){
+            unlock=false;
+            break;
+        }
+    }
+    if(unlock==true){
+        ShapeshifterPlayer.unlocked=true;
+    }
     continueFlag = true;
     await delay(3000);
     if(obtainingCollectable){

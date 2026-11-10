@@ -4,6 +4,8 @@ function ShowEnemy(enemy){
     let sourceText=document.getElementById("enemySourceText");
     let descriptionText=document.getElementById("enemyDescriptionText");
     let abilityText=document.getElementById("enemyAbilityText");
+    descriptionText.style.textAlign="center";
+    descriptionText.style.marginLeft="0%";
     switch(enemy){
         case 1:
             sourceImage.src="images/enemy.webp";
@@ -232,6 +234,14 @@ function ShowEnemy(enemy){
             sourceText.innerText="Source: The calculus equation dy/dx sin(2x) written in Latex"
             abilityText.innerText="Ability: Shoots bullets that move in a sine wave and leave slowing puddles. Splits into 2 and cos(2x) on death"
             descriptionText.innerText="Chainslop (noun): The use of Calculus problems involving the Chain rule. \"That test had so much chainslop in it!\"";
+            break;
+        case 39:
+            sourceImage.src="images/portalEnemy.webp";
+            sourceText.innerText="Source: The profile picture of the user \"PortalHub\" on Youtube"
+            abilityText.innerText="Ability: Creates portals that teleport enemies closer to the player."
+            descriptionText.style.textAlign="left";
+            descriptionText.style.marginLeft="40%";
+            descriptionText.innerText="/visit PortalHub \nFinding Player... \nSending a visit request... \nCouldn't warp you! \nThis island has had too many recent visits!";
             break;
         case 1000:
             sourceImage.src="images/farmerBossCow.webp";

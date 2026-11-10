@@ -11,17 +11,8 @@ let playerAbilities = [];
 let mapObjects = [];
 let xpBagSpawnTimer = 0;
 let healthPotionSpawnTimer = 0;
-let waveTimer = 0;
-let isBossWave = false;
-let movingLeft, movingRight, movingUp, movingDown = false;
-let page = "gamePage";
 let healthBar, levellingBar, bossBars, boss, waveText, background, gambleText, choice1, choice2, choice3, shieldBarShield;
 let xpBagTimer = Math.random() * 200 + 200;
-let timeElapsed = 0;
-let mouseX = 0;
-let mouseY = 0;
-let currentWave = 0;
-let SCALE = 0.001;
 let continueFlag = false;
 let speedMultiplier = 0;
 let upgradingEnemy = false;
@@ -29,12 +20,7 @@ let controls = { left: "a", up: "w", right: "d", down: "s", ability1: "q", abili
 let controlBeingToggled = "";
 let enemyHealthMultiplier=1;
 let enemySpeedMultiplier=1;
-const NUMTIER2UPGRADES = 10;
 const NUMENEMYUPGRADES = 8;
-let boughtTier2Upgrades = new Array(NUMTIER2UPGRADES);
-for (let i = 0; i < boughtTier2Upgrades.length; i++) {
-    boughtTier2Upgrades[i] = 0;
-}
 let UPGRADES = [
     { onclick:  increaseDamage, text: v => `+${v} Damage`, defaultValue:0.5},
     { onclick:  increaseMaxHealth, text: v =>`+${v} Max Health`, defaultValue:8},
@@ -74,13 +60,30 @@ let UPGRADES = [
     { onclick: AddPassiveBolts, text:v=> `+${v} Passive Bolt Production`, defaultValue:1 },
     { onclick: DoublePositiveEffects, text:v=> "2x Duration of Positive Effects" },
     { onclick: AddRegeneration, text:v=> "When below 33% health, gain 5s regeneration (30s cooldown)" },
-    //{ onclick: AddBlackHole, text:v=> "Vortex Ability" },
+    { onclick: AddBlackHole, text:v=> "Vortex Ability" },
+    { onclick: GiveAbility, text: v => `Steal Ability:`, defaultValue:1, image:"images/shooterEnemy.webp"},
+    { onclick: GiveAbility, text: v => `Steal Ability:`, defaultValue:2, image:"images/aimingEnemy.webp"},
+    { onclick: GiveAbility, text: v => `Steal Ability:`, defaultValue:3, image:"images/homingEnemy.webp"},
+    { onclick: GiveAbility, text: v => `Steal Ability:`, defaultValue:4, image:"images/trapperEnemy.webp"},
+    { onclick: GiveAbility, text: v => `Steal Ability:`, defaultValue:20, image:"images/iceEnemy.webp"},
+    { onclick: GiveAbility, text: v => `Steal Ability:`, defaultValue:8, image:"images/ghostEnemy.webp"},
+    { onclick: GiveAbility, text: v => `Steal Ability:`, defaultValue:9, image:"images/poisonEnemy.webp"},
+    { onclick: GiveAbility, text: v => `Steal Ability:`, defaultValue:10, image:"images/blackHoleEnemy.webp"},
+    { onclick: GiveAbility, text: v => `Steal Ability:`, defaultValue:12, image:"images/builderEnemy.webp"},
+    { onclick: GiveAbility, text: v => `Steal Ability:`, defaultValue:13, image:"images/windupEnemy.webp"},
+    { onclick: GiveAbility, text: v => `Steal Ability:`, defaultValue:16, image:"images/machineGunEnemy.webp"},
+    { onclick: GiveAbility, text: v => `Steal Ability:`, defaultValue:18, image:"images/splitterEnemy.webp"},
+    { onclick: GiveAbility, text: v => `Steal Ability:`, defaultValue:25, image:"images/calculusEnemy.webp"},
+    { onclick: GiveAbility, text: v => `Steal Ability:`, defaultValue:22, image:"images/blindnessEnemy.webp"},
+    { onclick: GiveAbility, text: v => `Steal Ability:`, defaultValue:15, image:"images/selfDestructEnemy.webp"},
+    { onclick: GiveAbility, text: v => `Steal Ability:`, defaultValue:24, image:"images/alchemistEnemy.webp"},
 
 ];
+
 let abilityUpgradeIndexes=[8,9,15,38];
 let originalUpgrades=[];
 for(let i=0;i<UPGRADES.length;i++){
-    originalUpgrades[i]={onclick:UPGRADES[i].onclick, text:UPGRADES[i].text, defaultValue:UPGRADES[i].defaultValue};
+    originalUpgrades[i]={onclick:UPGRADES[i].onclick, text:UPGRADES[i].text, defaultValue:UPGRADES[i].defaultValue, image:UPGRADES[i].image};
 }
 const NUMUPGRADES = UPGRADES.length;
 let boughtUpgrades = new Array(NUMUPGRADES);
@@ -98,7 +101,19 @@ let TIER2UPGRADES = [
     { onclick:  AddRebirth, text:v=> "Rebirth On Death" },
     { onclick:  AddWindAttack, text:v=> `+${v} Tornado Projectiles`, defaultValue:2},
     { onclick:  AddNuke, text:v=> "Bomb attack -> Nuke Attack" },
+    { onclick: GiveBossAbility, text: v => `Steal Ability:`, defaultValue:0, image:"images/laserBoss.webp"},
+    { onclick: GiveBossAbility, text: v => `Steal Ability:`, defaultValue:1, image:"images/iceBoss.webp"},
+    { onclick: GiveBossAbility, text: v => `Steal Ability:`, defaultValue:3, image:"images/mageFireMode.webp"},
+    { onclick: GiveBossAbility, text: v => `Steal Ability:`, defaultValue:4, image:"images/bulletHellBoss.webp"},
+    { onclick: GiveBossAbility, text: v => `Steal Ability:`, defaultValue:5, image:"images/gambleBoss.webp"},
+    { onclick: GiveBossAbility, text: v => `Steal Ability:`, defaultValue:7, image:"images/healingBoss.webp"},
+    { onclick: GiveBossAbility, text: v => `Steal Ability:`, defaultValue:8, image:"images/engineerBoss.webp"},
 ]
+const NUMTIER2UPGRADES = TIER2UPGRADES.length;
+let boughtTier2Upgrades = new Array(NUMTIER2UPGRADES);
+for (let i = 0; i < boughtTier2Upgrades.length; i++) {
+    boughtTier2Upgrades[i] = 0;
+}
 let tier2AbilityIndexes=[7];
 let ENEMYUPGRADES = [
     { onclick: "IncreaseEnemyHealth(1.5)", text: "Healthier Enemies" },
@@ -110,8 +125,8 @@ let ENEMYUPGRADES = [
     { onclick: "AddConstantDamage()", text: "Player Takes 1 Damage every 4 Seconds" },
     { onclick: "IncreaseScale(2)", text: "Next Wave has 2x More Enemies" },
 ]
-const RESTRICTEDUPGRADES = [17, 18, 19, 20, 22, 23, 24, 25, 27, 28]
-const RESTRICTEDTIER2UPGRADES = [9];
+const RESTRICTEDUPGRADES = [17, 18, 19, 20, 22, 23, 24, 25, 27, 28, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53,54]
+const RESTRICTEDTIER2UPGRADES = [9, 10, 11, 12, 13, 14, 15, 16];
 let timeWarpCounter = 0;
 let gambleTimer = 0;
 let gambleChoice = 0;
@@ -145,6 +160,9 @@ let gameState;
 let createdRoom = true;
 let roomCode = "";
 let obtainingCollectable=false;
+let gamemodeUnlocked={"PickYourPoison":false,"BossRush":false,"MisprintMode":false, "OpenWorldAdventure":false, "OneShot":false};
+let gamemodeBeaten=[0,0,0,0,0,0,0,0,0,0,0];
+let gamemodeBeatenCount=0;
 //higher number = higher difficulty
 function SetDifficulty(d) {
     difficulty = d;
@@ -221,6 +239,16 @@ function SelectCharacter(character) {
             }
             document.getElementById("builderPlayer").style.border = "5px solid red";
             break;
+        case 8:
+            if (ShapeshifterPlayer.unlocked) {
+                descriptionText2.innerText = "Upgrades contain abilities from enemies. Abilities from more powerful enemies will be unlocked as the waves increase."
+
+            }
+            else {
+                descriptionText2.innerText = "LOCKED"
+            }
+            document.getElementById("shapeshifterPlayer").style.border = "5px solid red";
+            break;
     }
     document.getElementById("startButton").disabled = false;
     document.getElementById("startButton2").disabled = false;
@@ -265,6 +293,9 @@ function SelectMode(mode) {
                 break;
             case 8:
                 document.getElementById("gamemodeDescriptionText").innerText = "The border is removed. Enemies that spawn farther away from the center will have higher stats. Structures will also procedurally generate."
+                break;
+            case 9:
+                document.getElementById("gamemodeDescriptionText").innerText = "The player has one health. Enemies and bosses will be weaker. Not recommended if you want to have fun (speaking from experience)."
                 break;
         }
         if (mode < 100) gamemodes[mode - 2].style.border = "5px solid red";
@@ -363,10 +394,10 @@ function Start() {
         scaleMultiplier: 1,
         bossMultiplier: 1,
         waveTimer: 2000,
-        strengthPotionSpawnRate:0
+        strengthPotionSpawnRate:0,
     };
     for(let i=0;i<UPGRADES.length;i++){
-        UPGRADES[i]={onclick:originalUpgrades[i].onclick, text:originalUpgrades[i].text, defaultValue:originalUpgrades[i].defaultValue};
+        UPGRADES[i]={onclick:originalUpgrades[i].onclick, text:originalUpgrades[i].text, defaultValue:originalUpgrades[i].defaultValue, image:originalUpgrades[i].image};
     }
     healthPotionSpawnTimer = Math.random() * 600 + 700;
     xpBagTimer = Math.random() * 200 + 200;
@@ -422,6 +453,7 @@ function Start() {
         case 5: player = new NecromancerPlayer(12, gameState.abilityIcons); break;
         case 6: player = new PheonixPlayer(6); break;
         case 7: player = new BuilderPlayer(9, gameState.abilityIcons); break;
+        case 8: player = new ShapeshifterPlayer(12); break;
     }
     if (difficulty == 1) {
         gameState.scaleMultiplier = 0.5;
@@ -476,6 +508,8 @@ function Start() {
             player.boughtUpgrades[7] = 1;
             player.boughtUpgrades[10] = 1;
             player.boughtUpgrades[11] = 1;
+            player.boughtUpgrades[76-39] = 2;
+            boughtTier2Upgrades[1] = 1;
             boughtTier2Upgrades[4] = 1;
             boughtTier2Upgrades[5] = 1;
             break;
@@ -499,6 +533,24 @@ function Start() {
             gameState.seenTier1Bosses.push(5);
             player.boughtUpgrades[29]=1;
             boughtTier2Upgrades[5]=1;
+            break;
+        case 9:
+            mapType=1;
+            player.boughtUpgrades[1] = 1;
+            player.boughtUpgrades[6] = 1;
+            player.boughtUpgrades[7] = 1;
+            player.boughtUpgrades[10] = 1;
+            player.boughtUpgrades[11] = 1;
+            UPGRADES[14].defaultValue=1;
+            player.boughtUpgrades[76-39] = 1;
+            boughtTier2Upgrades[1] = 1;
+            boughtTier2Upgrades[4] = 1;
+            boughtTier2Upgrades[5] = 1;
+            player.health=1;
+            player.maxHealth=1;
+            gameState.bossMultiplier*=0.5
+            enemyHealthMultiplier=0.75;
+            gameState.scaleMultiplier*=0.75;
             break;
     }
     if (mapType == 1) {
@@ -811,6 +863,14 @@ if (typeof window !== "undefined") {
         for (let i = 0; i < ENEMYTYPES.length; i++) {
             localStorage.setItem(ENEMYTYPES[i].name + "Found", ENEMYTYPES[i].seen);
         }
+        
+        for (let i in gamemodeUnlocked) {
+            localStorage.setItem(i + "Found", gamemodeUnlocked[i]);
+        }
+        for (let i = 0; i < gamemodeBeaten.length; i++) {
+            localStorage.setItem("GamemodeBeaten"+i, gamemodeBeaten[i]);
+        }
+
 
         localStorage.setItem("LaserBossFound", LaserBoss.seen);
         localStorage.setItem("IceBossFound", IceBoss.seen);
@@ -832,6 +892,7 @@ if (typeof window !== "undefined") {
         localStorage.setItem("NecromancerPlayerUnlocked", NecromancerPlayer.unlocked);
         localStorage.setItem("PheonixPlayerUnlocked", PheonixPlayer.unlocked);
         localStorage.setItem("BuilderPlayerUnlocked", BuilderPlayer.unlocked);
+        localStorage.setItem("ShapeshifterPlayerUnlocked", ShapeshifterPlayer.unlocked);
 
         localStorage.setItem("ShowHealthbarSetting", showHealthBars);
     });
@@ -849,12 +910,22 @@ if (typeof window !== "undefined") {
         if (localStorage.getItem("levelUpControl") != null) controls["levelUp"] = localStorage.getItem("levelUpControl");
         if (localStorage.getItem("skipWaveControl") != null) controls["skipWave"] = localStorage.getItem("skipWaveControl");
         if (localStorage.getItem("dealDamageControl") != null) controls["dealDamage"] = localStorage.getItem("dealDamageControl");
-        Object.keys(localStorage)
-            .filter(k => localStorage.getItem(k) === "undefined")
-            .forEach(k => localStorage.removeItem(k));
+        
+        Object.keys(localStorage).filter(k => localStorage.getItem(k) === "undefined").forEach(k => localStorage.removeItem(k));
         for (let i = 0; i < ENEMYTYPES.length; i++) {
             ENEMYTYPES[i].seen = JSON.parse(localStorage.getItem(ENEMYTYPES[i].name + "Found"))
+        }
 
+        for (let i in gamemodeUnlocked) {
+            gamemodeUnlocked.i=JSON.parse(localStorage.getItem(gamemodeUnlocked.i+ "Found"))
+            localStorage.setItem(i + "Found", gamemodeUnlocked[i]);
+        }
+        for (let i = 0; i < gamemodeBeaten.length; i++) {
+            if(JSON.parse(localStorage.getItem("GamemodeBeaten"+i))==null)continue;
+            gamemodeBeaten[i] = JSON.parse(localStorage.getItem("GamemodeBeaten"+i));
+            if(i>1 && gamemodeBeaten[i]==1){
+                gamemodeBeatenCount++;
+            }
         }
 
         LaserBoss.seen = JSON.parse(localStorage.getItem("LaserBossFound"));
@@ -879,6 +950,7 @@ if (typeof window !== "undefined") {
         if (JSON.parse(localStorage.getItem("NecromancerPlayerUnlocked")) != null) NecromancerPlayer.unlocked = JSON.parse(localStorage.getItem("NecromancerPlayerUnlocked"));
         if (JSON.parse(localStorage.getItem("PheonixPlayerUnlocked")) != null) PheonixPlayer.unlocked = JSON.parse(localStorage.getItem("PheonixPlayerUnlocked"));
         if (JSON.parse(localStorage.getItem("BuilderPlayerUnlocked")) != null) BuilderPlayer.unlocked = JSON.parse(localStorage.getItem("BuilderPlayerUnlocked"));
+        if (JSON.parse(localStorage.getItem("ShapeshifterPlayerUnlocked")) != null) ShapeshifterPlayer.unlocked = JSON.parse(localStorage.getItem("ShapeshifterPlayerUnlocked"));
         if (JSON.parse(localStorage.getItem("ShowHealthbarSetting")) != null) showHealthBars = JSON.parse(localStorage.getItem("ShowHealthbarSetting"));
 
     });
@@ -1563,13 +1635,131 @@ function AddRegeneration(amount,player){
 function AddBlackHole(amount, player){
     if(gamemode==100){
         socket.emit("buyUpgrade", {type: "object", stat:"blackHole", amount:amount});
-        socket.emit("changeBoughtUpgrades", {index: 8, amount:1});
+        socket.emit("changeBoughtUpgrades", {index: 38, amount:1});
     }
     else{
         let temp = new BlackHoleIcon(50, player.abilities.length)
         player.abilities.push(temp)
         gameState.abilityIcons.push(temp);
         player.boughtUpgrades[38] = 1;
+    }
+    ChangePage('gamePage', false)
+}
+function GiveAbility(amount, player){
+    let temp=new ENEMYTYPES[amount](ENEMYTYPES[amount].speed, ENEMYTYPES[amount].health);
+    temp.owner=player;
+    temp.x=player.x;
+    temp.y=player.y;
+    let count=1;
+    switch(amount){
+        case 1:
+            temp.reloadSpeed/=3;
+            break;
+        case 2:
+            temp.reloadSpeed/=2;
+            break;
+        case 3:
+            temp.reloadSpeed/=2;
+            break;
+        case 4:
+            temp.reloadSpeed/=2;
+            break;
+        case 9:
+            temp.reloadSpeed/=1.5;
+            break;
+        case 10:
+            temp.reloadSpeed/=1.5;
+            break;
+        case 22:
+            temp.maxHealth=Math.round(temp.maxHealth/3);
+            temp.health=Math.round(temp.maxHealth/3);
+            break;
+    }
+    for(let i=0;i<player.inheritedEnemies.length;i++){
+        if(player.inheritedEnemies[i].index==amount){
+            count++;
+        }
+    }
+    for(let i=0;i<player.inheritedEnemies.length;i++){
+        if(player.inheritedEnemies[i].index==amount){
+            player.inheritedEnemies[i].shootTimer=(i+1)*player.inheritedEnemies[i].reloadSpeed/count;
+        }
+    }
+    temp.shootTimer=temp.reloadSpeed;
+    player.inheritedEnemies.push(temp);
+    if(amount==8){
+        player.boughtUpgrades[44]=1;
+    }
+    else if(amount==12){
+        temp.maxWalls=99999;
+        temp.wallHealth=20;
+    }
+    else if(amount==22){
+        player.boughtUpgrades[52]=1;
+    }
+    else if(amount==15){
+        player.boughtUpgrades[53]=1;
+    }
+    ChangePage('gamePage', false)
+}
+function GiveBossAbility(amount, player){
+    let temp=new BOSSENEMYTYPES[amount](ENEMYTYPES[amount].speed, ENEMYTYPES[amount].health, [], 1);
+    temp.owner=player;
+    temp.x=player.x;
+    temp.y=player.y;
+    switch(amount){
+        case 0:
+            boughtTier2Upgrades[10]=1;
+            temp.reloadSpeed*=1.5;
+            break;
+        case 1:
+            temp.frostAuraHeight/=2;
+            temp.frostAuraWidth/=2;
+            boughtTier2Upgrades[11]=1;
+            break;
+        case 3:
+            boughtTier2Upgrades[12]=1;
+            break;
+        case 4:
+            boughtTier2Upgrades[13]=1;
+            temp.walkTimer=0;
+            temp.reloadLaser*=1.5;
+            temp.reloadSpiral*=1.5;
+            temp.reloadLooping*=1.5;
+            break;
+        case 5:
+            boughtTier2Upgrades[14]=1;
+            break;
+        case 7:
+            boughtTier2Upgrades[15]=1;
+            break;
+        case 8:
+            boughtTier2Upgrades[16]=1;
+            break;
+
+
+    }
+    
+    player.inheritedEnemies.push(temp);
+    ChangePage('gamePage', false)
+}
+function UnlockUpgrades1(amount, player){
+    player.boughtUpgrades[52]=1;
+    player.boughtUpgrades[44]=0;
+    player.boughtUpgrades[45]=0;
+    player.boughtUpgrades[46]=0;
+    player.boughtUpgrades[53]=0;
+    ChangePage('gamePage', false)
+}
+function UnlockUpgrades2(amount, player){
+    player.boughtUpgrades[53]=1;
+    player.boughtUpgrades[55]=0;
+    ChangePage('gamePage', false)
+}
+function UnlockUpgrades3(amount, player){
+    player.boughtUpgrades[54]=1;
+    player.boughtUpgrades[51]=0;
+    if(typeof window !=="undefined"){
     }
     ChangePage('gamePage', false)
 }

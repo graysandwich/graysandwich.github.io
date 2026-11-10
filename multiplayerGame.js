@@ -234,6 +234,13 @@ function MultiplayerGameLogic(gameState) {
             enemyBullets.splice(i, 1);
         }
     }
+    let mapObjects = gameState.mapObjects;
+    for (let i = mapObjects.length - 1; i >= 0; i--) {
+        mapObjects[i].act(gameState, gameState.players);
+        if (mapObjects[i].dead) {
+            mapObjects.splice(i, 1);
+        }
+    }
     let abilityIcons = gameState.abilityIcons
     for (let i = abilityIcons.length - 1; i >= 0; i--) {
         abilityIcons[i].timer();

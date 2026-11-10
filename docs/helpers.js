@@ -31,7 +31,7 @@ document.addEventListener("keydown", (e)=>{
         }
         if(key==controls["dealDamage"]){
             for(let i=0;i<gameState.enemies.length;i++){
-                gameState.enemies[i].takeDamage(new Bullet(1,1,2000, player), player, gameState);
+                gameState.enemies[i].takeDamage(2000, new Bullet(1,1,2000, player), gameState);
             }
         }
         if(key=='l'){

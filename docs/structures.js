@@ -259,7 +259,7 @@ class SpawnerStructure{
             (player.y - player.height / 2) < (this.centerY + this.height*50 / 2) &&
             (player.y + player.height / 2) > (this.centerY - this.height*50 / 2) && this.iFrame <= 0
         ) {
-            player.takeDamage(1, this, gameState.floatingObjects);
+            player.takeDamage(1, this, gameState);
             this.iFrame = 20;
         }
         if(this.spawned==false){
@@ -551,10 +551,10 @@ class PoisonDefender extends Enemy {
         }
         //console.log(this.shootTimer);
     }
-    move(players, floatingObjects, enemies){
+    move(players, gameState, enemies){
         if(this.dead)return;
         if(this.owner.brewingStand==null){
-            super.move(players,floatingObjects,enemies);
+            super.move(players,gameState,enemies);
             return;
         }
         if(this.x>this.owner.centerX+300){
@@ -580,11 +580,10 @@ class PoisonDefender extends Enemy {
             let temp=new BuilderPlayerDecoy(1,1);
             temp.x=this.owner.centerX;
             temp.y=this.owner.centerY;
-            console.log("check")
-            super.move([temp],[],enemies);
+            super.move([temp],{floatingObjects:[]},enemies);
         }
         else{
-            super.move(players,floatingObjects,enemies);
+            super.move(players,gameState,enemies);
         }
         if(this.dead)this.dead=false;
         

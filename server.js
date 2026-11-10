@@ -219,6 +219,11 @@ io.on("connection", (socket) => {
                     player.abilities.push(temp);
                     game.abilityIcons.push(temp);
                 }
+                else if (data.stat === "blackHole") {
+                    let temp = new gameLogic.BlackHoleIcon(50, player.abilities.length, 10);
+                    player.abilities.push(temp);
+                    game.abilityIcons.push(temp);
+                }
             }
             else{
                 if(data.stat=="spawnStrengthPotions"){

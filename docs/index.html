@@ -92,13 +92,13 @@
             <h1 style="text-align: center; font-size: 47px; position: relative; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0; font-family: Black ops one;">A very cool Roguelike Game by graysandwich</h1>
             <h1 style="text-align: center; font-size: 20px; position: relative; top: 0; left: 0; width: 100%; z-index: 1000; margin: 0; font-family: Black ops one;" id="splashText"></h1>
             
-            <button onclick="ChangePage('coopPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 40%; left: 0px; width: 50%; z-index: 1000; margin: 0px;">Co-op</button>
-            <button onclick="SelectMode(1)" style="text-align: center; font-size: 67px; position: absolute; top: 25%; left: 0px; width: 50%; z-index: 1000; margin: 0px;">PLAY</button>
-            <button onclick="ChangePage('gamemodeSelectionPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 25%; left: 50%; width: 50%; z-index: 1000; margin: 0px;">Other Modes</button>
+            <button onclick="ChangePage('coopPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 40%; left: 0px; width: 50%; z-index: 1000; margin: 0px;" disabled>Co-op</button>
+            <button onclick="SelectMode(1)" style="text-align: center; font-size: 67px; position: absolute; top: 25%; left: 0px; width: 100%; z-index: 1000; margin: 0px;">PLAY</button>
+            <button onclick="ChangePage('gamemodeSelectionPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 40%; left: 0%; width: 100%; z-index: 1000; margin: 0px;">Minigames</button>
 
-            <button onclick="SelectMode(0)" style="text-align: center; font-size: 67px; position: absolute; top: 40%; left: 50%; width: 50%; z-index: 1000; margin: 0;">Tutorial</button>
-            <button onclick="ChangePage('devlogPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 55%; left: 0; width: 100%; z-index: 1000; margin: 0;">Update Log</button>
-            <button onclick="ChangePage('settingsPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 70%; left: 0; width: 100%; z-index: 1000; margin: 0;">Settings</button>
+            <button onclick="SelectMode(0)" style="text-align: center; font-size: 67px; position: absolute; top: 55%; left: 0%; width: 100%; z-index: 1000; margin: 0;">Tutorial</button>
+            <button onclick="ChangePage('devlogPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 70%; left:x 0; width: 50%; z-index: 1000; margin: 0;">Update Log</button>
+            <button onclick="ChangePage('settingsPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 70%; left: 50%; width: 50%; z-index: 1000; margin: 0;">Settings</button>
             <button onclick="ChangePage('enemyDescriptionSelectionPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 85%; left: 0; width: 100%; z-index: 1000; margin: 0;">Enemy Guide</button>
 
 
@@ -134,7 +134,7 @@
 
         </div>
         <div id="gamemodeSelectionPage" style="display:none; position:relative; overflow:auto;height:100vh;">
-            <h1 style="text-align: center; font-size: 67px; position: relative; top: 7px; left: 0; width: 100%;z-index: 1000; margin: 0;">Choose Your Gamemode</h1>
+            <h1 style="text-align: center; font-size: 67px; position: relative; top: 7px; left: 0; width: 100%;z-index: 1000; margin: 0;">Minigames</h1>
             <h1 style="position: absolute  ; text-align:center;top: 25%; height:200px; width:100%; z-index: 1000;"id="gamemodeDescriptionText"></h1>
             <div class="scrollable-box" style="position: absolute; top: 40%; left: 0px; width: 100%; height: 60%; z-index: 1000; margin: 0px;">
                 
@@ -145,6 +145,7 @@
                 <button onclick="SelectMode(6)" style="text-align: center; font-size: 67px; position: absolute; top: 100%; left: 0px; height:20%; width: 100%; z-index: 1000; margin: 0px;" id="gamemodeSelectionButton">Boss Rush</button>
                 <button onclick="SelectMode(7)" style="text-align: center; font-size: 67px; position: absolute; top: 125%; left: 0px; height:20%; width: 100%; z-index: 1000; margin: 0px;" id="gamemodeSelectionButton">Misprint Mode</button>
                 <button onclick="SelectMode(8)" style="text-align: center; font-size: 67px; position: absolute; top: 150%; left: 0px; height:20%; width: 100%; z-index: 1000; margin: 0px;" id="gamemodeSelectionButton">Open World Adventure</button>
+                <button onclick="SelectMode(9)" style="text-align: center; font-size: 67px; position: absolute; top: 175%; left: 0px; height:20%; width: 100%; z-index: 1000; margin: 0px;" id="gamemodeSelectionButton">One Shot</button>
 
             </div>
             <button onclick="ChangePage('IntroPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 0%; left: 80%; width: 20%; z-index: 1000; margin: 0px;">Back</button>
@@ -190,8 +191,10 @@
             <h1 style="position: absolute  ; text-align:center;top: 32%; left: 7%; width: 15%; height:28.8%; z-index: 1000;" id="necromancerPlayerText">Necromancer</h1>
             <button onclick="SelectCharacter(6)" style=" font-size:30px; position:absolute; top: 42%; left: 32%; width: 13%; height:28.8%; z-index: 1000;padding:0px" id="pheonixPlayer"><img src="images/player.webp" style="height:100%;width: 100%; " id="pheonixPlayerImage"></img></button>
             <h1 style="position: absolute  ; text-align:center;top: 42%; left: 32%; width: 13%; height:28.8%; z-index: 1000;" id="pheonixPlayerText">Phoenix</h1>
-            <button onclick="SelectCharacter(7)" style=" font-size:30px; position:absolute; top: 42%; left: 57%; width: 13%; height:28.8%; z-index: 1000;padding:0px" id="builderPlayer"><img src="images/player.webp" style="height:100%;width: 100%; " id="builderPlayerImage"></img></button>
-            <h1 style="position: absolute  ; text-align:center;top: 42%; left: 57%; width: 13%; height:28.8%; z-index: 1000;" id="builderPlayerText">Mechanic</h1>
+            <button onclick="SelectCharacter(7)" style=" font-size:30px; position:absolute; top: 42%; left: 56%; width: 13%; height:28.8%; z-index: 1000;padding:0px" id="builderPlayer"><img src="images/player.webp" style="height:100%;width: 100%; " id="builderPlayerImage"></img></button>
+            <h1 style="position: absolute  ; text-align:center;top: 42%; left: 56%; width: 13%; height:28.8%; z-index: 1000;" id="builderPlayerText">Mechanic</h1>
+            <button onclick="SelectCharacter(8)" style=" font-size:30px; position:absolute; top: 42%; left: 80%; width: 13%; height:28.8%; z-index: 1000;padding:0px" id="shapeshifterPlayer"><img src="images/player.webp" style="height:100%;width: 100%; " id="shapeshifterPlayerImage"></img></button>
+            <h1 style="position: absolute  ; text-align:center;top: 42%; left: 80%; width: 13%; height:28.8%; z-index: 1000;" id="shapeshifterPlayerText">Mechanic</h1>
   
             <h1 style="position: absolute  ; text-align:center;top: 70%; height:200px; z-index: 1000;"id="descriptionText2"></h1>
 
@@ -307,6 +310,7 @@
             <button onclick="ShowEnemy(38)" style=" font-size:30px; position:absolute; top: 90%; left: 15%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
             <button onclick="ShowEnemy(1008)" style=" font-size:30px; position:absolute; top: 280%; left: 4%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
             <button onclick="ShowEnemy(1009)" style=" font-size:30px; position:absolute; top: 280%; left: 15%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
+            <button onclick="ShowEnemy(39)" style=" font-size:30px; position:absolute; top: 90%; left: 26%; width: 150px; height:150px; z-index: 1000;padding:0px" id="chargingEnemyGuideButton"><img src="images/chargingEnemy.webp" style="height:100%;width: 100%;" id="chargingEnemyGuideImage"></img></button>
 
             
 
@@ -338,21 +342,62 @@
             <button onclick="ChangePage('IntroPage', false)" style="position:absolute;text-align: center; font-size: 67px; top: 0px; left: 0; width: 100%; z-index: 1000; margin: 0;">Back</button>
 
             <div class="scrollable-box" style="position: absolute; top: 12%; left: 0px; width: 100%; height: 88%; z-index: 1000; margin: 0px;">
-            
+            <h1>Update 5.1 - October 26, 2026</h1>
+            <ul>
+                <li>Added 23 new upgrades</li>
+                <b>Developer's Note:</b> (22 of the new upgrades are exclusive to the new character, only one of them is universal to all characters)
+                <li>Added 1 new gamemode: One Shot</li>
+                <li>Added 1 new character: Spy</li>
+                <li>Added 1 tier 4 enemy</li>
+                <li>Renamed "Other modes" to "Minigames"</li>
+                <li>Made it so you need to beat previous gamemodes in order to unlock later ones</li>
+                <b>Developer's Note:</b> R E P L A Y A B I L I T Y part 2
+                <li>Removed the monochrome effect on death</li>
+                <b>Developer's Note:</b> This monochrome filter made the game really laggy, especially when there were a lot of enemies on screen. now you get slightly less cool visuals on death.
+                <li>Removed co-op mode</li>
+                <b>Developer's Note:</b> RIP co-op mode. You were an absolute pain to make and a total of zero (0) co-op games were ever played in your entire lifetime. You will not be missed. Maintaining co-op mode was just too painful and it didn't even function that well. Especially with the new character changing a lot of the base game's code it would take a lot of effort to fix co-op up.
+                <li>Balance Changes:</li>
+                <ul>
+                    <li>Decreased amount of time between heals for the regeneration effect (0.5s -> 0.33s)</li>
+                    <b>Developer's Note:</b> Also it turns out that the upgrade that gave regeneration when below 33% health was bugged but now that's fixed. Regeneration felt really slow considering that it only happens once every 30 seconds. Also the Brewing Stand item in Open World Adventure mode was bugged to have a 60% chance of giving a regeneration potion when it should have been 10%.
+                    
+                    <li>Decreased amount of time that Time Stop abliity lasts for (3.33s -> 2.5s)</li>
+                    <b>Developer's Note:</b> Time stop is really powerful since it can be used to deal so much damage to bosses. might revert this nerf depending on how powerful time stop is afterwards.
+                    
+                    <li>Increased health of bosses on easy and medium difficulty (Easy: 0.75x base -> 1x, medium: 0.75x base health -> 1x)</li>
+                    <b>Developer's Note:</b> Bosses die way to quickly on these difficulties. I'm unsure whether or not these difficulties will become too hard after this but right now the bosses seem to die really quickly.
+                    <li>Increased boss difficulty for the tutorial boss</li>
+                    <b>Developer's Note:</b> gg tutorial's gonna be impossible now. that one Cuphead reviewer game journalist is going to slime me (now the tutorial boss will have the same stats as a boss on easy mode)
+                    <p></p>
+                    <li>Increased damage for Demonlist's rock attacks (Golem: 2 -> 3, Amethyst: 1 -> 2)</li>
+                    <b>Developer's Note:</b> the rock attack has always had no danger at all. This probably wont make the attack too threatening but it at least is something.
+                    
+                    <li>Farmer John's attacks will now disappear after damaging the player 20 times (used to be infinite)</li>
+                    <b>Developer's Note:</b> This should pretty much never affect actual gameplay and was only made so the Shapeshifter character would be more balanced
+                    
+                    <li>Roblox walls will now disappear after 30 seconds (used to be infinite)</li>
+                    <li>Added enemy cap of 50 (only counts enemies that naturally spawned, things like walls or enemies that came from spawners will not contribute to the enemy cap)</li>
+                    <b>Developer's Note:</b> Similarly, these changes should also not affect actual gameplay and were made as an attempt to fix the lag in the Open World Adventure mode.
+                </ul>
+                <p></p>
+                <b>Developer's Note:</b> I feel like the XP system needs to be changed. It was created back when I first started making this game because I couldn't think of any other ways to reward the player with upgrades. I feel like the XP system might as well be a timer in the late game because there's no real way to control how much XP you get. Maybe a shop system is the way to go but then i feel like that's a bit generic but ig this XP system is also generic as well. idk maybe ill change later
+
+            </ul>
+
             <h1>Update 5.0 - October 26, 2026</h1>
             <ul>
                 
                 <li>Added 1 new gamemode: Open World Adventure</li>
                 <li>Added different splash texts that can appear in the intro screen</li>
                 <li>Added Pause screen</li>
-                <b>Developer's Note:</b> You know how sometimes you think a task will be really easy and only take a couple minutes but instead it takes hours to do and you don't even get it done in the end? Yeah so making savestates is too much of a pain maybe ill do that later.
+                <b>Developer's Note:</b> You know how sometimes you think a task will be really easy and will only take a couple minutes but instead it takes hours to do and you don't even get it done in the end? Yeah so making savestates is too much of a pain maybe ill do that later.
                 <li>Added a new category of tier 4 enemies. Currently, there are 2 of them in the game.</li>
                 <b>Developer's Note:</b> I want the later waves to contain less enemy spam and contain more strong and important enemies. These tier 4 enemies will appear starting at wave 6 and should hopefully add some more interesting difficulty to later waves.
 
                 <li>Balance Changes:</li>
                 <ul>
                     <li>Lowered spawn rate for enemies after wave 7</li>
-                    <b>The high spawn rates just make lategame levels spam way too much enemies. Most tier 3 enemies will be buffed to compensate for the lower spawn rate.</b>
+                    <b>Developer's Note:</b> The high spawn rates just make lategame levels spam way too much enemies. Most tier 3 enemies will be buffed to compensate for the lower spawn rate.
                     <li>Increased Furnace Zombie's bullet damage on death (1 -> 2)</li>
                     <li>Increased Furnace zombie's explosion damage (1 per tick -> 2)</li>
                     <b>Developer's Note:</b> Furnace zombie's main gimmick was supposed to be the explosion, but it ended up not doing much and the enemy's 5 collision damage ended up being the main threat. 
