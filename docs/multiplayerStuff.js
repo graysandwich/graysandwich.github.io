@@ -90,6 +90,8 @@ const enemyBulletPaths = [
     "images/blue.webp",
     "images/playerBombExploded.webp",
     "images/questionMark.webp",
+    "images/grayCircle.webp",
+    "images/volcanoRock.webp",
 ];
 let enemyBulletImages = enemyBulletPaths.map(src => {
     let img = new Image();
@@ -152,6 +154,9 @@ const otherImagePaths = {
     calculusEnemySmallClone:"images/calculusEnemySmallClone.webp",
     calculusEnemyBigClone:"images/calculusEnemyBigClone.webp",
     enemyPortal:"images/enemyPortal.webp",
+    volcano:"images/volcano.webp",
+    blizzard:"images/blizzardBackground.webp",
+    tornado:"images/tornado.webp",
 };
 let drawLoopRunning=false;
 let otherImages = Object.fromEntries(
@@ -384,7 +389,7 @@ function multiplayerDraw() {
     }
     if (serverState.players[socket.id]) {
         let player = serverState.players[socket.id]
-        healthBarDesiredLength = (player.health / player.maxHealth) * 400
+        healthBarDesiredLength = (player.health / player.maxHealth) * 405
 
         if (healthBarDesiredLength < healthBarCurrentLength) {
             healthBarCurrentLength -= 8;

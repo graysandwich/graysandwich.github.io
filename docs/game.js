@@ -47,6 +47,12 @@ function Draw() {
     if (player.statusEffects.timeStop > 0) {
         ctx.drawImage(timeWarpBackground, mapBorders.leftBorder-50, mapBorders.topBorder-50, mapBorders.rightBorder -mapBorders.leftBorder+ 100, mapBorders.bottomBorder-mapBorders.topBorder + 100);
     }
+    else if(gameState.chosenDisaster==5 && gameState.nextDisaster>200){
+        ctx.save();
+        ctx.fillStyle="#a3daff";
+        ctx.fillRect(mapBorders.leftBorder-50, mapBorders.topBorder-50, mapBorders.rightBorder-mapBorders.leftBorder+100, mapBorders.bottomBorder-mapBorders.topBorder+100);
+        ctx.restore();
+    }
     else {
         if(mapType==3){
             ctx.fillStyle='white';
@@ -80,9 +86,9 @@ function Draw() {
     }
     let bullets = gameState.bullets || [];
     drawBullets(bullets)
+    drawPlayers([...[player], ...gameState.players]);
     let enemyBullets = gameState.enemyBullets || [];
     drawEnemyBullets(enemyBullets);
-    drawPlayers([...[player], ...gameState.players]);
     
 
     let enemies = gameState.enemies || [];
@@ -167,6 +173,20 @@ function Draw() {
         ctx.fillRect(10, 60, healthBarCurrentLength/2, 30);
     }
     else ctx.fillRect(10, 60, healthBarCurrentLength, 30);
+    let width=400/player.maxHealth;
+    ctx.fillStyle="darkgreen"
+    if(player.maxHealthHalved){
+        width/=2;
+    }
+    for(let i=0;i<Math.floor(healthBarCurrentLength/width);i++){
+        if(i==player.maxHealth-1)continue;
+        
+        ctx.fillRect(10+width+width*i-3, 60, 6, 30);
+    }
+    if(player.maxHealth==player.health && !player.maxHealthHalved){
+        ctx.fillRect(10+width*player.maxHealth-3,60,3,30)
+    }
+        ctx.fillRect(10,60,3,30)
     if (player.statusEffects.invincibility > 0) {
         ctx.fillStyle = "white";
         ctx.strokeStyle = "black";
@@ -244,6 +264,9 @@ function SpawnEnemies() {
                 }
                 const newEnemy = new ENEMYTYPES[i](ENEMYTYPES[i].speed, ENEMYTYPES[i].health);
                 newEnemy.naturallyGenerating=true;
+                if(gamemode==9){
+                    newEnemy.reloadSpeed*=1.5;
+                }
                 if (newEnemy.index == 6) {
                     const shield = new EnemyShield(0, 1000, newEnemy);
                     gameState.enemies.push(shield);
@@ -363,10 +386,10 @@ function Actions() {
                 }
                 gameState.bossesLeft--;
                 if (gameState.bossBars.length == 0 && gameState.isBossWave) {
+                    console.log(gameState.isBossWave+" before");
                     [gameState.isBossWave, gameState.bossesLeft, gameState.currentWave, gameState.SCALE] = ChangeWave(gameState);
+                    console.log(gameState.isBossWave+" after");
                     gameState.timeElapsed = 0;
-
-                    ChangePage("upgradePage", false, player);
                 }
             }
             enemies.splice(i, 1);
@@ -465,7 +488,7 @@ function Actions() {
         }
         xpBagTimer--;
         healthPotionSpawnTimer--;
-        if (gameState.timeElapsed < 7200 || gamemode==8) {
+        if (gameState.timeElapsed < 7200 || gamemode==8 ) {
             gameState.timeElapsed++;
         }
         if (player.health <= 0) {
@@ -495,6 +518,9 @@ function Actions() {
     if (gamemode == 0) {
         TutorialText.Update();
     }
+    if (gamemode==10){
+        checkNaturalDisaster(gameState);
+    }
     if(mapType==3){
         mapBorders.topBorder = player.y-550;
         mapBorders.leftBorder = player.x-1000;
@@ -506,7 +532,14 @@ function drawBullets(bullets){
     for (let i = 0; i < bullets.length; i++) {
         if(typeof window !=="undefined" && bullets[i].isFriendly!=true){
             let object=bullets[i];
-            if(bullets[i].index!=5){
+            if(bullets[i].index==6 || bullets[i].index==3){
+                ctx.strokeStyle = "green";
+                ctx.lineWidth = 10;
+                ctx.beginPath();
+                ctx.arc(object.x, object.y, object.width / 2, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            else if(bullets[i].index!=5){
                 ctx.save();
                 ctx.lineWidth = 10;
                 ctx.strokeStyle = "green";
@@ -1059,7 +1092,7 @@ function drawPlayerInfo(player){
     
     let currentX=45;
     let currentY=175;
-    if(typeof window !== "undefined" && gamemode==5){
+    if(typeof window !== "undefined" && (gamemode==5 || gamemode==10)){
         currentY+=50;
     }
     if (player.index == 5) {
@@ -1069,8 +1102,7 @@ function drawPlayerInfo(player){
         drawPheonixIcon(player.icon, collectableImages[2]);
     }
     for(let id in player.statusEffects){
-        if(player.statusEffects[id]>0){   
-            console.log(id);
+        if(player.statusEffects[id]>0){  
             ctx.fillStyle="#676767";
             ctx.fillRect(currentX-35, currentY-35, 70, 70);
             ctx.drawImage(statusEffectImages[id], currentX - 35, currentY - 35, 70, 70);
@@ -1195,7 +1227,121 @@ function drawPlayers(players){
         }
     }
 }
+function checkNaturalDisaster(gameState){
+    gameState.nextDisaster--;
+    if(gameState.nextDisaster==200){
+        
+        let text=document.getElementById("modifierText");
+        gameState.chosenDisaster=Math.ceil(Math.random()*5);
+        gameState.chosenDisaster=1
+        switch(gameState.chosenDisaster){
+            case 1:
+                text.textContent="WARNING: Hurricane Incoming";
+                break;
+            case 2:
+                text.textContent="WARNING: Volcano Incoming";
+                break;
+            case 3:
+                text.textContent="WARNING: Tornado Incoming";
+                break;
+            case 4:
+                text.textContent="WARNING: Avalanche Incoming";
+                break;
+            case 5:
+                text.textContent="WARNING: Blizzard Incoming";
+                break;
+        }
+    }
+    if(gameState.nextDisaster<=0){
+        gameState.nextDisaster=Math.round(Math.random()*1000+1800);
+        let text=document.getElementById("modifierText");
+        text.textContent="Disaster: ";
+        switch(gameState.chosenDisaster){
+            case 1:
+                let forceX=Math.random();
+                let forceY=Math.random();
+                forceX*=forceX;
+                forceY*=forceY;
+                forceX*=Math.random()<0.5 ? 1:-1;
+                forceY*=Math.random()<0.5 ? 1:-1;
+                forceX=0.1;
+                forceY=0.1;
+                let totalForce=Math.hypot(forceX,forceY);
+                if(totalForce<0.4){
+                    text.textContent+="Weak Hurricane";
+                }
+                else if(totalForce<0.8){
+                    text.textContent+="Moderate Hurricane";
+                }
+                else{
+                    text.textContent+="Severe Hurricane";
+                }
+                gameState.mapObjects.push(new Hurricane(0.05+forceX/10, 0.05+forceY/10, gameState.nextDisaster));
+                break;
+            case 2:
+                let size=Math.random();
+                size*=size;
+                
+                if(size<0.4){
+                    text.textContent+="Weak Volcano";
+                }
+                else if(size<0.7){
+                    text.textContent+="Moderate Volcano";
+                }
+                else{
+                    text.textContent+="Severe Volcano";
+                }
+                gameState.mapObjects.push(new Volcano(0.5+size/2, gameState.nextDisaster));
+                break;
+            case 3:
+                let tornadoSeverity=Math.random();
+                tornadoSeverity*=tornadoSeverity;
+                
+                if(tornadoSeverity<0.4){
+                    text.textContent+="Weak Tornado";
+                }
+                else if(tornadoSeverity<0.7){
+                    text.textContent+="Moderate Tornado";
+                }
+                else{
+                    text.textContent+="Severe Tornado";
+                }
+                gameState.mapObjects.push(new Tornado(0.5+tornadoSeverity/2, gameState.nextDisaster));
+                break;
+            case 4:
+                let avalancheSeverity=Math.random();
+                avalancheSeverity*=avalancheSeverity;
+                
+                if(avalancheSeverity<0.4){
+                    text.textContent+="Weak Avalanche";
+                }
+                else if(avalancheSeverity<0.7){
+                    text.textContent+="Moderate Avalanche";
+                }
+                else{
+                    text.textContent+="Severe Avalanche";
+                }
+                gameState.mapObjects.push(new Avalanche(0.5+avalancheSeverity/2, gameState.nextDisaster));
+                break;
+            case 5:
+                let blizzardSeverity=Math.random();
+                blizzardSeverity*=blizzardSeverity;
+                
+                if(blizzardSeverity<0.4){
+                    text.textContent+="Weak Blizzard";
+                }
+                else if(blizzardSeverity<0.7){
+                    text.textContent+="Moderate Blizzard";
+                }
+                else{
+                    text.textContent+="Severe Blizzard";
+                }
+                gameState.mapObjects.push(new Blizzard(blizzardSeverity, gameState.nextDisaster));
+                break;
 
+        }
+    }
+}
 
 
 async function EndGame(win) {
@@ -1328,13 +1474,13 @@ async function newEnemyText() {
 
     let unlock=true;
     for(let i=0;i<ENEMYTYPES.length;i++){
-        if(ENEMYTYPES[i].discovered==false){
+        if(ENEMYTYPES[i].seen==false){
             unlock=false;
             break;
         }
     }
     for(let i=0;i<BOSSENEMYTYPES.length;i++){
-        if(BOSSENEMYTYPES[i].discovered==false){
+        if(BOSSENEMYTYPES[i].seen==false){
             unlock=false;
             break;
         }

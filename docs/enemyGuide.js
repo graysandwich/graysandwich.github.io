@@ -17,7 +17,7 @@ function ShowEnemy(enemy){
             sourceImage.src="images/shooterEnemy.webp";
             sourceText.innerText="Source: Dream's face reveal"
             abilityText.innerText="Ability: Shoots bullets, alternating between shooting horizontally and vertically.";
-            descriptionText.innerText="In this video game, you try to survive while enemies hunt you down. Can they stop you from beating level 11 or will you win? Also, according to Youtube statistics, only a small percentage of my players are subscribed. So if you enjoy this game, consider subscribing. It's free, and you can always change your mind. Enjoy the game.";
+            descriptionText.innerText="He might seem weak, but don't be fooled. His screenshot mod actually has the capability to manipulate time.";
             break;
         case 3:
             sourceImage.src="images/aimingEnemy.webp";
@@ -83,7 +83,7 @@ function ShowEnemy(enemy){
             sourceImage.src="images/builderEnemy.webp";
             sourceText.innerText="Source: Roblox Bacon Hair default avatar"
             abilityText.innerText="Ability: Spawns walls that block the player from moving past them.";
-            descriptionText.innerText="Is bullying bacon hairs still a thing? What happened to the guest666 stuff? He's still stuck in the past, building stud walls the old-fashioned way. (Now you may proceed to tell me about Roblox memes that existed before I was born and how the examples I listed here are actually not that old)";
+            descriptionText.innerText="noob.";
             break;
         case 14:
             sourceImage.src="images/windupEnemy.webp";
@@ -227,7 +227,7 @@ function ShowEnemy(enemy){
             sourceImage.src="images/alchemistEnemy.webp";
             sourceText.innerText="Source: Alchemist monkey from BTD6"
             abilityText.innerText="Ability: Alternates between throwing health potions and speed potions at other enemies. Potions will damage the player on contact."
-            descriptionText.innerText="Unfortunately, his 4-0-2 upgrade path was too busy being spammed in CHIMPS mode, so he's chosen as a replacement.";
+            descriptionText.innerText="Works a 9-5, 5 days a week as a 5-0-2 Perma Brew in CHIMPS mode. That'll turn anyone crazy.";
             break;
         case 38:
             sourceImage.src="images/calculusEnemy.webp";

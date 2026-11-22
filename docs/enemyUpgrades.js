@@ -48,7 +48,7 @@ function HalveMaxHealth(){
     ChangePage('gamePage', false)
 }
 function SlowPlayer(){
-    player.statusEffects.slowed=10000000;
+    player.statusEffects.slow=10000000;
     document.getElementById("modifierText").textContent="Modifier: Player Always Slowed"
     upgradingEnemy = false;
     ChangePage('gamePage', false)
@@ -60,7 +60,7 @@ function RemoveHealing(){
     ChangePage('gamePage', false)
 }
 function AddConstantDamage(){
-    player.constantDamageAmount=1;
+    player.constantDamageAmount=2;
     document.getElementById("modifierText").textContent="Modifier: Constant Damage"
     upgradingEnemy = false;
     ChangePage('gamePage', false)

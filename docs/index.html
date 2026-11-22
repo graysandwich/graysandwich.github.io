@@ -65,6 +65,7 @@
                     <script src="settings.js" defer></script>
                     <script src="mapObjects.js" defer></script>
                     <script src="game.js" defer></script>
+                    <script src="disasters.js" defer></script>
                     <script src="multiplayerStuff.js" defer></script>
                     
                 </div>
@@ -99,7 +100,8 @@
             <button onclick="SelectMode(0)" style="text-align: center; font-size: 67px; position: absolute; top: 55%; left: 0%; width: 100%; z-index: 1000; margin: 0;">Tutorial</button>
             <button onclick="ChangePage('devlogPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 70%; left:x 0; width: 50%; z-index: 1000; margin: 0;">Update Log</button>
             <button onclick="ChangePage('settingsPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 70%; left: 50%; width: 50%; z-index: 1000; margin: 0;">Settings</button>
-            <button onclick="ChangePage('enemyDescriptionSelectionPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 85%; left: 0; width: 100%; z-index: 1000; margin: 0;">Enemy Guide</button>
+            <button onclick="ChangePage('enemyDescriptionSelectionPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 85%; left: 0; width: 50%; z-index: 1000; margin: 0;">Enemy Guide</button>
+            <button onclick="ChangePage('creditsPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 85%; left:50%; width: 50%; z-index: 1000; margin: 0;">Credits</button>
 
 
         </div>
@@ -133,6 +135,18 @@
             <button onclick="if(gamemode==1)ChangePage('IntroPage', false); else if(gamemode==100)ChangePage('coopPage', false); else ChangePage('gamemodeSelectionPage', false);" style="text-align: center; font-size: 67px; position: relative; top: -410px; left: 80%; width: 15%; z-index: 1000; margin: 0px;">Back</button>
 
         </div>
+        <div id="misprintDifficultyPage" style="display:none">
+            <h1 style="text-align: center; font-size: 67px; position: absolute; top: 5%; left: 0; width: 100%; z-index: 1000; margin: 0;">Choose Your Difficulty</h1>
+            <div style=" font-size: 40px;position:absolute;top:20%;left:0px;width:100%; font-family: black ops one;pointer-events:none">Misprint Craziness Slider</div>
+            <div for="volume"  style=" font-size: 40px;position:absolute;top:30%;left:0px;width:100%; font-family: black ops one;pointer-events:none" id="misprintDisplay">Current: 0.5X-2X</div>
+            <input type="range" id="misprintSlider" name="misprint" min="1.5" max="5" value="3" step="0.1" oninput="SetMisprint(this.value)" style=" font-size: 67px; position:absolute;top:28%;left:0px;width:100%">
+            <button onclick="SetDifficulty(1)" style="text-align: center; font-size: 67px; position: absolute; top: 40%; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Easy</button>
+            <button onclick="SetDifficulty(2)" style="text-align: center; font-size: 67px; position: absolute; top: 55%; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Normal</button>
+            <button onclick="SetDifficulty(3)" style="text-align: center; font-size: 67px; position: absolute; top: 70%; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Hard</button>
+            <button onclick="SetDifficulty(4)" style="text-align: center; font-size: 67px; position: absolute; top: 85%; left: 0px; width: 100%; z-index: 1000; margin: 0px;">Extreme Demon</button>
+            <button onclick="if(gamemode==1)ChangePage('IntroPage', false); else if(gamemode==100)ChangePage('coopPage', false); else ChangePage('gamemodeSelectionPage', false);" style="text-align: center; font-size: 67px; position: absolute; top: 5%; left: 80%; width: 15%; z-index: 1000; margin: 0px;">Back</button>
+
+        </div>
         <div id="gamemodeSelectionPage" style="display:none; position:relative; overflow:auto;height:100vh;">
             <h1 style="text-align: center; font-size: 67px; position: relative; top: 7px; left: 0; width: 100%;z-index: 1000; margin: 0;">Minigames</h1>
             <h1 style="position: absolute  ; text-align:center;top: 25%; height:200px; width:100%; z-index: 1000;"id="gamemodeDescriptionText"></h1>
@@ -146,6 +160,7 @@
                 <button onclick="SelectMode(7)" style="text-align: center; font-size: 67px; position: absolute; top: 125%; left: 0px; height:20%; width: 100%; z-index: 1000; margin: 0px;" id="gamemodeSelectionButton">Misprint Mode</button>
                 <button onclick="SelectMode(8)" style="text-align: center; font-size: 67px; position: absolute; top: 150%; left: 0px; height:20%; width: 100%; z-index: 1000; margin: 0px;" id="gamemodeSelectionButton">Open World Adventure</button>
                 <button onclick="SelectMode(9)" style="text-align: center; font-size: 67px; position: absolute; top: 175%; left: 0px; height:20%; width: 100%; z-index: 1000; margin: 0px;" id="gamemodeSelectionButton">One Shot</button>
+                <button onclick="SelectMode(10)" style="text-align: center; font-size: 67px; position: absolute; top: 200%; left: 0px; height:20%; width: 100%; z-index: 1000; margin: 0px;" id="gamemodeSelectionButton">Natural Disaster Survival</button>
 
             </div>
             <button onclick="ChangePage('IntroPage', false)" style="text-align: center; font-size: 67px; position: absolute; top: 0%; left: 80%; width: 20%; z-index: 1000; margin: 0px;">Back</button>
@@ -165,7 +180,7 @@
             <h1 style="text-align: center; font-size: 67px; position: relative; top: 7px; left: 0; width: 100%; z-index: 1000; margin: 0;">Choose Your Character</h1>
             
             <button onclick="SelectCharacter(1)" style=" font-size:30px; position:absolute; top: 42%; left: 8%; width: 13%; height:28.8%; z-index: 1000;padding:0px" id="basicPlayer"><img src="images/player.webp" style="height:100%;width: 100%; "></img></button>
-            <h1 style="position: absolute  ; text-align:center;top: 32%; left: 8%; width: 13%; height:28.8%; z-index: 1000;">Basic</h1>
+            <h1 style="position: absolute  ; text-align:center;top: 32%; left: 8%; width: 13%; height:32%; z-index: 1000; font-size: 2vw;">Basic</h1>
             <button onclick="SelectCharacter(2)" style=" font-size:30px;position: absolute; top: 42%; left: 32%; width: 13%; height:28.8%; z-index: 1000;padding:0px" id="tankPlayer"><img src="images/tankPlayer.webp" style="height:100%;width: 100%; "id="tankPlayerImage"></img></button>
             <h1 style="position: absolute  ; text-align:center;top: 32%; left: 32%; width: 13%; height:28.8%; z-index: 1000;"id="tankPlayerText">Tank</h1>
             <button onclick="SelectCharacter(3)" style=" font-size:30px;position: absolute; top: 42%; left: 56%; width: 13%; height:28.8%; z-index: 1000;padding:0px" id="healerPlayer"><img src="images/healerPlayer.webp" style="height:100%;width: 100%; "id="healerPlayerImage"></img></button>
@@ -188,7 +203,7 @@
             <h1 style="text-align: center; font-size: 67px; position: relative; top: 7px; left: 0; width: 100%; z-index: 1000; margin: 0;">Choose Your Character</h1>
             
             <button onclick="SelectCharacter(5)" style=" font-size:30px; position:absolute; top: 42%; left: 8%; width: 13%; height:28.8%; z-index: 1000;padding:0px" id="necromancerPlayer"><img src="images/player.webp" style="height:100%;width: 100%; " id="necromancerPlayerImage"></img></button>
-            <h1 style="position: absolute  ; text-align:center;top: 32%; left: 7%; width: 15%; height:28.8%; z-index: 1000;" id="necromancerPlayerText">Necromancer</h1>
+            <h1 style="position: absolute  ; text-align:center;top: 32%; left: 8%; width: 13%; height:28.8%; z-index: 1000;" id="necromancerPlayerText">Necromancer</h1>
             <button onclick="SelectCharacter(6)" style=" font-size:30px; position:absolute; top: 42%; left: 32%; width: 13%; height:28.8%; z-index: 1000;padding:0px" id="pheonixPlayer"><img src="images/player.webp" style="height:100%;width: 100%; " id="pheonixPlayerImage"></img></button>
             <h1 style="position: absolute  ; text-align:center;top: 42%; left: 32%; width: 13%; height:28.8%; z-index: 1000;" id="pheonixPlayerText">Phoenix</h1>
             <button onclick="SelectCharacter(7)" style=" font-size:30px; position:absolute; top: 42%; left: 56%; width: 13%; height:28.8%; z-index: 1000;padding:0px" id="builderPlayer"><img src="images/player.webp" style="height:100%;width: 100%; " id="builderPlayerImage"></img></button>
@@ -342,7 +357,44 @@
             <button onclick="ChangePage('IntroPage', false)" style="position:absolute;text-align: center; font-size: 67px; top: 0px; left: 0; width: 100%; z-index: 1000; margin: 0;">Back</button>
 
             <div class="scrollable-box" style="position: absolute; top: 12%; left: 0px; width: 100%; height: 88%; z-index: 1000; margin: 0px;">
-            <h1>Update 5.1 - October 26, 2026</h1>
+            <h1>Update 4.5 - </h1>
+            <ul>
+                
+                <li>Added Credits button</li>
+                <li>Added slider for Misprint Mode to modify amount of randomness</li>
+                <li>Added 1 new gamemode: Natural Disaster Survival</li>
+                <li>Added segments to the player's healthbar to more clearly show how much health the player has</li>
+                <li>Fixed some image scaling issues with devices with higher resolution</li>
+
+                <li>Balance Changes:</li>
+                <ul>
+                    <li>Changed weighting of the randomization for Misprint Mode</li>
+                    <b>Developer's Note:</b> Originally, the randomness was designed so that the average multiplier that misprint mode would give was 1X. However, this meant that smaller multipliers were much more common than larger ones. The rework makes higher multipliers more likely to appear.
+                    <li>Changed default Randomness for Misprint Mode (0.25X-4X -> 0.33X-3X)</li>
+                    <b>Developer's Note:</b> You can always change it back to the original value if you want. The old 4x multiplier often led to unwinnable runs where the multiplier made unkillable and supersonic enemies.
+                    <li>Decreased enemy spawn rate for the One Shot minigame </li>
+                    <li>Time between attacks for enemies with projectiles in the One Shot minigame will increase by 50%</li>
+                    <b>Developer's Note:</b> One shot should be extremely difficult, not unfair. Right now, if you get a Collatz Conjecture enemy or an Arena Closer enemy then you almost insta lose. This will (hopefully) still make this minigame really hard but not unfair.
+                    <li>Decreased amount of enemies in Boss Rush (Wave 8: 4 -> 3, Wave 10: 5 -> 4, Wave 11: 6 -> 5)</li>
+                    <b>Developer's Note:</b> Boss Rush is a little chaotic right now and can lag towards the end of the game. Combined with the fact that boos HP increases in the later waves, having this many bosses is no longer necessary. The distribution between Tier 1 and Tier 2 bosses have also been altered slightly.
+                    <li>Buffed "Player takes 1 damage every 4 seconds" punishment in Pick Your Poison</li>
+                    <b>Developer's Note:</b> 1 damage every 4 seconds is too light especially considering the player's max health is 2X normal.
+                    <p></p>
+                    <li>Arena Closer's bullets will now have a circular hitbox</li>
+                    <b>Developer's Note:</b> took long enough for that to happen
+                    <li>Increased the amount of time PortalHub's portals last for before disappearing (20s -> 30s)</li>
+                    <li>Decreased PortalHub's time between attacks (4s -> 3.5s)</li>
+                    <b>Developer's Note:</b> This enemy was a lot less threatening than I expected but I also don't want to keep increasing the health of enemies so these are my balance changes
+                    <li>Decreased Calculus enemy's health (35 -> 30)</li>
+                    <li>Decreased Calculus enemy's spawn rate</li>
+                    <b>Developer's Note:</b> Combined with the two enemies that it spawns on death, Calculus had a lot of health and was very hard to deal with without high dps.
+                    <li>Decreased spawn rate for all enemies for waves 8, 9, 10, and 11</li>
+                    <b>Developer's Note:</b> As mentioned in previous updates, I want waves to have less enemy spam and more individually difficult enemies. We now have more difficult enemies so we can reduce the amount of them.
+                
+                </ul>
+
+            </ul>
+            <h1>Update 5.1 - November 9, 2026</h1>
             <ul>
                 <li>Added 23 new upgrades</li>
                 <b>Developer's Note:</b> (22 of the new upgrades are exclusive to the new character, only one of them is universal to all characters)
@@ -837,6 +889,112 @@
             <ul>
                 <li>Added How to Play button</li>
             </ul>
+            </div>
+        </div>
+        <div id="creditsPage" style="display:none; overflow: auto; height:100%; font-size: 18px; top: 10px; left: 0; width: 100%; z-index: 1000; margin: 0px;">
+            <button onclick="ChangePage('IntroPage', false)" style="position:absolute;text-align: center; font-size: 67px; top: 0px; left: 0; width: 100%; z-index: 1000; margin: 0;">Back</button>
+
+            <div class="scrollable-box" style="position: absolute; top: 12%; left: 0px; width: 100%; height: 88%; z-index: 1000; margin: 0px;">
+            <div style="padding:20px">
+                <h1>Inspirations:</h1>
+                <div style="font-size: 30px;">Vampire Survivors, Soul Knight</div>
+                
+                <h1>Image sources:</h1>
+                <div style="font-size: 30px;">
+                    <h2>Games:</h2>
+                    <ul>
+                        <li>Minecraft</li>
+                        <ul>
+                            <li>MCSR Ranked</li>
+                            <li>Hypixel Skyblock</li>
+                        </ul>
+                        <li>Plants vs. Zombies</li>
+                        <ul>
+                            <li>Plants vs. Zombies TD mod</li>
+                        </ul>
+                        <li>Plants vs. Zombies Heroes</li>
+                        <li>Plants vs. Zombies Chinese Edition</li>
+                        <li>Plants vs. Zombies 2</li>
+                        <li>Soul Knight</li>
+                        <li>Bloons Tower Defense 6</li>
+                        <li>Brawl Stars</li>
+                        <li>Clash Royale</li>
+                        <li>Clash of Clans</li>
+                        <li>Balatro</li>
+                        <li>Geometry Dash</li>
+                        <li>Among Us</li>
+                        <li>The Battle Cats</li>
+                        <li>Roblox</li>
+                        <ul>
+                            <li>Natural Disaster Survival game</li>
+                        </ul>
+                        <li>Super Mario Bros.</li>
+                        <li>Diep.io</li>
+                        <li>Slither.io</li>
+                        <li>Luck Be A Landlord</li>
+                        <li>Will You Snail?</li>
+                        <li>Game Inside a Game Inside a Game Inside a</li>
+                        <li>Fruit Ninja</li>
+                    </ul>
+                    <h2>Social Media:</h2>
+                    <ul>
+                        <li>Youtube</li>
+                        <ul>
+                            <li>Pheonix SC's profile picture</li>
+                            <li>PortalHub's profile picture</li>
+                            <li>Skycrab's Minecraft Random Seed Glitchless World Record thumbnail</li>
+                            <li>Battle For Dream Island series</li>
+                            
+                        </ul>
+                        <li>Discord</li>
+                        <ul>
+                            <li>Angry snow pea emote from "Seeds" Discord server</li>
+                            <li>"Heal Midrose" deck from Plants vs. Zombies Heroes Discord server</li>
+                        </ul>
+                    </ul>
+                    <h2>Images from Google:</h2>
+                    <ul>
+                        <li><a href="https://mathsbtc.com/wp-content/uploads/2021/04/website-images.jpg" target="_blank" rel="noopener noreferrer">Collatz Conjecture</a> (Enemy) </li>
+                        <li><a href="https://www.pinterest.com/pin/649433208806601908/" target="_blank" rel="noopener noreferrer">Background</a></li>
+                        <li><a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJgWQ6kgGp5uZAjLNsDIXSRCL2DtrOx7wwV_9vP75maLnPTJ5j" target="_blank" rel="noopener noreferrer">Vacuum Cleaner</a> (Enemy)</li>
+                        <li><a href="https://www.google.com/imgres?q=screensaver%20dvd%20logo&imgurl=https%3A%2F%2Fplay-lh.googleusercontent.com%2Fu4TO2AHHT38_oXzuDg06C1YJW87T0ChR8X3KmdBMQGa7uvE6wUgPluQ7liuvYi9nKFnGNmt5kofCeS1-jSdxMA&imgrefurl=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.stephanwozniak.dvdwallpaper&docid=BD3A_uLV6XPOZM&tbnid=2TLMBtbpZnakqM&vet=12ahUKEwi5xKPfv4aYAxXXETQIHa-7NJUQnPAOegQIPRAA..i&w=512&h=512&hcb=2&ved=2ahUKEwi5xKPfv4aYAxXXETQIHa-7NJUQnPAOegQIPRAA" target="_blank" rel="noopener noreferrer">DVD logo</a> (Bouncing Bullet)</li>
+                        <li><a href="https://preview.redd.it/what-shade-do-you-mean-when-you-say-blue-usually-v0-acowaq1qo9wc1.png?width=626&format=png&auto=webp&s=92bc9c3051ad4ad581b509a4f195db3e6f906731" target="_blank" rel="noopener noreferrer">Blue color (for objects such as Job Application bullets)</a></li>
+                        <li><a href="data:image/png;base64,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" target="_blank" rel="noopener noreferrer">Troll Face</a> (Enemy)</li>
+                        <li><a href="https://static.vecteezy.com/system/resources/previews/060/100/944/non_2x/mcafee-logo-square-rounded-mcafee-logo-mcafee-logo-free-download-free-png.png" target="_blank" rel="noopener noreferrer">McAfee</a> (Boss)</li>
+                        <li><a href="https://media.tenor.com/aLCR52_vKIkAAAAM/lol.gif" target="_blank" rel="noopener noreferrer">Laughing Minion</a> (Enemy)</li>
+                        <li><a href="https://images.squarespace-cdn.com/content/v1/5d43060705978700013b84aa/c4c8b0a9-411b-4445-9705-6bcae9a0784b/Barrons+2.png" target="_blank" rel="noopener noreferrer">Hydrogen</a> (Basic enemy bullet)</li>
+                        <li><a href="https://avatars.githubusercontent.com/u/21228024?v=4" target="_blank" rel="noopener noreferrer">Bessie</a> (Boss)</li>
+                        <li><a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgnwOV5PpX4Ih8s5YCuc0a7oiVAHfILtCK0bZXap3w4PvyrlD_NS2T2h4&s=10" target="_blank" rel="noopener noreferrer">USACO logo</a> (Bessie's bullet sprite)</li>
+                        <li><a href="https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/Mozilla_Firefox_logo_2013.svg/3840px-Mozilla_Firefox_logo_2013.svg.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=thumbnail" target="_blank" rel="noopener noreferrer">Firefox logo</a> (Demonlist's fire attack)</li>
+                        <li><a href="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcTLqsKCb9Oy9xz_zrq_hQbqOTvYcMSHIMsaRmo-8874QsWlc_ex" target="_blank" rel="noopener noreferrer">Dasani Water</a> (Demonlist's water attack)</li>
+                        <li><a href="https://svgsilh.com/svg_v2/847264.svg" target="_blank" rel="noopener noreferrer">Black Rounded Square</a> (a transparent filter is put on it for Buster's forcefield)</li>
+                        <li><a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTeTlbsbAFFYCH4W8JeLrr99hOpRvcViAsNxQOKnSUW0lTUiOGN" target="_blank" rel="noopener noreferrer">Blue Circle</a> (transparent version is used for Job Application's slow radius)</li>
+                        <li><a href="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSb_oW2zu8eChduWgn0TF7BXTrhZLmgA_UK1hRftPqrQWlj7Jvf" target="_blank" rel="noopener noreferrer">Gray Circle</a> (transparent version is used for player's shield)</li>
+                        <li><a href="https://www.publicdomainpictures.net/pictures/310000/velka/red-circle.png" target="_blank" rel="noopener noreferrer">Red Circle </a>(transparent version is used for Fire Tower's damage radius, regular version is used for Shockwave ability)</li>
+                        <li><a href="https://thumb.wikimedia.org/wikipedia/commons/thumb/8/80/Location_dot_darkred.svg/250px-Location_dot_darkred.svg.png?utm_source=sco.wikipedia.org&utm_campaign=index&utm_content=thumbnail" target="_blank" rel="noopener noreferrer">Dark red circle</a> (used for Slither.io body segments)</li>
+                        <li><a href="https://cdn-icons-png.flaticon.com/256/0/14.png" target="_blank" rel="noopener noreferrer">Black Circle</a> (used for Vortex ability)</li>
+                        <li><a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRonwxT3X7Hm6d1-93EqHOGi2rvJgcMJQ6NFr5txu1L8Q&s" target="_blank" rel="noopener noreferrer">Stack Overflow logo</a> (for Edgar's bullets)</li>
+                        <li><a href="https://eforms.com/images/2018/03/Employment-Job-Application-550x712.png" target="_blank" rel="noopener noreferrer">Job Application</a> (Boss)</li>
+                        <li><a href="https://i.ebayimg.com/00/s/MTA2NlgxNjAw/z/EGUAAOSwSWhjxdjA/$_57.JPG?set_id=880000500F" target="_blank" rel="noopener noreferrer">Nvidia</a> (Boss)</li>
+                        <li><a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPzuqYyEbBdqlIrN5LOkNODUgR_pK3rQ4Nig&s" target="_blank" rel="noopener noreferrer">Skull Emoji</a> (Mimic enemy's death image)</li>
+                        <li><a href="https://upload.wikimedia.org/wikipedia/commons/8/8e/Electron_shell_---_Free_electron_-_no_label.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" target="_blank" rel="noopener noreferrer">Electron</a> (Protector Bullets)</li>
+                        <li><a href="https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/Question_mark_alternate.png/500px-Question_mark_alternate.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=thumbnail" target="_blank" rel="noopener noreferrer">Question Mark </a>(for PortalHub's bullets and for undiscovered enemies in Enemy Guide)</li>
+                        <li><a href="https://i.pinimg.com/564x/5e/2c/d3/5e2cd30392e79ca2e9d90f35a735d72e.jpg" target="_blank" rel="noopener noreferrer">Nokia phone</a> (Starr Drop enemy's shield)</li>
+                        <li><a href="https://preview.redd.it/its-official-this-is-dreams-face-during-the-face-reveal-v0-p3wj0q6tphr91.png?auto=webp&s=3ae88d7e98994c181cb538f40ca94784832cef3c" target="_blank" rel="noopener noreferrer">Dream's Face </a>(Enemy)</li>
+                        <li><a href="https://i.redd.it/vtifv1nyxdbg1.jpeg" target="_blank" rel="noopener noreferrer">File Explorer </a>(Enemy)</li>
+                        <li><a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT4yrTv3iNuJWqlUJSoxB6vXSldcKCkOJwqaReDLwYzn_nir10lzVGqX3Q&s=10" target="_blank" rel="noopener noreferrer">Twitter</a> (Enemy)</li>
+                        <li><a href="https://www.desmos.com/calc_thumbs/production/version/5da5f8dcc0/39bd01f0-17df-11f1-b39e-9f2a4c05b4b6.png" target="_blank" rel="noopener noreferrer">Desmos logo</a> (Calculus enemy's bullets)</li>
+                        <li><a href="https://static.thenounproject.com/png/1053750-200.png">Arrow</a>(for Hurricane Background)</li>
+
+                    </ul>
+                    <h2>Images I could not find the source of:</h2>
+                    <ul>
+                        <li>Green circle (used for Database's healing radius)</li>
+                        <li>Spiral (used for Vacuum Cleaner enemy's black holes)</li>
+                    </ul>
+
+                </div>
+            </div>
             </div>
         </div>
     </head>

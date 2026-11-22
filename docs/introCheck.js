@@ -347,3 +347,9 @@ else{
         document.getElementById("splashText").innerText="Congratulations! You have found the 0.1% splash text! Have a cookie 🍪"
     }
 }
+// let num=0;
+//  misprintValue=10;
+// for(let i=0;i<1000;i++){
+//     num+=MisprintRandom();
+// }
+// console.log(num/1000);

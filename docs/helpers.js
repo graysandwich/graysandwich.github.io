@@ -168,7 +168,7 @@ function SaveAndExit(){
 
 
 function MisprintRandom(){
-    return Math.pow(Math.random(),4)*3.75+0.25;
+    return Math.pow(Math.random(),2*Math.log(misprintValue))*(misprintValue-1/misprintValue)+1/misprintValue;
 }
 function RPGScaling(){
     let value=Math.sqrt(Math.abs((player.x-1000)*(player.x-1000))+Math.abs((player.y-550)*(player.y-550)))/6500+1;

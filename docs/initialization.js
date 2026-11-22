@@ -122,7 +122,7 @@ let ENEMYUPGRADES = [
     { onclick: "HalveMaxHealth()", text: "Player Healing and Max Health Both Get Halved" },
     { onclick: "SlowPlayer()", text: "Player is Slowed Until Next Wave" },
     { onclick: "RemoveHealing()", text: "No Healing" },
-    { onclick: "AddConstantDamage()", text: "Player Takes 1 Damage every 4 Seconds" },
+    { onclick: "AddConstantDamage()", text: "Player Takes 2 Damage every 4 Seconds" },
     { onclick: "IncreaseScale(2)", text: "Next Wave has 2x More Enemies" },
 ]
 const RESTRICTEDUPGRADES = [17, 18, 19, 20, 22, 23, 24, 25, 27, 28, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53,54]
@@ -163,6 +163,7 @@ let obtainingCollectable=false;
 let gamemodeUnlocked={"PickYourPoison":false,"BossRush":false,"MisprintMode":false, "OpenWorldAdventure":false, "OneShot":false};
 let gamemodeBeaten=[0,0,0,0,0,0,0,0,0,0,0];
 let gamemodeBeatenCount=0;
+let misprintValue=0;
 //higher number = higher difficulty
 function SetDifficulty(d) {
     difficulty = d;
@@ -289,13 +290,16 @@ function SelectMode(mode) {
                 document.getElementById("gamemodeDescriptionText").innerText = "Waves consist of only bosses. If you don't kill them fast enough, the next wave will spawn."
                 break;
             case 7:
-                document.getElementById("gamemodeDescriptionText").innerText = "All Enemy stats (e.g. health, attack speed) and upgrade values are randomized between x0.25 and x4 when possible (idea from Balatro Cryptid mod)"
+                document.getElementById("gamemodeDescriptionText").innerText = "All Enemy stats (e.g. health, attack speed) and upgrade values are randomized when possible. (idea from Balatro Cryptid mod)"
                 break;
             case 8:
                 document.getElementById("gamemodeDescriptionText").innerText = "The border is removed. Enemies that spawn farther away from the center will have higher stats. Structures will also procedurally generate."
                 break;
             case 9:
                 document.getElementById("gamemodeDescriptionText").innerText = "The player has one health. Enemies and bosses will be weaker. Not recommended if you want to have fun (speaking from experience)."
+                break;
+            case 10:
+                document.getElementById("gamemodeDescriptionText").innerText = "Natural disasters will appear on the map (e.g. tornado, volcano)."
                 break;
         }
         if (mode < 100) gamemodes[mode - 2].style.border = "5px solid red";
@@ -395,6 +399,9 @@ function Start() {
         bossMultiplier: 1,
         waveTimer: 2000,
         strengthPotionSpawnRate:0,
+        misprintValue:0,
+        nextDisaster:300,
+        chosenDisaster:0,
     };
     for(let i=0;i<UPGRADES.length;i++){
         UPGRADES[i]={onclick:originalUpgrades[i].onclick, text:originalUpgrades[i].text, defaultValue:originalUpgrades[i].defaultValue, image:originalUpgrades[i].image};
@@ -517,7 +524,7 @@ function Start() {
             mapType = 1;
             player.health *= 2;
             player.maxHealth *= 2;
-            new ModifierText();
+            new ModifierText("Modifier: None");
             break;
         case 6:
             mapType = 1;
@@ -550,7 +557,11 @@ function Start() {
             player.maxHealth=1;
             gameState.bossMultiplier*=0.5
             enemyHealthMultiplier=0.75;
-            gameState.scaleMultiplier*=0.75;
+            gameState.scaleMultiplier*=0.5;
+            break;
+        case 10:
+            mapType=1;
+            new ModifierText("Disaster: None");
             break;
     }
     if (mapType == 1) {
@@ -600,6 +611,7 @@ function Start() {
         RandomizeEnemies(2, 0, 0, 0, 0, 0, gameState);
     }
     //ctx.clearRect(0, 0, 2000, 1100);
+    
     currentPage = "gamePage";
 
 }
@@ -840,6 +852,15 @@ function SpawnStructures(){
 
 
 
+
+
+
+
+
+
+
+
+
 }
 if (typeof window !== "undefined") {
     window.addEventListener("beforeunload", (e) => {
@@ -955,6 +976,21 @@ if (typeof window !== "undefined") {
 
     });
 }
+function SetMisprint(value){
+    misprintValue=value;
+    let text="Current: ";
+    text+=Math.round(1/misprintValue*100)/100;
+    text+="X-";
+    text+=Math.round(misprintValue*10)/10;
+    text+="X"
+    document.getElementById("misprintDisplay").innerText=text;
+}
+
+
+
+
+
+
 
 
 
@@ -1686,6 +1722,9 @@ function GiveAbility(amount, player){
         }
     }
     temp.shootTimer=temp.reloadSpeed;
+    if(count==0){
+        temp.shootTimer/=2;
+    }
     player.inheritedEnemies.push(temp);
     if(amount==8){
         player.boughtUpgrades[44]=1;

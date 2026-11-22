@@ -1220,23 +1220,23 @@ class WaveText {
     }
 }
 class ModifierText {
-    constructor(size) {
-        this.size = size;
+    constructor(defaultText) {
+        this.size = 50;
         this.text = document.createElement("div");
         this.text.style.position = "absolute";
-        this.text.style.left = "210px";
-        this.text.style.top = "170px";
+        this.text.style.left = "15.5%";
+        this.text.style.top = "23%";
         this.text.style.zIndex = "2";
         this.text.style.transform = "translate(-50%, -50%)";
         this.text.style.pointerEvents = "none";
-        this.text.style.fontSize = "30px";
+        this.text.style.fontSize = "2vw";
         this.text.style.whiteSpace = "nowrap";
         this.text.style.color = "black";
-        this.text.style.width = "400px";
+        this.text.style.width = "30%";
         this.text.style.textAlign = "left";
         this.text.style.fontFamily = "Black ops one";
         this.text.id = "modifierText";
-        this.text.textContent = `Modifier: None`;
+        this.text.textContent = defaultText;
         document.body.appendChild(this.text);
 
 
@@ -1603,7 +1603,7 @@ class Player {
         if (this.constantDamageTimer <= 0 && this.constantDamageAmount > 0) {
             this.constantDamageTimer = 240;
 
-            this.takeDamage(this.constantDamageAmount, new EnemyBullet(0,0,1,0,0), floatingObjects);
+            this.takeDamage(this.constantDamageAmount, new EnemyBullet(0,0,1,0,0), gameState);
         }
         if(this.regenerationTimer<=0 && this.statusEffects.regeneration>0){
             this.regenerationTimer=20;
@@ -3713,8 +3713,10 @@ class WindupEnemy extends Enemy {
         this.value = 150;
         this.orb;
         this.index = 13;
+        this.reloadSpeed=800;
         if(typeof window !== "undefined" && gamemode==7){
             this.reloadSpeed*=MisprintRandom();
+        
         }
         //console.log(this.shootTimer);
     }
@@ -3741,7 +3743,7 @@ class WindupEnemy extends Enemy {
         }
         if (this.shootTimer <= 0 && this.chargeTimer < 0 && this.accelerationX < 0.1 && this.accelerationY < 0.1) {
 
-            this.shootTimer = 800;
+            this.shootTimer = this.reloadSpeed;
             if (players.length == 0) return;
             let player = FindClosestPlayer(this.x, this.y, players);
             let distanceX = player.x - this.x;
@@ -3758,7 +3760,7 @@ class WindupEnemy extends Enemy {
             this.orb = new ChargingOrb(this.x, this.y, vx, vy, vx * 20, vy * 20)
             enemyBullets.push(this.orb)
         }
-        if(this.shootTimer>200){
+        if(this.shootTimer>200 && this.orb){
             this.orb.x=this.x+this.orb.offsetX
             this.orb.y=this.y+this.orb.offsetY;
         }
@@ -3836,7 +3838,7 @@ class SpawnerEnemy extends Enemy {
             }
         }
 
-        if (!this.releasing) super.move(players, floatingObjects, enemies);
+        if (!this.releasing) super.move(players, gameState, enemies);
     }
     timer(enemies) {
         if (this.slowCountdown > 0) {
@@ -4103,6 +4105,7 @@ class MachineGunEnemy extends Enemy {
             temp.width = 40;
             temp.height = 40;
             temp.index = 8;
+            temp.hitboxType="circle";
             enemyBullets.push(temp);
         }
     }
@@ -4144,7 +4147,6 @@ class SmokeBombEnemy extends Enemy {
         // this.smoke.src = "images/smoke.webp";
         this.smokeWidth = 75;
         this.smokeHeight = 75;
-        this.health = health;
         this.iFrame = 0;
         this.value = 150;
         this.index = 17;
@@ -4755,7 +4757,7 @@ class PortalEnemy extends Enemy {
         super(speed, health);
         this.index = 26;
         this.value=250;
-        this.reloadSpeed=240;
+        this.reloadSpeed=210;
         this.shootTimer=100;
         this.width=100;
         this.height=100;
@@ -4797,19 +4799,6 @@ class PortalEnemy extends Enemy {
     special(enemyBullets, players, enemies, bullets, floatingObjects) {
         this.timer(enemyBullets,players);
     }
-    takeDamage(bullet, owner, gameState){
-        super.takeDamage(bullet, owner, gameState);
-        if(this.dead){
-            let temp=new CalculusEnemySmallClone(1.5,10);
-            let temp2=new CalculusEnemyBigClone(1.5, 15);
-            temp.x=this.x;
-            temp.y=this.y;
-            temp2.x=this.x;
-            temp2.y=this.y;
-            gameState.enemies.push(temp);
-            gameState.enemies.push(temp2);
-        }
-    }
 }
 class EnemyPortal{
     constructor(x, y) {
@@ -4820,7 +4809,7 @@ class EnemyPortal{
         this.width = 75;
         this.height = 75;
         this.index = 1000;
-        this.surviveTimer=1200;
+        this.surviveTimer=1800;
         if(typeof window !== "undefined" && gamemode==7){
             this.surviveTimer*=MisprintRandom();
         }
@@ -5895,6 +5884,23 @@ class GambleBoss extends Boss {
                     this.currentGamble = 3
                 }
                 else if (randomNum <= 90) {
+                    this.currentGamble = 4
+                }
+                else {
+                    this.currentGamble = 5;
+                }
+                break;
+            default:
+                if (randomNum <= 50) {
+                    this.currentGamble = 1
+                }
+                else if (randomNum <= 75) {
+                    this.currentGamble = 2
+                }
+                else if (randomNum <= 90) {
+                    this.currentGamble = 3
+                }
+                else if (randomNum <= 97) {
                     this.currentGamble = 4
                 }
                 else {
@@ -7172,6 +7178,8 @@ class EnemyBullet {
         this.slowed=false;
         this.slowCountdown=0;
         this.index = 0;
+        this.hitboxType="square";
+        this.despawnDist=500;
     }
     move(players, gameState) {
         this.slowCountdown--;
@@ -7185,17 +7193,26 @@ class EnemyBullet {
         }
         for (let id = 0; id < players.length; id++) {
             let player = players[id];
-            const dx = (this.x + 5) - (player.x + 5);
-            const dy = (this.y + 5) - (player.y + 5);
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            if (distance < (player.width / 2 - 10) + this.width / 2 && player.ignoreBullets==false) {
-                player.takeDamage(this.damage, this, gameState);
-                this.dead = true;
-                if(player.isPlayer || player.canSiphon==true)this.hitPlayer = true;
+            if(this.hitboxType=="square"){
+                const dx = (this.x + 5) - (player.x + 5);
+                const dy = (this.y + 5) - (player.y + 5);
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < (player.width / 2 - 10) + this.width / 2 && player.ignoreBullets==false) {
+                    player.takeDamage(this.damage, this, gameState);
+                    this.dead = true;
+                    if(player.isPlayer || player.canSiphon==true)this.hitPlayer = true;
+                }
             }
-            if (this.x < mapBorders.leftBorder - 500 || this.y < mapBorders.topBorder - 500 || this.x > mapBorders.rightBorder + 500 || this.y >= mapBorders.bottomBorder + 500) {
-                this.dead = true;
+            else{
+                if(RectCircleColliding(this, player, this.width/2-5, this.x, this.y)){
+                    player.takeDamage(this.damage, this, gameState);
+                    this.dead = true;
+                    if(player.isPlayer || player.canSiphon==true)this.hitPlayer = true;
+                }
             }
+        }
+        if (this.x < mapBorders.leftBorder - this.despawnDist || this.y < mapBorders.topBorder - this.despawnDist || this.x > mapBorders.rightBorder + this.despawnDist || this.y >= mapBorders.bottomBorder + this.despawnDist) {
+            this.dead = true;
         }
     }
     draw() {
@@ -8644,6 +8661,7 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier4, numTier1Boss, 
     tier4 = shuffle(tier4);
     tier1Bosses = shuffle(tier1Bosses);
     tier2Bosses = shuffle(tier2Bosses);
+    //tier1Bosses[0]=3;
     if(typeof window !=="undefined" && gamemode==8)tier2Bosses[0]=5;
     DisableAllEnemies();
     for (let i = 0; i < numTier1; i++) {
@@ -8879,11 +8897,16 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier4, numTier1Boss, 
         }
     }
     let spawnedBossCount=0;
+    // boss = new BouncyBoss(5, 120, true, bossBars, bossMultiplier);
+    // enemies[enemies.length] = boss;
+    // 
+    //player.boltCount=100;
     for (let i = 0; i < numTier1Boss; i++) {
         let boss=null;
         if(i==tier1Bosses.length-1){
             gameState.seenTier1Bosses=[];
             for (let j = 0; j < originalTier1BossCount-spawnedBossCount; j++) {
+                
                 switch (tier1Bosses[j]) {
                     case 1:
                         boss=new LaserBoss(1, 120, bossBars, bossMultiplier);
@@ -9149,7 +9172,8 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier4, numTier1Boss, 
             boss.speed*=MisprintRandom();
         }
     }
-    //PortalEnemy.isActive=true;
+    // SmokeBombEnemy.isActive=true;
+    // enemies.push(new GambleBoss(1.5,175,bossBars,bossMultiplier))
     //SelfDestructEnemy.isActive=true;
 
 }
@@ -9310,10 +9334,10 @@ function InitializeStats() {
     AlchemistEnemy.health = 35;
     AlchemistEnemy.speed = 1.5;
     
-    CalculusEnemy.baseTimer = 1100;
-    CalculusEnemy.randomTimer = 1000;
+    CalculusEnemy.baseTimer = 1250;
+    CalculusEnemy.randomTimer = 1250;
     CalculusEnemy.index = 25;
-    CalculusEnemy.health = 35;
+    CalculusEnemy.health = 30;
     CalculusEnemy.speed = 1.5;
     
     PortalEnemy.baseTimer = 1300;
@@ -9366,11 +9390,13 @@ function InitializeStats() {
 
 }
 function ChangePage(id, reset, player) {
-    console.log(id)
     if (continueFlag) return;
     if (id == "upgradePage" && isLevelling) return;
     if ((gameOver && id == "upgradePage")) {
         return;
+    }
+    if(id=="difficultyPage" && gamemode==7){
+        id="misprintDifficultyPage";
     }
     currentPage = id;
     list = document.querySelectorAll('div[id$="Page"]');
@@ -9408,22 +9434,22 @@ function ChangePage(id, reset, player) {
             tankPlayerButton.style.pointerEvents = "none";
             tankPlayerImage.src = "images/black.webp";
             tankPlayerText.textContent = "Clear wave 3 in any difficulty to unlock";
-            tankPlayerText.style.fontSize = "20px";
-            tankPlayerText.style.top = "200px";
+            tankPlayerText.style.fontSize = "1.5vw";
+            tankPlayerText.style.top = "27%";
         }
         else if(gamemode==9){
             tankPlayerButton.style.pointerEvents = "none";
             tankPlayerImage.src = "images/black.webp";
             tankPlayerText.textContent = "BANNED";
-            tankPlayerText.style.fontSize = "30px";
-            tankPlayerText.style.top = "225px";
+            tankPlayerText.style.fontSize = "2vw";
+            tankPlayerText.style.top = "32%";
         }
         else {
             tankPlayerButton.style.pointerEvents = "auto";
             tankPlayerImage.src = "images/tankPlayer.webp";
             tankPlayerText.textContent = "Tank";
-            tankPlayerText.style.fontSize = "30px";
-            tankPlayerText.style.top = "225px";
+            tankPlayerText.style.fontSize = "2vw";
+            tankPlayerText.style.top = "32%";
         }
         let healerPlayerButton = document.getElementById("healerPlayer");
         let healerPlayerImage = document.getElementById("healerPlayerImage");
@@ -9432,15 +9458,15 @@ function ChangePage(id, reset, player) {
             healerPlayerButton.style.pointerEvents = "none";
             healerPlayerImage.src = "images/black.webp";
             healerPlayerText.textContent = "Clear wave 5 in any difficulty to unlock";
-            healerPlayerText.style.fontSize = "20px";
-            healerPlayerText.style.top = "200px";
+            healerPlayerText.style.fontSize = "1.5vw";
+            healerPlayerText.style.top = "27%";
         }
         else {
             healerPlayerButton.style.pointerEvents = "auto";
             healerPlayerImage.src = "images/healerPlayer.webp";
             healerPlayerText.textContent = "Healer";
-            healerPlayerText.style.fontSize = "30px";
-            healerPlayerText.style.top = "225px";
+            healerPlayerText.style.fontSize = "2vw";
+            healerPlayerText.style.top = "32%";
         }
         let magePlayerButton = document.getElementById("magePlayer");
         let magePlayerImage = document.getElementById("magePlayerImage");
@@ -9449,15 +9475,15 @@ function ChangePage(id, reset, player) {
             magePlayerButton.style.pointerEvents = "none";
             magePlayerImage.src = "images/black.webp";
             magePlayerText.textContent = "Defeat The Demonlist boss to unlock";
-            magePlayerText.style.fontSize = "20px";
-            magePlayerText.style.top = "200px";
+            magePlayerText.style.fontSize = "1.5vw";
+            magePlayerText.style.top = "27%";
         }
         else {
             magePlayerButton.style.pointerEvents = "auto";
             magePlayerImage.src = "images/magePlayer.webp";
             magePlayerText.textContent = "Mage";
-            magePlayerText.style.fontSize = "30px";
-            magePlayerText.style.top = "225px";
+            magePlayerText.style.fontSize = "2vw";
+            magePlayerText.style.top = "32%";
         }
     }
     else if (id == "characterSelection2Page") {
@@ -9471,19 +9497,19 @@ function ChangePage(id, reset, player) {
         let necromancyPlayerButton = document.getElementById("necromancerPlayer");
         let necromancyPlayerImage = document.getElementById("necromancerPlayerImage");
         let necromancyPlayerText = document.getElementById("necromancerPlayerText");
-        if (NecromancerPlayer.unlocked == false) {
+        if (NecromancerPlayer.unlocked==false) {
             necromancyPlayerButton.style.pointerEvents = "none";
             necromancyPlayerImage.src = "images/black.webp";
             necromancyPlayerText.textContent = "Beat wave 7 in Medium, Hard, or Extreme Demon difficulty to unlock";
-            necromancyPlayerText.style.fontSize = "20px";
-            necromancyPlayerText.style.top = "150px";
+            necromancyPlayerText.style.fontSize = "1.4vw";
+            necromancyPlayerText.style.top = "20%";
         }
         else {
             necromancyPlayerButton.style.pointerEvents = "auto";
             necromancyPlayerImage.src = "images/necromancerPlayer.webp";
             necromancyPlayerText.textContent = "Necromancer";
-            necromancyPlayerText.style.fontSize = "30px";
-            necromancyPlayerText.style.top = "225px";
+            necromancyPlayerText.style.fontSize = "1.75vw";
+            necromancyPlayerText.style.top = "32%";
         }
         let pheonixPlayerButton = document.getElementById("pheonixPlayer");
         let pheonixPlayerImage = document.getElementById("pheonixPlayerImage");
@@ -9492,22 +9518,22 @@ function ChangePage(id, reset, player) {
             pheonixPlayerButton.style.pointerEvents = "none";
             pheonixPlayerImage.src = "images/black.webp";
             pheonixPlayerText.textContent = "Beat wave 9 in Medium, Hard, or Extreme Demon difficulty to unlock";
-            pheonixPlayerText.style.fontSize = "20px";
-            pheonixPlayerText.style.top = "150px";
+            pheonixPlayerText.style.fontSize = "1.4vw";
+            pheonixPlayerText.style.top = "20%";
         }
         else if(gamemode==9){
             pheonixPlayerButton.style.pointerEvents = "none";
             pheonixPlayerImage.src = "images/black.webp";
             pheonixPlayerText.textContent = "BANNED";
-            pheonixPlayerText.style.fontSize = "30px";
-            pheonixPlayerText.style.top = "225px";
+            pheonixPlayerText.style.fontSize = "2vw";
+            pheonixPlayerText.style.top = "32%";
         }
         else {
             pheonixPlayerButton.style.pointerEvents = "auto";
             pheonixPlayerImage.src = "images/pheonixPlayer.webp";
             pheonixPlayerText.textContent = "Phoenix";
-            pheonixPlayerText.style.fontSize = "30px";
-            pheonixPlayerText.style.top = "225px";
+            pheonixPlayerText.style.fontSize = "2vw";
+            pheonixPlayerText.style.top = "32%";
         }
 
         let builderPlayerButton = document.getElementById("builderPlayer");
@@ -9517,25 +9543,25 @@ function ChangePage(id, reset, player) {
             builderPlayerButton.style.pointerEvents = "none";
             builderPlayerImage.src = "images/black.webp";
             builderPlayerText.textContent = "Beat the game in Medium, Hard, or Extreme Demon difficulty to unlock";
-            builderPlayerText.style.fontSize = "20px";
-            builderPlayerText.style.top = "150px";
+            builderPlayerText.style.fontSize = "1.4vw";
+            builderPlayerText.style.top = "20%";
         }
         else {
             builderPlayerButton.style.pointerEvents = "auto";
             builderPlayerImage.src = "images/builderPlayer.webp";
             builderPlayerText.textContent = "Mechanic";
-            builderPlayerText.style.fontSize = "30px";
-            builderPlayerText.style.top = "225px";
+            builderPlayerText.style.fontSize = "2vw";
+            builderPlayerText.style.top = "32%";
         }
         let base="shapeshifterPlayer";
         let button = document.getElementById(base);
         let image = document.getElementById(base+"Image");
         let text = document.getElementById(base+"Text");
         if(ShapeshifterPlayer.unlocked==false){
-            SetCharacterInfo(button, image, text, "none", "images/black.webp", "Discover every enemy to unlock", "20px", "225px");
+            SetCharacterInfo(button, image, text, "none", "images/black.webp", "Discover every enemy to unlock", "1.5vw", "25%");
         }
         else{
-            SetCharacterInfo(button, image, text, "auto", "images/shapeshifterPlayer.webp", "Spy", "30px", "225px");
+            SetCharacterInfo(button, image, text, "auto", "images/shapeshifterPlayer.webp", "Spy", "2vw", "32%");
         }
     }
     else if (id == "gamemodeSelectionPage") {
@@ -10006,9 +10032,6 @@ function ChangeWave(gameState) {
     gameState.waveText.Update(gameState.currentWave);
     let isBossWave = false;
     let bossesLeft = 0;
-    let enemies = gameState.enemies;
-    let bossBars = gameState.bossBars;
-    let bossMultiplier = gameState.bossMultiplier;
     if(typeof window!=="undefined" && gamemode==3){
         gameState.mapObjects = [
             new Wall(-55, -55, 2110, 30),
@@ -10096,7 +10119,7 @@ function ChangeWave(gameState) {
                 RandomizeEnemies(2, 2, 2, 1, 1, 0, gameState);
                 bossesLeft = 1;
                 isBossWave = true;
-                SCALE = 0.0005;
+                SCALE = 0.0004;
                 if (typeof window !== "undefined" && difficulty > 1 && NecromancerPlayer.unlocked == false) {
                     NecromancerPlayer.unlocked = true;
                     // newEnemyQueue.push("images/necromancerPlayer.webp");
@@ -10107,13 +10130,13 @@ function ChangeWave(gameState) {
                 RandomizeEnemies(1, 2, 3, 1, 0, 1, gameState);
                 bossesLeft = 1;
                 isBossWave = true;
-                SCALE = 0.0005;
+                SCALE = 0.0004;
                 break;
             case 10:
                 RandomizeEnemies(1, 2, 1, 1, 2, 0, gameState);
                 bossesLeft = 2;
                 isBossWave = true;
-                SCALE = 0.0005;
+                SCALE = 0.0004;
                 if (typeof window !== "undefined" && difficulty > 1 && PheonixPlayer.unlocked == false) {
                     PheonixPlayer.unlocked = true;
                     // newEnemyQueue.push("images/pheonixPlayer.webp");
@@ -10124,7 +10147,7 @@ function ChangeWave(gameState) {
                 RandomizeEnemies(2, 2, 2, 1, 1, 1, gameState);
                 bossesLeft = 2;
                 isBossWave = true;
-                SCALE = 0.0005;
+                SCALE = 0.0004;
                 break;
             case 12:
                 if (typeof window !== "undefined") EndGame(true);
@@ -10154,23 +10177,23 @@ function ChangeWave(gameState) {
                 bossesLeft = 3;
                 break;
             case 7:
-                RandomizeEnemies(0, 0, 0, 0, 0, 3, gameState);
+                RandomizeEnemies(0, 0, 0, 0, 1, 2, gameState);
                 bossesLeft = 3;
                 break;
             case 8:
-                RandomizeEnemies(0, 0, 0, 0, 3, 1, gameState);
+                RandomizeEnemies(0, 0, 0, 0, 0, 3, gameState);
                 bossesLeft = 4;
                 break;
             case 9:
-                RandomizeEnemies(0, 0, 0, 0, 1, 3, gameState);
+                RandomizeEnemies(0, 0, 0, 0, 3, 1, gameState);
                 bossesLeft = 4;
                 break;
             case 10:
-                RandomizeEnemies(0, 0, 0, 0, 3, 2, gameState);
+                RandomizeEnemies(0, 0, 0, 0, 1, 3, gameState);
                 bossesLeft = 5;
                 break;
             case 11:
-                RandomizeEnemies(0, 0, 0, 0, 3, 3, gameState);
+                RandomizeEnemies(0, 0, 0, 0, 2, 3, gameState);
                 bossesLeft = 6;
                 break;
             case 12:
