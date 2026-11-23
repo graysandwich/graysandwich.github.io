@@ -505,7 +505,7 @@ class RPGSpawner extends Enemy{
             (player.y - player.height / 2) < (this.y + this.height / 2) &&
             (player.y + player.height / 2) > (this.y - this.height / 2) && this.iFrame <= 0
         ) {
-            player.takeDamage(2, this, floatingObjects);
+            player.takeDamage(2, this, gameState);
             if (this.x > player.x) {
                 player.AddForce(-10, 0);
             }
