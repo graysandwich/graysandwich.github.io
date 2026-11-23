@@ -4871,6 +4871,95 @@ class EnemyPortal{
 
     }
 }
+class JumpingEnemy extends Enemy {
+    //Idea: shoots portals
+    constructor(speed, health) {
+        super(speed, health);
+        this.index = 26;
+        this.value=250;
+        this.reloadSpeed=300;
+        this.shootTimer=100;
+        this.width=100;
+        this.height=100;
+     
+        this.doesKnockback=true;
+        
+        if(typeof window !== "undefined" && gamemode==7){
+            this.reloadSpeed*=MisprintRandom();
+        }
+        this.isJumping=false;
+        this.storedVX=0;
+        this.storedVY=0;
+        this.playerLastFrame=[0,0];
+        this.isTargeting=false;
+        this.chargingTimer=0;
+        //console.log(this.shootTimer);
+    }
+    timer(enemyBullets,players){
+        this.chargingTimer--;
+        if(this.slowCountdown>0){
+            this.shootTimer-=0.5;
+        }
+        else{
+            this.shootTimer--;
+        }
+        if(this.shootTimer<=0 && this.isTargeting==false){
+            this.isTargeting=true;
+            if (players.length == 0) return;
+            let player = FindClosestPlayer(this.x, this.y, players);
+            this.playerLastFrame=[player.x, player.y];
+        }
+        else if(this.shootTimer<=0 && this.isTargeting==true){
+            this.shootTimer=this.reloadSpeed;
+            this.isTargeting=false;        
+            let playerSpeed=[player.x-this.playerLastFrame[0], player.y-this.playerLastFrame[1]];
+            let playerNextX=player.x+=playerSpeed[0]*60;
+            let playerNextY=player.y+=playerSpeed[1]*60;
+            let distanceX = playerNextX - this.x;
+            let distanceY = playerNextY - this.y;
+            let distance = distanceX * distanceX + distanceY * distanceY;
+            let vx = 0;
+            let vy = 0;
+
+            if (distance > 0) {
+                let angle = Math.atan2(distanceY, distanceX);
+                if(distance<9.9*60){
+                    vx=distanceX/60;
+                    vy=distanceY/60;
+                }
+                else{
+                    vx = 7 * Math.cos(angle);
+                    vy = 7 * Math.sin(angle);
+                }
+            }
+            this.storedVX=vx;
+            this.storedVY=vy;
+            this.chargingTimer=60;
+            
+
+        }
+    }
+    move(players, floatingObjects, enemies){
+        if(this.chargingTimer>0){
+            super.move(players, floatingObjects, enemies);           
+        }
+        else{
+            this.x+=this.storedVX;
+            this.y+=this.storedVY;   
+            if(this.chargingTimer>30){
+                this.width+=2;
+                this.height+=2;
+            }     
+            else{
+                this.width-=2;
+                this.height-=2;
+            }
+        }
+    }
+    special(enemyBullets, players, enemies, bullets, floatingObjects) {
+        this.timer(enemyBullets,players);
+    }
+}
 
 function drawMachineGunEnemy(enemy, image, angle, showHealthBars) {
     if (enemy.dead) return;
@@ -8887,6 +8976,32 @@ function RandomizeEnemies(numTier1, numTier2, numTier3, numTier4, numTier1Boss, 
                 }
                 break;
             case 3:
+                if (typeof window !== "undefined" && !ForcefieldEnemy.seen) {
+                    ForcefieldEnemy.seen = true;
+                    newEnemyQueue.push("images/forcefieldEnemy.webp");
+                    isPlayerUnlocked.push(false);
+                }
+                break;
+        }
+    }
+    for (let i = 0; i < numTier4; i++) {
+        switch (tier4[i]) {
+            case 1:
+                AlchemistEnemy.isActive = true;
+                if (typeof window !== "undefined" && !AlchemistEnemy.seen) {
+                    AlchemistEnemy.seen = true;
+                    newEnemyQueue.push("images/alchemistEnemy.webp");
+                    isPlayerUnlocked.push(false);
+                }
+                break;
+            case 2:
+                CalculusEnemy.isActive = true;
+                if (typeof window !== "undefined" && !CalculusEnemy.seen) {
+                    CalculusEnemy.seen = true;
+                    newEnemyQueue.push("images/calculusEnemy.webp");
+                    isPlayerUnlocked.push(false);
+                }
+                break;
                 PortalEnemy.isActive = true;
                 if (typeof window !== "undefined" && !PortalEnemy.seen) {
                     PortalEnemy.seen = true;
