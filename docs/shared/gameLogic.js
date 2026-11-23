@@ -8544,7 +8544,7 @@ class LavaTerrain{
         {
             if(LavaTerrain.iFrame<=0){
                 LavaTerrain.iFrame=60;
-                player.takeDamage(this.damage,this, gameState.floatingObjects);
+                player.takeDamage(this.damage,this, gameState);
 
             }
             
